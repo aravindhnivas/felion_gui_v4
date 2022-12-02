@@ -1,9 +1,9 @@
 <script>
-    // import { SvelteToast } from '@zerodevx/svelte-toast'
+    import { SvelteToast } from '@zerodevx/svelte-toast'
     import Navbar from '$src/layout/main//Navbar.svelte'
     import Footer from '$src/layout/main/Footer.svelte'
-    // import PreModal from '$components/PreModal.svelte'
-    // import ConfirmAlert from '$components/alert/ConfirmAlert.svelte'
+    import PreModal from '$src/lib/notifier/PreModal.svelte'
+    import ConfirmAlert from '$src/lib/alert/ConfirmAlert.svelte'
     import Home from './Pages/Home.svelte'
     // import Powerfile from './Pages/Powerfile.svelte'
     // import Normline from './Pages/Normline.svelte'
@@ -31,10 +31,10 @@
     if (import.meta.env.MODE === 'development') {
         navItems.push('Test')
     }
-    //   const toastOpts = { reversed: true, intro: { y: 100 } };
+    const toastOpts = { reversed: true, intro: { y: 100 } }
 </script>
 
-<!-- <PreModal />
+<PreModal />
 <div class="toast_container">
     <SvelteToast options={toastOpts} />
     <div id="leftToaster">
@@ -44,7 +44,7 @@
         <SvelteToast target="left" options={{ intro: { y: 100 } }} />
     </div>
 </div>
-<ConfirmAlert /> -->
+<ConfirmAlert />
 
 <div class="layout">
     <Navbar {navItems} />
