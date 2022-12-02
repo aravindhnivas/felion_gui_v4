@@ -3,7 +3,7 @@ import { writable } from 'svelte/store'
 import { toast } from '@zerodevx/svelte-toast'
 import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
 import bulmaQuickview from 'bulma-extensions/bulma-quickview/src/js/index.js'
-// import './chrome-tabs'
+import { tempdir } from '@tauri-apps/api/os'
 export const activateChangelog = writable(false)
 export const windowLoaded = writable(false)
 export const updateAvailable = writable(false)
@@ -56,6 +56,8 @@ export const handleError = (error: unknown) => {
     }
 }
 
+window.tempdirPath = await tempdir()
+// console.warn('tempdirPath', tempdirPath)
 window.createToast = createToast
 window.handleError = handleError
 

@@ -4,7 +4,7 @@
     "beforeBuildCommand": "npm run build",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
-    "withGlobalTauri": false
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "felion_gui_v4",
@@ -12,7 +12,14 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "fs": {
+        "scope": [
+          "$TEMP",
+          "$APPLOG",
+          "D:/*"
+        ]
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +36,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.felion.app",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

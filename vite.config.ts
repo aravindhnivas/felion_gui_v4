@@ -9,7 +9,7 @@ export default defineConfig({
     plugins: [
         svelte(),
         AutoImport({
-            imports: ['svelte', 'svelte/store', 'svelte/transition'],
+            imports: ['svelte', 'svelte/store', 'svelte/transition', { 'ts-try': ['tryF', 'isError'] }],
             dts: './src/auto-imports.d.ts',
         }),
     ],

@@ -7,26 +7,27 @@
     import Home from './Pages/Home.svelte'
     // import Powerfile from './Pages/Powerfile.svelte'
     // import Normline from './Pages/Normline.svelte'
-    // import Masspec from './Pages/Masspec.svelte'
+    import Masspec from './Pages/Masspec.svelte'
     // import Timescan from './Pages/Timescan.svelte'
     // import THz from './Pages/THz.svelte'
 
     // import Kinetics from './Pages/Kinetics.svelte'
     // import Misc from './Pages/Misc.svelte'
     // import Settings from './Pages/Settings.svelte'
-    // import Test from './Pages/Test.svelte'
-    // import PageLayout from '$components/main/PageLayout.svelte'
+    import Test from './Pages/Test.svelte'
+    import PageLayout from '$src/layout/pages/PageLayout.svelte'
 
     // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
-    const pageIDs = []
+    // const pageIDs = []
+    const pageIDs = ['Masspec']
     const navItems = ['Home', ...pageIDs]
-    // const PageComponents = {
-    //     Normline,
-    //     Masspec,
-    //     Timescan,
-    //     THz,
-    // }
+    const PageComponents = {
+        // Normline,
+        Masspec,
+        // Timescan,
+        // THz,
+    }
 
     if (import.meta.env.MODE === 'development') {
         navItems.push('Test')
@@ -50,17 +51,17 @@
     <Navbar {navItems} />
     <div id="pageContainer" style="overflow: hidden;">
         <Home />
-        <!-- {#each pageIDs as id}
+        {#each pageIDs as id}
             <PageLayout component={PageComponents[id]} {id} />
         {/each}
-        <Kinetics />
+        <!-- <Kinetics />
         <Powerfile />
         <Misc />
         <Settings /> -->
 
-        <!-- {#if import.meta.env.MODE === 'development'}
+        {#if import.meta.env.MODE === 'development'}
             <Test />
-        {/if} -->
+        {/if}
     </div>
     <Footer />
 </div>

@@ -1,3 +1,5 @@
+import { fs } from '@tauri-apps/api'
+
 function validate_line(line: string): boolean {
     const valid = line.trim().length > 0 && line.startsWith('# Sect01 Ion Source')
     return valid
@@ -5,11 +7,11 @@ function validate_line(line: string): boolean {
 
 export default function (filename: string): Promise<{ [name: string]: number }> {
     return new Promise(async (resolve, reject) => {
-        if (!window.fs.isFile(filename)) return reject('Invalid file')
-        if (!window.fs.isFile(filename)) return reject(`${filename} does not exist`)
+        if (!(await fs.exists(filename))) return reject('Invalid file')
+        if (!(await fs.exists(filename))) return reject(`${filename} does not exist`)
 
-        const fileContents = await window.fs.readFile(filename)
-        if (window.fs.isError(fileContents)) return reject(fileContents)
+        const fileContents = await tryF(fs.readTextFile(filename))
+        if (isError(fileContents)) return reject(fileContents)
 
         const variableValues: { [name: string]: number } = {}
         for (const line of fileContents.split('\n')) {

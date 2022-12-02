@@ -14,6 +14,7 @@ declare global {
   const getAllContexts: typeof import('svelte')['getAllContexts']
   const getContext: typeof import('svelte')['getContext']
   const hasContext: typeof import('svelte')['hasContext']
+  const isError: typeof import('ts-try')['isError']
   const onDestroy: typeof import('svelte')['onDestroy']
   const onMount: typeof import('svelte')['onMount']
   const readable: typeof import('svelte/store')['readable']
@@ -21,5 +22,6 @@ declare global {
   const setContext: typeof import('svelte')['setContext']
   const slide: typeof import('svelte/transition')['slide']
   const tick: typeof import('svelte')['tick']
+  const tryF: typeof import('ts-try')['tryF']
   const writable: typeof import('svelte/store')['writable']
 }

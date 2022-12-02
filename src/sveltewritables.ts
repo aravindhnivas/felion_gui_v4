@@ -38,7 +38,7 @@ export const running_processes = writable<
         pyfile: string
         close?: {
             name: string
-            cb: () => boolean
+            cb: () => Promise<void>
             style: string
         }
     }[]
