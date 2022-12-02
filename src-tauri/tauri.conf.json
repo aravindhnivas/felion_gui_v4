@@ -15,9 +15,7 @@
       "all": true,
       "fs": {
         "scope": [
-          "$TEMP",
-          "$APPLOG",
-          "D:/*"
+          "*"
         ]
       }
     },
