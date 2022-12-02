@@ -1,0 +1,23 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": 2019,
+        "sourceType": "module",
+        "requireConfigFile": false
+    },
+    "plugins": ["svelte3"],
+    "extends": ["eslint:recommended"],
+    "overrides": [
+        {
+        "files": ["**/*.svelte"],
+        "processor": "svelte3/svelte3"
+        }
+    ],
+    "rules": {
+        // ...
+    }
+}

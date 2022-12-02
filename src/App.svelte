@@ -1,39 +1,74 @@
-<script lang="ts">
-  import Greet from './lib/Greet.svelte'
+<script>
+    // import { SvelteToast } from '@zerodevx/svelte-toast'
+    import Navbar from '$src/layout/main//Navbar.svelte'
+    import Footer from '$src/layout/main/Footer.svelte'
+    // import PreModal from '$components/PreModal.svelte'
+    // import ConfirmAlert from '$components/alert/ConfirmAlert.svelte'
+    import Home from './Pages/Home.svelte'
+    // import Powerfile from './Pages/Powerfile.svelte'
+    // import Normline from './Pages/Normline.svelte'
+    // import Masspec from './Pages/Masspec.svelte'
+    // import Timescan from './Pages/Timescan.svelte'
+    // import THz from './Pages/THz.svelte'
+
+    // import Kinetics from './Pages/Kinetics.svelte'
+    // import Misc from './Pages/Misc.svelte'
+    // import Settings from './Pages/Settings.svelte'
+    // import Test from './Pages/Test.svelte'
+    // import PageLayout from '$components/main/PageLayout.svelte'
+
+    // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
+    // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
+    const pageIDs = []
+    const navItems = ['Home', ...pageIDs]
+    // const PageComponents = {
+    //     Normline,
+    //     Masspec,
+    //     Timescan,
+    //     THz,
+    // }
+
+    if (import.meta.env.MODE === 'development') {
+        navItems.push('Test')
+    }
+    //   const toastOpts = { reversed: true, intro: { y: 100 } };
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri!</h1>
+<!-- <PreModal />
+<div class="toast_container">
+    <SvelteToast options={toastOpts} />
+    <div id="leftToaster">
+        <SvelteToast target="right" options={{ initial: 0, intro: { y: 100 } }} />
+    </div>
+    <div id="rightToaster">
+        <SvelteToast target="left" options={{ intro: { y: 100 } }} />
+    </div>
+</div>
+<ConfirmAlert /> -->
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
+<div class="layout">
+    <Navbar {navItems} />
+    <div id="pageContainer" style="overflow: hidden;">
+        <Home />
+        <!-- {#each pageIDs as id}
+            <PageLayout component={PageComponents[id]} {id} />
+        {/each}
+        <Kinetics />
+        <Powerfile />
+        <Misc />
+        <Settings /> -->
 
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
-
-  <div class="row">
-    <Greet />
-  </div>
-
-
-</main>
+        <!-- {#if import.meta.env.MODE === 'development'}
+            <Test />
+        {/if} -->
+    </div>
+    <Footer />
+</div>
 
 <style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
+    .layout {
+        display: grid;
+        height: 100vh;
+        grid-template-rows: auto 1fr auto;
+    }
 </style>
