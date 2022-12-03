@@ -27,6 +27,17 @@
     const plotID = `${uniqueID}-mplot`
     const btnID = `${uniqueID}-masspec-plot-btn`
 
+    let massfiles: string[] = []
+    const update_massfiles = async (checked: string[]) => {
+        if (!(await fs.exists(currentLocation))) return
+        const files = checked.map(async (file) => await path.resolve(currentLocation, file))
+        massfiles = await Promise.all(files)
+        if (massfiles.length > 0) {
+            plotData()
+        }
+    }
+
+    $: update_massfiles(fileChecked)
     // $: massfiles = window.fs.isDirectory(currentLocation)
     //     ? fileChecked.map((file) => window.path.resolve(currentLocation, file))
     //     : []
@@ -79,11 +90,11 @@
             if (selected_file === '') return window.createToast('No files selected', 'danger')
         }
 
-        const files = (await fs.exists(currentLocation))
-            ? fileChecked.map(async (file) => await path.resolve(currentLocation, file))
-            : []
+        // const files = (await fs.exists(currentLocation))
+        //     ? fileChecked.map(async (file) => await path.resolve(currentLocation, file))
+        //     : []
 
-        const massfiles = await Promise.all(files)
+        // const massfiles = await Promise.all(files)
         const pyfileInfo: { [name: string]: { pyfile: string; args: Object } } = {
             mass: { pyfile: 'mass', args: { massfiles, tkplot: 'run' } },
             general: { pyfile: 'mass', args: { massfiles, tkplot: 'plot' } },
