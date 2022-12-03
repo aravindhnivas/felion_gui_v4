@@ -2,9 +2,9 @@
     import { numberDensity } from '../stores/common'
     import Textfield from '@smui/textfield'
     import { cloneDeep } from 'lodash-es'
-    import CustomTextSwitch from '$components/CustomTextSwitch.svelte'
-    import CustomPanel from '$src/components/CustomPanel.svelte'
-    import { tick } from 'svelte'
+    import TextSwitch from '$components/TextSwitch.svelte'
+    import Panel from '$src/components/Panel.svelte'
+    // import { tick } from 'svelte'
 
     export let attachmentCoefficients: ValueLabel[] = []
 
@@ -33,13 +33,10 @@
     }
 </script>
 
-<CustomPanel
-    label="Rare-gas attachment (K3) and dissociation (kCID) constants"
-    loaded={attachmentCoefficients.length > 0}
->
+<Panel label="Rare-gas attachment (K3) and dissociation (kCID) constants" loaded={attachmentCoefficients.length > 0}>
     <div class="align h-center mb-5">
         {#each attachmentCoefficients as { label, value, id } (id)}
-            <CustomTextSwitch bind:value {label} step={0.1} />
+            <TextSwitch bind:value {label} step={0.1} />
         {/each}
     </div>
 
@@ -78,4 +75,4 @@
             {/each}
         </div>
     </div>
-</CustomPanel>
+</Panel>

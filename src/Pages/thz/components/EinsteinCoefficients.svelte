@@ -4,15 +4,16 @@
     import { trapArea, configLoaded } from '../stores/common'
     import { cloneDeep, find, isArray } from 'lodash-es'
     import Textfield from '@smui/textfield'
-    import computePy_func from '$src/Pages/general/computePy'
+    import computePy_func from '$lib/pyserver/computePy'
     import { PlanksConstant, SpeedOfLight } from '$src/js/constants'
     import { computeStatisticalWeight } from '../functions/balance_distribution'
-    import CustomPanel from '$src/components/CustomPanel.svelte'
+    import Panel from '$src/components/Panel.svelte'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import { correctObjValue, getYMLFileContents, setID } from '$src/js/utils'
     import { tick } from 'svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTable, formatNumber } from '../functions/utils'
+    import { fs } from '@tauri-apps/api'
 
     export let lorrentz = 0.32
     export let gaussian = 0.21
@@ -134,7 +135,7 @@
     }
 
     const loadfile = async () => {
-        if (!window.fs.isFile(einsteinFilename)) return window.createToast('File not found', 'danger')
+        if (!(await fs.exists(einsteinFilename))) return window.createToast('File not found', 'danger')
         const data = await getYMLFileContents(einsteinFilename)
         if (!isArray(data?.rateConstants)) return window.createToast('EinsteinA - Invalid file format', 'danger')
         $einsteinCoefficientA = data.rateConstants.map(setID).map(correctObjValue)
@@ -180,7 +181,7 @@
     }
 </script>
 
-<CustomPanel label="Einstein Co-efficients" loaded={einsteinB_rateComputed}>
+<Panel label="Einstein Co-efficients" loaded={einsteinB_rateComputed}>
     <div class="align h-center subtitle">Einstein A Co-efficients</div>
 
     <BrowseTextfield
@@ -248,4 +249,4 @@
             {/each}
         </div>
     {/if}
-</CustomPanel>
+</Panel>

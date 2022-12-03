@@ -1,8 +1,8 @@
 <script lang="ts">
     import { energyUnit, numberOfLevels, energyLevels, energyInfos } from '../stores/energy'
     import { excitedFrom, excitedTo } from '../stores/common'
-    import CustomPanel from '$src/components/CustomPanel.svelte'
-    import CustomSelect from '$src/components/CustomSelect.svelte'
+    import Panel from '$src/components/Panel.svelte'
+    import Select from '$src/components/Select.svelte'
     import IconButton from '$src/components/IconButton.svelte'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import Textfield from '@smui/textfield'
@@ -10,6 +10,7 @@
     import { wavenumberToMHz, MHzToWavenumber, getYMLFileContents, setID } from '$src/js/utils'
     import BoltzmanDistribution from '../windows/BoltzmanDistribution.svelte'
     import { tick } from 'svelte'
+    import { fs, path } from '@tauri-apps/api'
 
     export let energyFilename: string = ''
 
@@ -18,7 +19,9 @@
     let lock_energylevels = true
 
     const readFile = async () => {
-        console.log(window.path.basename(energyFilename), 'updating energy levels')
+        if (!(await fs.exists(energyFilename))) return
+
+        console.log(await path.basename(energyFilename), 'updating energy levels')
         let energyLevelsStore_NoKey: OnlyValueLabel<number>[] = []
 
         if (energyFilename) {
@@ -43,15 +46,14 @@
         $excitedFrom = energyLevelsStore?.[0].label
         $excitedTo = energyLevelsStore?.[1].label
     }
-
-    $: if (window.fs.isFile(energyFilename)) {
+    $: if (energyFilename) {
         readFile()
     }
 </script>
 
 <BoltzmanDistribution bind:active={openBoltzmanWindow} bind:graphWindow={boltzmanWindow} />
 
-<CustomPanel label="Energy Levels" loaded={$energyLevels.length > 0}>
+<Panel label="Energy Levels" loaded={$energyLevels.length > 0}>
     <BrowseTextfield
         dir={false}
         filetype="yml"
@@ -71,7 +73,7 @@
             type={'number'}
             label="numberOfLevels (J levels)"
         />
-        <CustomSelect options={['MHz', 'cm-1']} bind:value={$energyUnit} label="unit" />
+        <Select options={['MHz', 'cm-1']} bind:value={$energyUnit} label="unit" />
         <button
             class="button is-link"
             on:click={() => {
@@ -89,4 +91,4 @@
             <Textfield {value} {label} disabled={lock_energylevels} type="number" input$step="0.0001" />
         {/each}
     </div>
-</CustomPanel>
+</Panel>

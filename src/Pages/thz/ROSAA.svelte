@@ -17,20 +17,20 @@
         figs_dir,
     } from './stores/common'
     import { collisionalRateConstants } from './stores/collisional'
-    import { tick } from 'svelte'
+    // import { tick } from 'svelte'
     import Textfield from '@smui/textfield'
     import Accordion from '@smui-extra/accordion'
     import { parse as Yml } from 'yaml'
-    import CustomSelect from '$components/CustomSelect.svelte'
-    import LayoutDiv from '$components/LayoutDiv.svelte'
-    import CustomCheckbox from '$components/CustomCheckbox.svelte'
-    import CustomTextSwitch from '$components/CustomTextSwitch.svelte'
+    import Select from '$components/Select.svelte'
+    import LayoutDiv from '$src/layout/misc/LayoutDiv.svelte'
+    import Checkbox from '$components/Checkbox.svelte'
+    import TextSwitch from '$components/TextSwitch.svelte'
     import EinsteinCoefficients from './components/EinsteinCoefficients.svelte'
     import CollisionalCoefficients from './components/CollisionalCoefficients.svelte'
     import AttachmentCoefficients from './components/AttachmentCoefficients.svelte'
     import ROSAA_Footer from './ROSAA_layout/ROSAA_Footer.svelte'
-    import CustomPanel from '$components/CustomPanel.svelte'
-    import SeparateWindow from '$components/SeparateWindow.svelte'
+    import Panel from '$components/Panel.svelte'
+    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
     import EnergyDetails from './components/EnergyDetails.svelte'
     import {
         amuToKG,
@@ -41,12 +41,13 @@
         VaccumPermitivity,
         plt_styles,
     } from '$src/js/constants'
-    import computePy_func from '$src/Pages/general/computePy'
+    import computePy_func from '$lib/pyserver/computePy'
     import { persistentWritable } from '$src/js/persistentStore'
     import { setID, correctObjValue } from '$src/js/utils'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
-    import CustomSegBtn from '$src/components/CustomSegBtn.svelte'
+    import SegBtn from '$src/components/SegBtn.svelte'
     import VariableSelector from './components/header/VariableSelector.svelte'
+    import { fs, path } from '@tauri-apps/api'
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let [mainParameters, simulationParameters, dopplerLineshape, powerBroadening]: Coefficients[] = Array(4).fill([])
@@ -62,7 +63,8 @@
     let statusReport = ''
 
     const simulation = async (e?: Event) => {
-        if (!window.fs.isDirectory($currentLocation)) return window.createToast("Location doesn't exist", 'danger')
+        if (!(await fs.exists($currentLocation))) return window.createToast("Location doesn't exist", 'danger')
+
         if (!$configLoaded) return window.createToast('Config file not loaded', 'danger')
         if (!$transitionFrequency) return window.createToast('Transition frequency is not defined', 'danger')
 
@@ -129,7 +131,8 @@
             }
         }
 
-        window.fs.ensureDirSync(data_dir)
+        // window.fs.ensureDirSync(data_dir)
+        if (!fs.exists(data_dir)) await fs.createDir(data_dir)
 
         const args = {
             trapTemp: $trapTemp,
@@ -215,7 +218,7 @@
     async function loadConfig() {
         try {
             $configLoaded = false
-            if (window.fs.isFile($configFile)) {
+            if (await fs.exists($configFile)) {
                 await setConfig()
                 await tick()
                 return
@@ -272,8 +275,9 @@
         try {
             $configLoaded = false
 
-            const fileRead = window.fs.readFileSync($configFile)
-            if (window.fs.isError(fileRead)) return window.handleError(fileRead)
+            const content = await fs.readTextFile($configFile)
+            const fileRead = tryF(() => JSON.parse(content))
+            if (isError(fileRead)) return window.handleError(fileRead)
 
             const CONFIG = Yml(fileRead)
             console.table(CONFIG)
@@ -316,12 +320,12 @@
                 configsBaseName = CONFIG.filenames.base
             }
 
-            energyFilename = energyFilename ? window.path.join($currentLocation, configsBaseName, energyFilename) : ''
+            energyFilename = energyFilename ? await path.join($currentLocation, configsBaseName, energyFilename) : ''
             einsteinFilename = einsteinFilename
-                ? window.path.join($currentLocation, configsBaseName, einsteinFilename)
+                ? await path.join($currentLocation, configsBaseName, einsteinFilename)
                 : ''
             collisionalFilename = collisionalFilename
-                ? window.path.join($currentLocation, configsBaseName, collisionalFilename)
+                ? await path.join($currentLocation, configsBaseName, collisionalFilename)
                 : ''
 
             await tick()
@@ -331,9 +335,9 @@
 
             console.log({ data_dir, data_dir_locked })
 
-            if (!window.fs.isDirectory(data_dir) || !data_dir_locked) {
+            if (!(await fs.exists(data_dir)) || !data_dir_locked) {
                 console.log('setting output dir')
-                data_dir = window.path.join($currentLocation, 'output/data')
+                data_dir = await path.join($currentLocation, 'output/data')
             }
 
             return Promise.resolve('config loaded')
@@ -342,9 +346,14 @@
             return Promise.reject(error)
         }
     }
-    let data_dir: string = $currentLocation ? window.path.join($currentLocation, 'output/data') : ''
-    let data_dir_locked = true
 
+    const update_data_dir = async (_loc: string) => {
+        data_dir = $currentLocation ? await path.join(_loc, 'output/data') : ''
+    }
+    $: update_data_dir($currentLocation)
+    let data_dir = ''
+
+    let data_dir_locked = true
     $: voigtFWHM = Number(0.5346 * lorrentz + Math.sqrt(0.2166 * lorrentz ** 2 + gaussian ** 2)).toFixed(3)
     const plot_style = persistentWritable('THz_simulation_plot_style', 'seaborn')
     let simulationMethod = 'Normal'
@@ -382,9 +391,9 @@
             bind:lock={data_dir_locked}
         />
         <div class="align box px-3 py-2" class:hide={showreport} style="border: solid 1px #fff9;">
-            <CustomSegBtn bind:choices={simulation_choices} />
-            <CustomCheckbox bind:value={$electronSpin} label="Electron Spin" />
-            <CustomCheckbox bind:value={$zeemanSplit} label="Zeeman" />
+            <SegBtn bind:choices={simulation_choices} />
+            <Checkbox bind:value={$electronSpin} label="Electron Spin" />
+            <Checkbox bind:value={$zeemanSplit} label="Zeeman" />
         </div>
 
         <div class="align box px-3 py-2" class:hide={showreport} style="border: solid 1px #fff9; min-height: 5em;">
@@ -393,8 +402,8 @@
             </div>
 
             <div class="align v-center" style="width: auto; margin-left: auto;">
-                <CustomSelect options={plt_styles} bind:value={$plot_style} label="plot style" />
-                <CustomSelect options={variablesList} bind:value={variable} label="variable" />
+                <Select options={plt_styles} bind:value={$plot_style} label="plot style" />
+                <Select options={variablesList} bind:value={variable} label="variable" />
                 <button class="button is-link" on:click={resetConfig}>Reset Config</button>
                 <button class="button is-warning flex" on:click={() => (toggle_modal = !toggle_modal)}
                     ><span>Full-Screen</span><span class="material-symbols-outlined">open_in_full</span></button
@@ -429,17 +438,17 @@
                 </div>
                 <div class="pr-5" class:hide={showreport}>
                     <Accordion multiple style="width: 100%;">
-                        <CustomPanel label="Main Parameters" loaded={mainParameters.length > 0}>
+                        <Panel label="Main Parameters" loaded={mainParameters.length > 0}>
                             <div class="align h-center">
                                 {#each mainParameters as { label, value, id } (id)}
                                     <Textfield bind:value {label} />
                                 {/each}
                             </div>
-                        </CustomPanel>
+                        </Panel>
 
                         <EnergyDetails bind:energyFilename />
 
-                        <CustomPanel label="Simulation parameters" loaded={simulationParameters.length > 0}>
+                        <Panel label="Simulation parameters" loaded={simulationParameters.length > 0}>
                             <div class="align h-center mb-5">
                                 {#each simulationParameters as { label, value, id } (id)}
                                     <Textfield bind:value {label} />
@@ -447,23 +456,23 @@
                             </div>
 
                             <div class="align h-center">
-                                <CustomSelect
+                                <Select
                                     options={$energyLevels.map((f) => f.label)}
                                     bind:value={$excitedFrom}
                                     label="excitedFrom"
                                 />
-                                <CustomSelect
+                                <Select
                                     options={$energyLevels.map((f) => f.label)}
                                     bind:value={$excitedTo}
                                     label="excitedTo"
                                 />
                                 <Textfield value={$transitionFrequency.toFixed(3)} label="Frequency ({$energyUnit})" />
                             </div>
-                        </CustomPanel>
+                        </Panel>
 
-                        <CustomPanel label="Doppler lineshape" loaded={dopplerLineshape.length > 0}>
+                        <Panel label="Doppler lineshape" loaded={dopplerLineshape.length > 0}>
                             {#each dopplerLineshape as { label, value, id } (id)}
-                                <CustomTextSwitch step={0.5} bind:value {label} />
+                                <TextSwitch step={0.5} bind:value {label} />
                             {/each}
                             <Textfield
                                 bind:value={$collisionalTemp}
@@ -472,15 +481,15 @@
                                 input$step="0.1"
                             />
                             <Textfield bind:value={gaussian} label="gaussian - FWHM (MHz)" />
-                        </CustomPanel>
+                        </Panel>
 
-                        <CustomPanel label="Lorrentz lineshape" loaded={powerBroadening.length > 0}>
+                        <Panel label="Lorrentz lineshape" loaded={powerBroadening.length > 0}>
                             {#each powerBroadening as { label, value, id } (id)}
                                 <Textfield bind:value {label} />
                             {/each}
                             <Textfield bind:value={lorrentz} label="lorrentz - FWHM (MHz)" />
                             <Textfield value={voigtFWHM} label="Voigt - FWHM (MHz)" variant="outlined" />
-                        </CustomPanel>
+                        </Panel>
 
                         <EinsteinCoefficients {einsteinFilename} {power} {gaussian} {lorrentz} {moleculeName} />
                         <CollisionalCoefficients {collisionalFilename} {moleculeName} {tagName} />
@@ -492,9 +501,9 @@
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
-        <CustomCheckbox bind:value={$writefile} label="writefile" />
-        <CustomCheckbox bind:value={figure.show} label="show figure" />
-        <!-- <CustomSegBtn bind:choices={output_choices} bind:selected={output_choices_selected} /> -->
+        <Checkbox bind:value={$writefile} label="writefile" />
+        <Checkbox bind:value={figure.show} label="show figure" />
+        <!-- <SegBtn bind:choices={output_choices} bind:selected={output_choices_selected} /> -->
         <Textfield bind:value={savefilename} label="savefilename" />
         <Textfield style="width: 5em;" bind:value={figure.dpi} label="DPI" type="number" input$step={10} />
     </svelte:fragment>

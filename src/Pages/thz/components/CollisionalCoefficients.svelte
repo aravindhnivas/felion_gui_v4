@@ -14,9 +14,10 @@
     import balance_distribution from '../functions/balance_distribution'
     import CollisionalDistribution from '../windows/CollisionalDistribution.svelte'
     import CollisionalRateConstantPlot from '../windows/CollisionalRateConstantPlot.svelte'
-    import CustomPanel from '$src/components/CustomPanel.svelte'
+    import Panel from '$src/components/Panel.svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTableRow, makeTable, formatNumber } from '../functions/utils'
+    import { fs, path } from '@tauri-apps/api'
 
     export let collisionalFilename = ''
     export let moleculeName = ''
@@ -63,47 +64,61 @@
 
     let OpenRateConstantsPlot = false
 
-    const saveCollisionalRateConstants = () => {
-        const save_dir = window.path.dirname(collisionalCoefficientJSONFile)
-        if (!window.fs.isDirectory(save_dir)) {
+    const saveCollisionalRateConstants = async () => {
+        const save_dir = await path.dirname(collisionalCoefficientJSONFile)
+        if (!(await fs.exists(save_dir))) {
             return window.createToast(`Directory ${save_dir} does not exist`, 'danger')
         }
 
-        const result = window.fs.outputJsonSync(collisionalCoefficientJSONFile, {
+        const saveJSON = {
             $collisionalCoefficient,
             $collisionalCoefficient_balance,
-        })
-        if (window.fs.isError(result)) return window.handleError(result)
+        }
+
+        const result = await tryF(fs.writeTextFile(collisionalCoefficientJSONFile, JSON.stringify(saveJSON, null, 4)))
+        if (isError(result)) return window.handleError(result)
+
         console.log(`${collisionalCoefficientJSONFile} saved`)
-        window.createToast('Saved: ' + window.path.basename(collisionalCoefficientJSONFile))
+        window.createToast('Saved: ' + (await path.basename(collisionalCoefficientJSONFile)))
     }
 
-    $: configFileDir = window.path.dirname(collisionalFilename)
-    $: collisionalCoefficientJSONFile = window.path.join(configFileDir, 'collisionalCoefficients.json')
+    const update_config_dir = async (_loc: string) => {
+        configFileDir = await path.dirname(_loc)
+    }
+    $: update_config_dir(collisionalFilename)
+    let configFileDir = ''
 
-    const readcollisionalCoefficientJSONFile = (toast = true) => {
-        if (!window.fs.isFile(collisionalCoefficientJSONFile)) {
+    const update_collsional_file = async (_loc: string) => {
+        collisionalCoefficientJSONFile = await path.join(_loc, 'collisionalCoefficients.json')
+    }
+    $: update_collsional_file(configFileDir)
+    let collisionalCoefficientJSONFile = ''
+
+    const readcollisionalCoefficientJSONFile = async (toast = true) => {
+        if (!(await fs.exists(collisionalCoefficientJSONFile))) {
             if (!toast) return console.warn(`${collisionalCoefficientJSONFile} does not exist`)
             return window.createToast('File not found', 'danger')
         }
 
         console.log('loading: ', collisionalCoefficientJSONFile)
-        const data = window.fs.readJsonSync(collisionalCoefficientJSONFile)
-        if (window.fs.isError(data)) return window.handleError(data)
+
+        const content = await fs.readTextFile(collisionalCoefficientJSONFile)
+        const data = tryF(() => JSON.parse(content))
+        if (isError(data)) return window.handleError(data)
 
         if (isEmpty(data)) return window.createToast('Collisional data file is empty', 'danger')
         ;({ $collisionalCoefficient, $collisionalCoefficient_balance } = data)
 
-        if (window.db.get('active_tab') !== 'Kinetics') return
+        if (localStorage.getItem('active_tab') !== 'Kinetics') return
 
-        window.createToast('loaded: ' + window.path.basename(collisionalCoefficientJSONFile), 'warning', {
+        window.createToast('loaded: ' + (await path.basename(collisionalCoefficientJSONFile)), 'warning', {
             target: 'left',
         })
     }
 
     const after_configs_loaded = async () => {
         await tick()
-        readcollisionalCoefficientJSONFile()
+        await readcollisionalCoefficientJSONFile()
     }
     $: if ($configLoaded) {
         after_configs_loaded()
@@ -137,10 +152,7 @@
 <CollisionalDistribution bind:active={activate_collisional_simulation_window} {moleculeName} />
 <CollisionalRateConstantPlot {collisionalFilename} bind:active={OpenRateConstantsPlot} />
 
-<CustomPanel
-    label="Collisional rate constants"
-    loaded={$numberDensity.length > 0 && $collisionalRateConstants.length > 0}
->
+<Panel label="Collisional rate constants" loaded={$numberDensity.length > 0 && $collisionalRateConstants.length > 0}>
     <div class="align h-center">
         <div class="align h-center">
             <BrowseTextfield
@@ -154,8 +166,10 @@
                     console.log(e)
                 }}
             >
-                <button class="button is-warning" on:click={() => readcollisionalCoefficientJSONFile()}>load</button>
-                <button class="button is-link" on:click={saveCollisionalRateConstants}>Save</button>
+                <button class="button is-warning" on:click={async () => await readcollisionalCoefficientJSONFile()}
+                    >load</button
+                >
+                <button class="button is-link" on:click={async () => await saveCollisionalRateConstants()}>Save</button>
             </BrowseTextfield>
 
             <Textfield bind:value={$collisionalTemp} label="collisionalTemp" />
@@ -215,4 +229,4 @@
             <Textfield bind:value {label} />
         {/each}
     </div>
-</CustomPanel>
+</Panel>

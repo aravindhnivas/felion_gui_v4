@@ -1,6 +1,6 @@
 <script lang="ts">
     import ButtonBadge from '$components/ButtonBadge.svelte'
-    import CustomSelect from '$components/CustomSelect.svelte'
+    import Select from '$components/Select.svelte'
     import { tick } from 'svelte'
 
     export let progress = 0
@@ -27,7 +27,7 @@
     }}>{showreport ? 'Go back' : 'Show progress'}</button
 >
 <div style="display: flex; gap: 1em;" class:hide={showreport}>
-    <CustomSelect options={simulationMethods} bind:value={simulationMethod} label="simulationMethod" />
+    <Select options={simulationMethods} bind:value={simulationMethod} label="simulationMethod" />
     <ButtonBadge
         on:pyEventData={async (e) => {
             const { stdout } = e.detail
