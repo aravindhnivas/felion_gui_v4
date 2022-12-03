@@ -8,7 +8,7 @@
     import Powerfile from './Pages/Powerfile.svelte'
     import Normline from './Pages/Normline.svelte'
     import Masspec from './Pages/Masspec.svelte'
-    // import Timescan from './Pages/Timescan.svelte'
+    import Timescan from './Pages/Timescan.svelte'
     // import THz from './Pages/THz.svelte'
 
     // import Kinetics from './Pages/Kinetics.svelte'
@@ -20,12 +20,12 @@
     // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
-    const pageIDs = ['Normline', 'Masspec']
+    const pageIDs = ['Normline', 'Masspec', 'Timescan']
     const navItems = ['Home', ...pageIDs, 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
         Normline,
         Masspec,
-        // Timescan,
+        Timescan,
         // THz,
     }
 

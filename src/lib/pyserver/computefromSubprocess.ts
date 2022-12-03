@@ -46,7 +46,7 @@ export default async function ({
             target?.classList.toggle('is-loading')
         }
 
-        pyVersion.set(localStorage.getItem('pyVersion'))
+        // pyVersion.set(localStorage.getItem('pyVersion'))
         if (!get(pyVersion)) {
             window.handleError('Python is not valid. Fix it in Settings --> Configuration')
             return
