@@ -1,10 +1,10 @@
 <script lang="ts">
-    // import { running_processes } from '$src/sveltewritables'
-    // import STable from './STable.svelte'
-    // import MenuSurface from '@smui/menu-surface'
-    // import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
-
-    // let surface: MenuSurfaceComponentDev
+    import { running_processes } from '$src/sveltewritables'
+    import { fade } from 'svelte/transition'
+    import STable from '$components/tables/STable.svelte'
+    import MenuSurface from '@smui/menu-surface'
+    import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
+    let surface: MenuSurfaceComponentDev
 </script>
 
 <div class="animate__animated animate__fadeInUp" id="footer">
@@ -16,7 +16,7 @@
         </div>
 
         <div class="navbar-end">
-            <!-- {#if $running_processes.length > 0}
+            {#if $running_processes.length > 0}
                 <MenuSurface
                     style="background: var(--background-color);"
                     bind:this={surface}
@@ -34,7 +34,7 @@
                     Running {$running_processes.length}
                     {$running_processes.length > 1 ? 'processes' : 'process'}
                 </div>
-            {/if} -->
+            {/if}
             <div class="navbar-item">
                 <p>2019-2022 &copy; AN Marimuthu</p>
             </div>
