@@ -3,10 +3,10 @@
     import { collisionalTemp } from '../stores/common'
     import { polynomial } from 'regression'
     import Textfield from '@smui/textfield'
-    import SeparateWindow from '$components/SeparateWindow.svelte'
-    import colors from '$src/Pages/computeCode/colors'
+    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
+    import colors from '$lib/misc/colors'
     import { react } from 'plotly.js-basic-dist'
-    import CustomCheckbox from '$components/CustomCheckbox.svelte'
+    import Checkbox from '$components/Checkbox.svelte'
     import WinBox from 'winbox'
     export let active = false
     export let collisionalFilename = ''
@@ -198,7 +198,7 @@
             <button class="button is-link" on:click={rescaleData}>Rescale Data</button>
             <Textfield bind:value={$collisionalTemp} label="collisionalTemp" />
             <button class="button is-link" on:click={fitDataFunction}>Fit Data</button>
-            <CustomCheckbox bind:value={autoCompute} label="autoCompute" />
+            <Checkbox bind:value={autoCompute} label="autoCompute" />
         </div>
     </svelte:fragment>
 

@@ -1,7 +1,7 @@
 <script>
     import { persistentWritable } from '$src/js/persistentStore'
     import Modal from '$components/modal/Modal.svelte'
-    import STable from '$components/STable.svelte'
+    import STable from '$components/tables/STable.svelte'
     export let configDir = ''
     export let active = false
 

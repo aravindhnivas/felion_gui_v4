@@ -219,6 +219,7 @@
         try {
             $configLoaded = false
             if (await fs.exists($configFile)) {
+                $currentLocation = await path.dirname($configFile)
                 await setConfig()
                 await tick()
                 return

@@ -11,7 +11,7 @@
     import Timescan from './Pages/Timescan.svelte'
     import THz from './Pages/THz.svelte'
 
-    // import Kinetics from './Pages/Kinetics.svelte'
+    import Kinetics from './Pages/Kinetics.svelte'
     import Misc from './Pages/Misc.svelte'
     import Settings from './Pages/Settings.svelte'
     import Test from './Pages/Test.svelte'
@@ -21,7 +21,7 @@
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
-    const navItems = ['Home', ...pageIDs, 'Powerfile', 'Misc', 'Settings']
+    const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
         Normline,
         Masspec,
@@ -54,7 +54,7 @@
         {#each pageIDs as id}
             <PageLayout component={PageComponents[id]} {id} />
         {/each}
-        <!-- <Kinetics /> -->
+        <Kinetics />
         <Powerfile />
         <Misc />
         <Settings />

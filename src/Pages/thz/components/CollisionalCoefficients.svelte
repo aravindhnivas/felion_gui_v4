@@ -65,6 +65,7 @@
     let OpenRateConstantsPlot = false
 
     const saveCollisionalRateConstants = async () => {
+        if (!(await fs.exists(collisionalCoefficientJSONFile))) return
         const save_dir = await path.dirname(collisionalCoefficientJSONFile)
         if (!(await fs.exists(save_dir))) {
             return window.createToast(`Directory ${save_dir} does not exist`, 'danger')
@@ -83,6 +84,7 @@
     }
 
     const update_config_dir = async (_loc: string) => {
+        if (!(await fs.exists(_loc))) return
         configFileDir = await path.dirname(_loc)
     }
     $: update_config_dir(collisionalFilename)

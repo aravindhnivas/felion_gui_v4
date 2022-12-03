@@ -3,18 +3,19 @@
     import { numberOfLevels } from '../stores/energy'
     import { collisionalTemp, numberDensity, output_dir, figs_dir } from '../stores/common'
     import Textfield from '@smui/textfield'
-    import SeparateWindow from '$components/SeparateWindow.svelte'
-    import Notify from '$components/Notify.svelte'
-    import CustomSelect from '$components/CustomSelect.svelte'
-    import CustomTextSwitch from '$components/CustomTextSwitch.svelte'
+    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
+    import Notify from '$lib/notifier/Notify.svelte'
+    import Select from '$components/Select.svelte'
+    import TextSwitch from '$components/TextSwitch.svelte'
     import { plot } from '../../../js/functions'
     import boltzman_distribution from '../functions/boltzman_distribution'
-    import computePy_func from '$src/Pages/general/computePy'
+    import computePy_func from '$lib/pyserver/computePy'
     import { persistentWritable } from '$src/js/persistentStore'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
     import { plt_styles } from '$src/js/constants'
     import { save_data_to_file, replaceMathFormats } from '../functions/utils'
     import WinBox from 'winbox'
+    import { fs, path } from '@tauri-apps/api'
 
     export let active: boolean = false
     export let moleculeName: string = ''
@@ -151,7 +152,12 @@
     $: if (windowReady) {
         setTimeout(() => graphWindow?.focus(), 100)
     }
-    $: outputFile = window.path.join($output_dir, 'collisional', `${savefile}.json`)
+    const update_output_file = async (_loc: string, _name: string) => {
+        outputFile = await path.join(_loc, 'collisional', _name)
+    }
+    $: update_output_file($output_dir, `${savefile}.json`)
+    let outputFile = ''
+
     let saveInfo = { msg: '', error: '' }
 
     const saveData = async () => {
@@ -189,14 +195,16 @@
         saveInfo = await save_data_to_file(outputFile, data_to_save)
     }
 
-    const openFigure = (e?: Event) => {
-        if (!window.fs.isFile(outputFile)) {
+    const openFigure = async (e?: Event) => {
+        if (!(await fs.exists(outputFile))) {
             window.createToast('No data to open', 'danger')
             return
         }
 
-        const save_figs_dir = window.path.join($figs_dir, 'collisional')
-        window.fs.ensureDirSync(save_figs_dir)
+        const save_figs_dir = await path.join($figs_dir, 'collisional')
+        if (!(await fs.exists(save_figs_dir))) {
+            await fs.createDir(save_figs_dir)
+        }
         const { figXlabel, figYlabel } = collisionalMode ? $figlabels.collision : $figlabels.boltzmann
         const args = {
             legend_prefix: `${moleculeName}(`,
@@ -237,9 +245,9 @@
                 }
             }}
         >
-            <CustomTextSwitch bind:value={$initialTemp} label="Initial temp (K)" />
-            <CustomTextSwitch bind:value={$collisionalTemp} label="Coll. temp (K)" />
-            <CustomTextSwitch bind:value={duration} label="duration (in ms)" />
+            <TextSwitch bind:value={$initialTemp} label="Initial temp (K)" />
+            <TextSwitch bind:value={$collisionalTemp} label="Coll. temp (K)" />
+            <TextSwitch bind:value={duration} label="duration (in ms)" />
             <Textfield bind:value={totalSteps} label="totalSteps" />
             <Textfield bind:value={$numberDensity} label="Number density (cm-3)" />
 
@@ -247,9 +255,9 @@
         </div>
 
         <div class="align no-wrap">
-            <CustomSelect options={['default', ...plt_styles]} bind:value={$plot_style} label="plot style" />
-            <CustomSelect bind:value={savefile} options={saveOpts} label="plot-type" />
-            <CustomSelect bind:value={factorAxis} options={['x', 'y']} label="factorAxis" />
+            <Select options={['default', ...plt_styles]} bind:value={$plot_style} label="plot style" />
+            <Select bind:value={savefile} options={saveOpts} label="plot-type" />
+            <Select bind:value={factorAxis} options={['x', 'y']} label="factorAxis" />
             <Textfield bind:value={factor} label="factor" />
             <button class="button is-link" on:click={saveData}>Save data</button>
 

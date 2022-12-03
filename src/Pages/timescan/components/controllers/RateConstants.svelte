@@ -1,7 +1,7 @@
 <script lang="ts">
     import Textfield from '@smui/textfield'
     import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
-    import CustomSwitch from '$components/CustomSwitch.svelte'
+    import Switch from '$components/Switch.svelte'
 
     export let defaultInitialValues = true
     export let initialValues = ''
@@ -10,7 +10,7 @@
 </script>
 
 <div class="align h-center">
-    <CustomSwitch bind:selected={defaultInitialValues} label="default" />
+    <Switch bind:selected={defaultInitialValues} label="default" />
     <Textfield bind:value={initialValues} label="initialValues" />
     <TextAndSelectOptsToggler
         bind:value={kinetics_fitfile}

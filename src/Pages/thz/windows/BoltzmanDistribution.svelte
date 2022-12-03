@@ -1,15 +1,16 @@
 <script lang="ts">
     import { trapTemp, currentLocation, output_dir } from '../stores/common'
-    import SeparateWindow from '$components/SeparateWindow.svelte'
-    import Notify from '$components/Notify.svelte'
-    import CustomTextSwitch from '$components/CustomTextSwitch.svelte'
+    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
+    import Notify from '$lib/notifier/Notify.svelte'
+    import TextSwitch from '$components/TextSwitch.svelte'
     import { plot } from '../../../js/functions'
     import boltzman_distribution from '../functions/boltzman_distribution'
     import { sumBy } from 'lodash-es'
-    import computePy_func from '$src/Pages/general/computePy'
+    import computePy_func from '$lib/pyserver/computePy'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
     import WinBox from 'winbox'
     import { save_data_to_file } from '../functions/utils'
+    import { fs, path } from '@tauri-apps/api'
 
     export let active = false
     export let graphWindow: WinBox | null = null
@@ -54,7 +55,12 @@
     }
 
     let saveInfo = { msg: '', error: '' }
-    $: outputFile = window.path.join($output_dir, `boltzman/boltzman_distribution${$trapTemp}K.dat`)
+    const update_output_file = async (_loc: string, _trapTemp: number) => {
+        outputFile = await path.join(_loc, `boltzman/boltzman_distribution${_trapTemp}K.dat`)
+    }
+    $: update_output_file($output_dir, $trapTemp)
+    let outputFile = ''
+    // $: outputFile = window.path.join($output_dir, `boltzman/boltzman_distribution${$trapTemp}K.dat`)
 
     const saveData = async () => {
         const length = plotData[0].length
@@ -65,14 +71,17 @@
         saveInfo = await save_data_to_file(outputFile, writeContent)
     }
 
-    const openFigure = (e?: Event) => {
-        if (!window.fs.isFile(outputFile)) {
+    const openFigure = async (e?: Event) => {
+        if (!(await fs.exists(outputFile))) {
             window.createToast('No data to open', 'danger')
             return
         }
 
-        const figsDir = window.path.join($currentLocation, '../output/figs')
-        window.fs.ensureDirSync(figsDir)
+        const figsDir = await path.join($currentLocation, '../output/figs')
+        // window.fs.ensureDirSync(figsDir)
+        if (!(await fs.exists(figsDir))) {
+            await fs.createDir(figsDir)
+        }
 
         const args = {
             figArgs: {
@@ -91,7 +100,7 @@
 <SeparateWindow {title} bind:active bind:windowReady bind:graphWindow maximize={false}>
     <svelte:fragment slot="header_content__slot">
         <div class="align">
-            <CustomTextSwitch bind:value={$trapTemp} label="Temperature (K)" />
+            <TextSwitch bind:value={$trapTemp} label="Temperature (K)" />
             <button class="button is-link" on:click={plotGraph}>Compute</button>
             <button class="button is-link" on:click={saveData}>Save data</button>
             <ButtonBadge label="Produce figure" on:click={openFigure} />
