@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Modal from '$components/Modal.svelte'
+    import Modal from '$components/modal/Modal.svelte'
     import FelixPlotWidgets from './FelixPlotWidgets.svelte'
     import { createEventDispatcher } from 'svelte'
     export let active = false

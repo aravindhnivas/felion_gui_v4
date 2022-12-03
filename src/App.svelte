@@ -6,7 +6,7 @@
     import ConfirmAlert from '$src/lib/alert/ConfirmAlert.svelte'
     import Home from './Pages/Home.svelte'
     // import Powerfile from './Pages/Powerfile.svelte'
-    // import Normline from './Pages/Normline.svelte'
+    import Normline from './Pages/Normline.svelte'
     import Masspec from './Pages/Masspec.svelte'
     // import Timescan from './Pages/Timescan.svelte'
     // import THz from './Pages/THz.svelte'
@@ -20,10 +20,10 @@
     // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
-    const pageIDs = ['Masspec']
+    const pageIDs = ['Normline', 'Masspec']
     const navItems = ['Home', ...pageIDs, 'Settings']
     const PageComponents = {
-        // Normline,
+        Normline,
         Masspec,
         // Timescan,
         // THz,
