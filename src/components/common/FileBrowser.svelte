@@ -30,93 +30,67 @@
         }
     }
     let filesLoaded = false
-    function getfiles(toast = false, keepfiles = false) {
-        return new Promise(async (resolve, reject) => {
-            const locationStatus = await fs.exists(currentLocation)
-            if (!locationStatus) {
-                reject("Location doesn't exist: Browse files again")
-                if (!toast) return
-                return window.createToast('Location undefined', 'danger')
-            }
 
-            original_files = otherfolders = fullfiles = []
-            if (!keepfiles) {
-                fileChecked = []
-            }
-            selectAll = false
-            filesLoaded = false
+    async function getfiles(loc: string, toast = false, keepfiles = false) {
+        if (!(await fs.exists(loc))) {
+            // reject("Location doesn't exist: Browse files again")
+            if (!toast) return Promise.reject("Location doesn't exist: Browse files again")
+            window.createToast('Location undefined', 'danger')
+            return Promise.reject("Location doesn't exist: Browse files again")
+        }
 
-            try {
-                const folderfileEntry = await tryF(fs.readDir(currentLocation))
-                if (isError(folderfileEntry)) {
-                    throw folderfileEntry
-                }
+        original_files = otherfolders = fullfiles = []
+        if (!keepfiles) {
+            fileChecked = []
+        }
+        selectAll = false
+        filesLoaded = false
 
-                const folderfile = folderfileEntry.map((file) => file.name)
+        // try {
+        const folderfile = await tryF(fs.readDir(loc))
+        if (isError(folderfile)) {
+            throw folderfile
+        }
+        // console.log(folderfile)
 
-                const fileIncludePattern = new RegExp(`.+\\.[^fr]?${filetype}`) // f or r keyword is to avoid getting fscan and rscan files
+        const fileIncludePattern = new RegExp(`.+\\.[^fr]?${filetype}`) // f or r keyword is to avoid getting fscan and rscan files
 
-                original_files = fullfiles = folderfile
-                    .filter((file) => fileIncludePattern.test(file))
-                    .map((file) => ({ name: file, id: window.getID() }))
-                    .sort((a, b) => (a.name < b.name ? 1 : -1))
+        original_files = fullfiles = folderfile
+            .filter((file) => fileIncludePattern.test(file.name))
+            .map((file) => ({ name: file.name, id: window.getID() }))
+            .sort((a, b) => (a.name < b.name ? 1 : -1))
 
-                fullfileslist = fullfiles.map((file) => file.name)
-                otherfolders = folderfile
-                    .map((file) => ({ name: file, id: window.getID() }))
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
+        fullfileslist = fullfiles.map((file) => file.name)
+        otherfolders = folderfile
+            .filter((file) => Object.hasOwn(file, 'children'))
+            .map((file) => ({ name: file.name, id: window.getID() }))
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
 
-                console.log('Folder updated')
+        console.log('Folder updated')
 
-                original_location = currentLocation
-                dispatch('chdir', {
-                    action: 'chdir',
-                    filetype,
-                    currentLocation,
-                    fullfileslist,
-                })
-
-                if (saveLocationToDB && filetype.length > 2) {
-                    localStorage.setItem(`${filetype}_location`, currentLocation)
-                }
-                filesLoaded = true
-                resolve(fullfiles)
-            } catch (error) {
-                reject(error)
-                window.handleError(error)
-            }
+        dispatch('chdir', {
+            action: 'chdir',
+            filetype,
+            loc,
+            fullfileslist,
         })
+
+        if (saveLocationToDB && filetype.length > 2) {
+            localStorage.setItem(`${filetype}_location`, loc)
+        }
+        filesLoaded = true
+
+        return fullfiles
     }
 
     let sortFile = false
     $: sortFile
         ? (fullfiles = fullfiles.sort((a, b) => (a.name > b.name ? 1 : -1)))
         : (fullfiles = fullfiles.sort((a, b) => (a.name < b.name ? 1 : -1)))
-    let getFilePromise
+
     const changeDirectory = async (goto) => {
         currentLocation = await path.resolve(currentLocation, goto)
     }
-
-    let original_location = currentLocation
-    const updateFiles = async () => {
-        if (await fs.exists(currentLocation)) {
-            getFilePromise = await getfiles()
-            console.log('Updating files for ', filetype)
-        }
-    }
-
-    let mounted = false
-    onMount(async () => {
-        // console.log('File browser mounted')
-        // await updateFiles()
-        mounted = true
-    })
-
-    afterUpdate(() => {
-        if (original_location !== currentLocation) {
-            updateFiles()
-        }
-    })
 
     $: if (currentLocation) {
         fileChecked = []
@@ -141,7 +115,7 @@
         on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
         on:click={({ currentTarget }) => {
             currentTarget.classList.add('animate__rotateIn')
-            getFilePromise = getfiles(true, true)
+            currentLocation = currentLocation
         }}>refresh</i
     >
     <IconSwitch bind:toggler={sortFile} icons={['trending_up', 'trending_down']} />
@@ -191,13 +165,13 @@
     <div class="file-dir">
         <i class="material-symbols-outlined">keyboard_arrow_right</i>
         <div class="folder_name__div">
-            {#if currentLocation}
-                {#await path.basename(currentLocation) then name}
-                    <div>{name}</div>
-                {:catch _}
-                    <div>undefined</div>
-                {/await}
-            {/if}
+            <!-- {#if currentLocation} -->
+            {#await path.basename(currentLocation) then name}
+                <div>{name}</div>
+            {:catch _}
+                <div>undefined</div>
+            {/await}
+            <!-- {/if} -->
             {#if searchKey}
                 <div class="tag is-small is-warning">{searchKey}</div>
                 <button
@@ -211,10 +185,10 @@
         </div>
     </div>
 
-    {#await getFilePromise}
+    {#await getfiles(currentLocation)}
         <div class="mdc-typography--subtitle1 align center">...loading</div>
-    {:then _}
-        {#if fullfiles.length && mounted}
+    {:then fullfiles}
+        {#if fullfiles.length}
             <VirtualCheckList
                 on:fileselect
                 bind:fileChecked
