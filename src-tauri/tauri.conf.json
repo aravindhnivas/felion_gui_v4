@@ -22,20 +22,8 @@
         "sidecar": true,
         "scope": [
           {
-            "name": "binaries/felionpy",
-            "sidecar": true,
-            "args": [
-              {
-                "validator": "\\S+"
-              },
-              {
-                "validator": "\\S+"
-              }
-            ]
-          },
-          {
-            "name": "resources/felionpy/felionpy",
-            "sidecar": true,
+            "name": "felionpy",
+            "cmd": "$RESOURCE/resources/felionpy/felionpy.exe",
             "args": [
               {
                 "validator": "\\S+"
@@ -64,10 +52,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [
-        "binaries/felionpy",
-        "resources/felionpy/felionpy"
-      ],
+      "externalBin": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

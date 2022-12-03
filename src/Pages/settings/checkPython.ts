@@ -19,12 +19,14 @@ export async function getPyVersion(e?: ButtonClickEvent) {
     const target = e?.target as HTMLButtonElement
     target?.classList.toggle('is-loading')
 
-    const command = Command.sidecar(get(felionpy), ['getVersion', '{}'])
+    // console.log('getPyVersion', get(felionpy))
+    // const command = Command.sidecar(get(felionpy), ['getVersion', '{}'])
+    // const output = await tryF(command.execute())
+    const command = new Command('felionpy', ['getVersion', '{}'])
     const output = await tryF(command.execute())
-    // const output = await command.execute()
-    // console.log(output, typeof output)
-    if (isError(output) || typeof output === 'string') {
-        window.createToast(output, 'danger')
+    console.log(output)
+    if (isError(output)) {
+        window.createToast(output.message, 'danger')
         target?.classList.toggle('is-loading')
         console.error(output)
         return
@@ -33,6 +35,7 @@ export async function getPyVersion(e?: ButtonClickEvent) {
     console.log({ stdout, stderr })
 
     target?.classList.toggle('is-loading')
+    if (!stdout) return
 
     const [version] = stdout?.split('\n').filter?.((line) => line.includes('Python')) || ['']
     pyVersion.set(version?.trim() || '')
