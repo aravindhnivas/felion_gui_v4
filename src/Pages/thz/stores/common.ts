@@ -5,7 +5,7 @@ import { derived, writable } from 'svelte/store'
 export const electronSpin = writable<boolean>(false)
 export const zeemanSplit = writable<boolean>(false)
 
-export const configFile = writable(localStorage.getItem('ROSAA_configfile') ?? '')
+export const configFile = persistentWritable('ROSAA_configfile', '')
 export const currentLocation = persistentWritable('ROSAA_currentLocation', '')
 export const output_dir = derived(currentLocation, ($currentLocation) => {
     return $currentLocation + path.sep + 'output' + path.sep + 'data'
