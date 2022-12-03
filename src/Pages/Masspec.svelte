@@ -122,9 +122,7 @@
             <button class="button is-link" id={btnID} on:click={(e) => plotData({ e: e })}> Masspec Plot</button>
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
             <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Open in Matplotlib" />
-            <!-- {#if currentLogScale[activeTabID] !== undefined} -->
             <Switch style="margin: 0 1em;" on:change={linearlogCheck} bind:selected={logScale} label="Log" />
-            <!-- {/if} -->
         </div>
     </svelte:fragment>
 
