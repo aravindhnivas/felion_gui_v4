@@ -24,9 +24,13 @@
     }
 
     const browse_folder = async () => {
+        let filter = []
+        if (filetype) {
+            filter = [{ name: filetype, extensions: [filetype] }]
+        }
         const result = await dialog.open({
             directory: dir,
-            filters: [{ name: 'Files', extensions: [filetype] }],
+            filters: [...filter, { name: 'All files', extensions: ['*.*'] }],
             multiple: false,
         })
         if (!result) return

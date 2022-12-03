@@ -16,6 +16,7 @@
     import { fetchServerROOT } from '../serverConnections'
     import Switch from '$components/Switch.svelte'
     import Badge from '@smui-extra/badge'
+    import { path } from '@tauri-apps/api'
 
     interface ServerInfo {
         value: string
@@ -56,6 +57,8 @@
 
     onMount(async () => {
         try {
+            $pythonscript = await path.resolve('./resources/python_files/')
+            $felionpy = await path.resolve('./resources/felionpy/felionpy')
             if (!$pyVersion) {
                 console.warn('python is invalid. computing again')
                 await getPyVersion()
@@ -96,7 +99,13 @@
 
             {#if $developerMode}
                 <div class="align">
-                    <BrowseTextfield class="two_col_browse" bind:value={$pythonpath} label="pythonpath" dir={false} />
+                    <BrowseTextfield
+                        class="two_col_browse"
+                        bind:value={$pythonpath}
+                        label="pythonpath"
+                        dir={false}
+                        lock={true}
+                    />
                     <BrowseTextfield class="two_col_browse" bind:value={$pythonscript} label="pythonscript" />
                     <button
                         class="button is-warning ml-auto"
@@ -108,7 +117,7 @@
                 </div>
             {/if}
         </div>
-        <BrowseTextfield class="three_col_browse" bind:value={$felionpy} label="felionpy" lock={true} />
+        <BrowseTextfield class="three_col_browse" bind:value={$felionpy} label="felionpy" lock={true} dir={false} />
 
         <button class="button is-link" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls

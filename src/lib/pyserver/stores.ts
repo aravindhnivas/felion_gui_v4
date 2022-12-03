@@ -2,29 +2,17 @@ import { persistentWritable } from '$src/js/persistentStore'
 import { path } from '@tauri-apps/api'
 import { writable, get, derived } from 'svelte/store'
 
-// const setDefault = (key: string) => {
-//     const initialValue = localStorage.getItem(key)
-//     const store = window.persistentDB(key, initialValue)
-//     if(window.isPackaged) {store.set(initialValue)};
-//     return store
-// }
-export const pythonpath = persistentWritable('pythonpath', '')
+export const pythonpath = persistentWritable('pythonpath', 'python')
 export const pythonscript = persistentWritable('pythonscript', '')
 export const felionpy = persistentWritable('felionpy', '')
 
 export const developerMode = persistentWritable('developerMode', import.meta.env.DEV)
-// if(window.isPackaged) {developerMode.set(false)};
-
-export const pyProgram = derived(
-    [developerMode, pythonpath, felionpy],
-
-    ([$developerMode, $pythonpath, $felionpy]) => {
-        return $developerMode ? $pythonpath : $felionpy
-    }
-)
+export const pyProgram = derived([developerMode, pythonpath, felionpy], ([$developerMode, $pythonpath, $felionpy]) => {
+    return $developerMode ? $pythonpath : $felionpy
+})
 
 export const pyServerReady = writable(false)
-export const pyVersion = persistentWritable('pyVersion', '')
+export const pyVersion = writable('')
 export const pyServerPORT = persistentWritable('pyServerPORT', 5050)
 export const mainpyfile = derived([developerMode, pythonscript], async ([$developerMode, $pythonscript]) => {
     return $developerMode ? await path.join($pythonscript, 'main.py') : ''

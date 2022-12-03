@@ -2,9 +2,11 @@ import { execute } from '$lib/api/shell'
 import { pythonscript, pyVersion, developerMode, pyProgram, get } from '$lib/pyserver/stores'
 
 export async function getPyVersion(e?: ButtonClickEvent) {
+    console.log('getPyVersion', get(developerMode), get(pyProgram))
     if (get(developerMode)) {
         const version = (await execute(get(pyProgram), ['-V'])) as string
         pyVersion.set(version || '')
+        console.log(version)
         window.createToast('python location updated', 'success')
         return Promise.resolve(get(pyVersion))
     }
