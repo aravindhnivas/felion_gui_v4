@@ -5,7 +5,7 @@
     import PreModal from '$src/lib/notifier/PreModal.svelte'
     import ConfirmAlert from '$src/lib/alert/ConfirmAlert.svelte'
     import Home from './Pages/Home.svelte'
-    // import Powerfile from './Pages/Powerfile.svelte'
+    import Powerfile from './Pages/Powerfile.svelte'
     import Normline from './Pages/Normline.svelte'
     import Masspec from './Pages/Masspec.svelte'
     // import Timescan from './Pages/Timescan.svelte'
@@ -21,7 +21,7 @@
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
     const pageIDs = ['Normline', 'Masspec']
-    const navItems = ['Home', ...pageIDs, 'Misc', 'Settings']
+    const navItems = ['Home', ...pageIDs, 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
         Normline,
         Masspec,
@@ -55,7 +55,7 @@
             <PageLayout component={PageComponents[id]} {id} />
         {/each}
         <!-- <Kinetics /> -->
-        <!-- <Powerfile /> -->
+        <Powerfile />
         <Misc />
         <Settings />
 
