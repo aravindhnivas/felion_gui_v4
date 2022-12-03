@@ -1,0 +1,54 @@
+
+# Make a directory called simulations
+# Create "config, files and outputs" directory
+# make a config.yml file in config directory and paste the following contents into it
+# all the collisional, energy and einsteinA coefficients are in .yml format in "files" directory
+
+mainParameters:
+    - {label: molecule, value: "CD^+"}
+    - {label: tagging partner, value: He}
+    - {label: trap_area (sq-meter), value: "5e-5"}
+
+simulationParameters:
+
+    - {label: Simulation time(ms), value: 600}
+    - {label: Initial temperature (K), value: 300}
+    - {label: Total steps, value: 1000}
+    
+dopplerLineshape:
+    - {label: IonMass(amu), value: 14}
+    - {label: RG Mass(amu), value: 4}
+    - {label: IonTemperature(K), value: 12}
+    - {label: TrapTemp(K), value: 5}
+
+powerBroadening:
+    - {label: dipoleMoment(D), value: 1.313}
+    - {label: power(W), value: "2e-5"}
+
+attachmentCoefficients:
+    - {label: totalAttachmentLevels, value: 2}
+    - {label: branching-ratio(kCID), value: 0.5}
+    - {label: a(k31), value: 0.5}
+        
+attachmentRateConstants:
+    k3:
+        - {label: k31, value: 1.2e-30}
+        - {label: k32, value: 3.7e-30}
+    kCID: 
+        - {label: kCID1, value: 1.07e-15}
+        - {label: kCID2, value: 3e-15}
+        
+saveFile:
+    savefilename: CD+_He
+    savelocation: ""
+
+# all the following files are in files directory
+filenames:
+    collision: CD+He_collisionalRateConstant.txt
+    einsteinA: einstein_A_CD+.yml
+    energy: energy_CD+.yml
+ 
+numberDensity: "2e14"
+electronSpin: false
+zeemanSplit: false
+trapTemp: 5
