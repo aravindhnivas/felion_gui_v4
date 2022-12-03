@@ -59,8 +59,8 @@
                     console.log(response)
                     if (response?.toLowerCase() === 'cancel') {
                         fileChecked = []
-                        // fileChecked = fullfileslist.slice(0, $configs['max_files_to_plot'].value)
-                        // console.log(fullfileslist)
+                        fileChecked = fullfileslist.slice(0, $configs['max_files_to_plot'].value)
+                        console.log(fullfileslist)
                         return
                     }
                     plotData({
@@ -84,11 +84,6 @@
             if (selected_file === '') return window.createToast('No files selected', 'danger')
         }
 
-        // const files = (await fs.exists(currentLocation))
-        //     ? fileChecked.map(async (file) => await path.resolve(currentLocation, file))
-        //     : []
-
-        // const massfiles = await Promise.all(files)
         const pyfileInfo: { [name: string]: { pyfile: string; args: Object } } = {
             mass: { pyfile: 'mass', args: { massfiles, tkplot: 'run' } },
             general: { pyfile: 'mass', args: { massfiles, tkplot: 'plot' } },
