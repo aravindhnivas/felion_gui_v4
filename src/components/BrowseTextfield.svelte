@@ -4,7 +4,7 @@
     import { createEventDispatcher } from 'svelte'
     import { dialog } from '@tauri-apps/api'
 
-    export let value: string = ''
+    export let value: string | number = ''
     export let label: string = ''
     export let browseBtn: boolean = true
     export let dir: boolean = true

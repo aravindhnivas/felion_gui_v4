@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
-// import Inspect from 'vite-plugin-inspect'
+// import mdPlugin from 'vite-plugin-markdown'
 import AutoImport from 'unplugin-auto-import/vite'
 const PACKAGE_ROOT = __dirname
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
         svelte(),
+        // mdPlugin(),
         AutoImport({
             imports: ['svelte', 'svelte/store', 'svelte/transition', { 'ts-try': ['tryF', 'isError'] }],
             dts: './src/auto-imports.d.ts',

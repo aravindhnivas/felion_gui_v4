@@ -17,6 +17,19 @@
         "scope": [
           "*"
         ]
+      },
+      "shell": {
+        "scope": [
+          {
+            "name": "python",
+            "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
+            "args": [
+              {
+                "validator": "\\S+"
+              }
+            ]
+          }
+        ]
       }
     },
     "bundle": {
@@ -43,7 +56,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "resources"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {

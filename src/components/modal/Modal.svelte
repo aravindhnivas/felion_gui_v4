@@ -5,6 +5,7 @@
     export let title = 'Title'
     export let height = '70%'
     export let width = '70%'
+    export let id = window.getID()
 
     const dispatch = createEventDispatcher()
 
@@ -26,7 +27,7 @@
     }}
 />
 
-<div class="modal" class:is-active={active} use:mount>
+<div {id} class="modal" class:is-active={active} use:mount>
     <div class="modal-background" />
 
     <div class="modal-card animate__animated animate__fadeIn animate__faster" style:height style:width>
