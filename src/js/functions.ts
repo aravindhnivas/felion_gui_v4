@@ -56,17 +56,18 @@ export const handleError = (error: unknown) => {
     }
 }
 
-window.tempdirPath = await tempdir()
+// window.tempdirPath = await tempdir()
 // console.warn('tempdirPath', tempdirPath)
 window.createToast = createToast
 window.handleError = handleError
 
 window.sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', async (event) => {
     console.log('DOM fully loaded and parsed')
     windowLoaded.set(true)
     bulmaQuickview.attach()
+    window.tempdirPath = await tempdir()
 })
 
 window.getID = () => Math.random().toString(32).substring(2)

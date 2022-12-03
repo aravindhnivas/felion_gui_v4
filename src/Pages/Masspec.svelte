@@ -38,12 +38,6 @@
     }
 
     $: update_massfiles(fileChecked)
-    // $: massfiles = window.fs.isDirectory(currentLocation)
-    //     ? fileChecked.map((file) => window.path.resolve(currentLocation, file))
-    //     : []
-    // $: if (massfiles.length > 0) {
-    //     plotData()
-    // }
 
     let selected_file = ''
 
