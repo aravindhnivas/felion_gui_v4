@@ -58,7 +58,7 @@
     onMount(async () => {
         try {
             $pythonscript = await path.resolve('./resources/python_files/')
-            $felionpy = await path.resolve('./resources/felionpy/felionpy')
+            // $felionpy = await path.resolve('./resources/felionpy/felionpy')
             if (!$pyVersion) {
                 console.warn('python is invalid. computing again')
                 await getPyVersion()
@@ -117,7 +117,7 @@
                 </div>
             {/if}
         </div>
-        <BrowseTextfield class="three_col_browse" bind:value={$felionpy} label="felionpy" lock={true} dir={false} />
+        <BrowseTextfield class="three_col_browse" bind:value={$felionpy} label="felionpy" lock={true} dir={true} />
 
         <button class="button is-link" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls

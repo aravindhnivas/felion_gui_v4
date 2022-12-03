@@ -25,6 +25,7 @@ dist-ssr
 **/*.pyo
 **/__pycache__/
 misc/*
+src-tauri/binaries/*
 **/felionpy/*
 **/*.tmp
 src/resources/configs/autopy-config.json

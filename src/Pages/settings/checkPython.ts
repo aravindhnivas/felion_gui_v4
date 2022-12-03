@@ -1,46 +1,40 @@
-import { execute } from '$lib/api/shell'
-import { pythonscript, pyVersion, developerMode, pyProgram, get } from '$lib/pyserver/stores'
+import { pyVersion, developerMode, felionpy, get } from '$lib/pyserver/stores'
+import { Command } from '@tauri-apps/api/shell'
 
 export async function getPyVersion(e?: ButtonClickEvent) {
-    console.log('getPyVersion', get(developerMode), get(pyProgram))
     if (get(developerMode)) {
-        const version = (await execute(get(pyProgram), ['-V'])) as string
-        pyVersion.set(version || '')
-        console.log(version)
+        const command = new Command('python', ['-V'])
+        const output = await tryF(command.execute())
+        if (isError(output)) {
+            window.createToast(output.message, 'danger')
+            return
+        }
+        const { stdout } = output
+
+        pyVersion.set(stdout?.trim() || '')
         window.createToast('python location updated', 'success')
-        return Promise.resolve(get(pyVersion))
+        return
     }
 
-    // const target = e?.target as HTMLButtonElement
-    // target?.classList.toggle('is-loading')
+    const target = e?.target as HTMLButtonElement
+    target?.classList.toggle('is-loading')
 
-    // const pyfile = 'getVersion'
-    // const pyArgs = get(developerMode) ? await path.join(get(pythonscript), 'main.py') : ''
+    const command = Command.sidecar(get(felionpy), ['getVersion', '{}'])
+    const output = await tryF(command.execute())
+    // const output = await command.execute()
+    // console.log(output, typeof output)
+    if (isError(output) || typeof output === 'string') {
+        window.createToast(output, 'danger')
+        target?.classList.toggle('is-loading')
+        console.error(output)
+        return
+    }
+    const { stdout, stderr } = output
+    console.log({ stdout, stderr })
 
-    // const cmd = `${get(pyProgram)} ${pyArgs} ${pyfile} {} `
-    // const command = new shell.Command(cmd)
+    target?.classList.toggle('is-loading')
 
-    // command.on('close', (data) => {
-    //     target?.classList.toggle('is-loading')
-    //     console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-    // })
-    // command.on('error', (error) => console.error(`command error: "${error}"`))
-
-    // let stdout = ''
-    // let stderr = ''
-    // command.stdout.on('data', (line) => {
-    //     console.log(`command stdout: "${line}"`)
-    //     stdout += line
-    // })
-    // command.stderr.on('data', (line) => {
-    //     stderr += line
-    //     console.log(`command stderr: "${line}"`)
-    // })
-
-    // const [version] = stdout?.split('\n').filter?.((line) => line.includes('Python')) || ['']
-    // pyVersion.set(version?.trim() || '')
-    // console.log({ stdout, version })
-    // window.createToast('python location updated', 'success')
-    // // target?.classList.toggle('is-loading')
-    // return Promise.resolve(get(pyVersion))
+    const [version] = stdout?.split('\n').filter?.((line) => line.includes('Python')) || ['']
+    pyVersion.set(version?.trim() || '')
+    window.createToast('python location updated', 'success')
 }

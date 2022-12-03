@@ -4,7 +4,7 @@ import { writable, get, derived } from 'svelte/store'
 
 export const pythonpath = persistentWritable('pythonpath', 'python')
 export const pythonscript = persistentWritable('pythonscript', '')
-export const felionpy = persistentWritable('felionpy', '')
+export const felionpy = persistentWritable('felionpy', 'binaries/felionpy')
 
 export const developerMode = persistentWritable('developerMode', import.meta.env.DEV)
 export const pyProgram = derived([developerMode, pythonpath, felionpy], ([$developerMode, $pythonpath, $felionpy]) => {

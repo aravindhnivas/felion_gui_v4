@@ -19,7 +19,32 @@
         ]
       },
       "shell": {
+        "sidecar": true,
         "scope": [
+          {
+            "name": "binaries/felionpy",
+            "sidecar": true,
+            "args": [
+              {
+                "validator": "\\S+"
+              },
+              {
+                "validator": "\\S+"
+              }
+            ]
+          },
+          {
+            "name": "resources/felionpy/felionpy",
+            "sidecar": true,
+            "args": [
+              {
+                "validator": "\\S+"
+              },
+              {
+                "validator": "\\S+"
+              }
+            ]
+          },
           {
             "name": "python",
             "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
@@ -39,7 +64,10 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [],
+      "externalBin": [
+        "binaries/felionpy",
+        "resources/felionpy/felionpy"
+      ],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -57,7 +85,7 @@
         "signingIdentity": null
       },
       "resources": [
-        "resources"
+        "resources/**/*"
       ],
       "shortDescription": "",
       "targets": "all",
