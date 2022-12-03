@@ -1,6 +1,7 @@
 import computefromServer from './computefromServer'
 import computefromSubprocess from './computefromSubprocess'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
+import { startServer } from './felionpyServer'
 
 interface Type {
     pyfile: string
@@ -13,12 +14,7 @@ interface Type {
 const restartServer = async () => {
     const restartPyServer = await window.confirm('Restart Python server?')
     if (!restartPyServer) return Promise.resolve(null)
-
-    // const serverSpawned = await window.startServer()
-    // if (!serverSpawned) {
-    //     window.handleError('Python server is not ready. Fix it in Settings --> Configuration')
-    //     return Promise.resolve(null)
-    // }
+    await startServer()
     window.createToast('Python server is ready')
     return Promise.resolve(true)
 }
