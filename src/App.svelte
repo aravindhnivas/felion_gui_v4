@@ -9,7 +9,7 @@
     import Normline from './Pages/Normline.svelte'
     import Masspec from './Pages/Masspec.svelte'
     import Timescan from './Pages/Timescan.svelte'
-    // import THz from './Pages/THz.svelte'
+    import THz from './Pages/THz.svelte'
 
     // import Kinetics from './Pages/Kinetics.svelte'
     import Misc from './Pages/Misc.svelte'
@@ -20,13 +20,13 @@
     // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
-    const pageIDs = ['Normline', 'Masspec', 'Timescan']
+    const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
         Normline,
         Masspec,
         Timescan,
-        // THz,
+        THz,
     }
 
     if (import.meta.env.MODE === 'development') {
