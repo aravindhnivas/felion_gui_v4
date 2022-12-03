@@ -3,7 +3,7 @@
     import Textfield from '@smui/textfield'
     import MenuSurface from '@smui/menu-surface'
     import IconSwitch from '$components/IconSwitch.svelte'
-    import VirtualCheckList from '$components/VirtualCheckList.svelte'
+    import VirtualCheckList from '$src/components/lists/VirtualCheckList.svelte'
     import { path, fs } from '@tauri-apps/api'
     export let filetype = '*.*'
     export let markedFile = ''
