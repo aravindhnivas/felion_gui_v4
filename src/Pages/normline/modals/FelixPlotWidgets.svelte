@@ -20,9 +20,9 @@
 
     async function loadFiles() {
         const felixOpoDatLocation = await path.resolve($felixopoLocation[uniqueID], '../EXPORT')
-        const felixOpoDatfiles = getfiles(felixOpoDatLocation, '.dat')
+        const felixOpoDatfiles = await getfiles(felixOpoDatLocation, '.dat')
 
-        const theoryfiles = getfiles(theoryLocation, '.txt')
+        const theoryfiles = await getfiles(theoryLocation, '.txt')
         felixPlotCheckboxes = [
             {
                 label: 'DAT_file',
@@ -61,7 +61,7 @@
 
 <div style="padding-bottom: 1em;">
     <div class="align mb-2">
-        <button class="button is-link ml-auto" on:click={loadFiles}>reload files</button>
+        <button class="button is-link ml-auto" on:click={async () => await loadFiles()}>reload files</button>
     </div>
     <div class="align" style="justify-content: center;">
         {#each felixPlotCheckboxes as { label, options, value, id } (id)}
