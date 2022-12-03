@@ -186,39 +186,41 @@
     </div>
 
     {#key refresh}
-        {#await getfiles(currentLocation)}
-            <div class="mdc-typography--subtitle1 align center">...loading</div>
-        {:then _}
-            {#if fullfiles.length}
-                <VirtualCheckList
-                    on:fileselect
-                    bind:fileChecked
-                    {fileSelected}
-                    items={fullfiles}
-                    {markedFile}
-                    on:click={get_marked_file}
-                />
-            {:else if fullfiles.length <= 0}
-                <div>No {filetype} here! or try reload files</div>
-            {/if}
-            {#if otherfolders.length}
-                <div style="overflow-y: auto;">
-                    {#each otherfolders as folder (folder.id)}
-                        <div
-                            role="presentation"
-                            class="align"
-                            on:click={() => changeDirectory(folder.name)}
-                            transition:slide|local
-                        >
-                            <i role="presentation" class="material-symbols-outlined">keyboard_arrow_right</i>
-                            <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
-                        </div>
-                    {/each}
-                </div>
-            {/if}
-        {:catch error}
-            <div>{error}</div>
-        {/await}
+        {#if currentLocation}
+            {#await getfiles(currentLocation)}
+                <div class="mdc-typography--subtitle1 align center">...loading</div>
+            {:then _}
+                {#if fullfiles.length}
+                    <VirtualCheckList
+                        on:fileselect
+                        bind:fileChecked
+                        {fileSelected}
+                        items={fullfiles}
+                        {markedFile}
+                        on:click={get_marked_file}
+                    />
+                {:else if fullfiles.length <= 0}
+                    <div>No {filetype} here! or try reload files</div>
+                {/if}
+                {#if otherfolders.length}
+                    <div style="overflow-y: auto;">
+                        {#each otherfolders as folder (folder.id)}
+                            <div
+                                role="presentation"
+                                class="align"
+                                on:click={() => changeDirectory(folder.name)}
+                                transition:slide|local
+                            >
+                                <i role="presentation" class="material-symbols-outlined">keyboard_arrow_right</i>
+                                <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            {:catch error}
+                <div>{error}</div>
+            {/await}
+        {/if}
     {/key}
 </div>
 
