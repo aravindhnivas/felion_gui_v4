@@ -44,4 +44,4 @@ export const running_processes = writable<
     }[]
 >([])
 
-// export const updateInterval = writable(<number>window.db.get('updateInterval') || 15)
+export const updateInterval = writable(parseInt(localStorage.getItem('updateInterval')) || 15)
