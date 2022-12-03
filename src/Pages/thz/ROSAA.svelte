@@ -276,8 +276,7 @@
         try {
             $configLoaded = false
 
-            const content = await fs.readTextFile($configFile)
-            const fileRead = tryF(() => JSON.parse(content))
+            const fileRead = await tryF(fs.readTextFile($configFile))
             if (isError(fileRead)) return window.handleError(fileRead)
 
             const CONFIG = Yml(fileRead)
@@ -381,7 +380,7 @@
             bind:value={$configFile}
             label="config file"
         >
-            <button class="button is-warning" on:click={loadConfig}>load</button>
+            <button class="button is-warning" on:click={async () => loadConfig()}>load</button>
         </BrowseTextfield>
 
         <BrowseTextfield
