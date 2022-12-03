@@ -26,7 +26,7 @@ dist-ssr
 **/*.pyo
 **/__pycache__/
 misc/*
-**/python_files/felionpy
+**/felionpy/*
 **/*.tmp
 src/resources/configs/autopy-config.json
 *py3*
