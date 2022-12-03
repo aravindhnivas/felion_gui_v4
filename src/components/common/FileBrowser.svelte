@@ -31,10 +31,9 @@
     }
     let filesLoaded = false
 
-    async function getfiles(loc: string, toast = false, keepfiles = false) {
+    let keepfiles = false
+    async function getfiles(loc: string) {
         if (!(await fs.exists(loc))) {
-            // reject("Location doesn't exist: Browse files again")
-            if (!toast) return Promise.reject("Location doesn't exist: Browse files again")
             window.createToast('Location undefined', 'danger')
             return Promise.reject("Location doesn't exist: Browse files again")
         }
@@ -42,16 +41,15 @@
         original_files = otherfolders = fullfiles = []
         if (!keepfiles) {
             fileChecked = []
+            keepfiles = false
         }
         selectAll = false
         filesLoaded = false
 
-        // try {
         const folderfile = await tryF(fs.readDir(loc))
         if (isError(folderfile)) {
             throw folderfile
         }
-        // console.log(folderfile)
 
         const fileIncludePattern = new RegExp(`.+\\.[^fr]?${filetype}`) // f or r keyword is to avoid getting fscan and rscan files
 
@@ -105,6 +103,7 @@
     }
 
     $: fileSelected = fileChecked
+    let refresh = false
 </script>
 
 <div class="top__div px-2">
@@ -115,7 +114,8 @@
         on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
         on:click={({ currentTarget }) => {
             currentTarget.classList.add('animate__rotateIn')
-            currentLocation = currentLocation
+            keepfiles = true
+            refresh = !refresh
         }}>refresh</i
     >
     <IconSwitch bind:toggler={sortFile} icons={['trending_up', 'trending_down']} />
@@ -185,39 +185,41 @@
         </div>
     </div>
 
-    {#await getfiles(currentLocation)}
-        <div class="mdc-typography--subtitle1 align center">...loading</div>
-    {:then fullfiles}
-        {#if fullfiles.length}
-            <VirtualCheckList
-                on:fileselect
-                bind:fileChecked
-                {fileSelected}
-                items={fullfiles}
-                {markedFile}
-                on:click={get_marked_file}
-            />
-        {:else if fullfiles.length <= 0}
-            <div>No {filetype} here! or try reload files</div>
-        {/if}
-        {#if otherfolders.length}
-            <div style="overflow-y: auto;">
-                {#each otherfolders as folder (folder.id)}
-                    <div
-                        role="presentation"
-                        class="align"
-                        on:click={() => changeDirectory(folder.name)}
-                        transition:slide|local
-                    >
-                        <i role="presentation" class="material-symbols-outlined">keyboard_arrow_right</i>
-                        <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
-                    </div>
-                {/each}
-            </div>
-        {/if}
-    {:catch error}
-        <div>{error}</div>
-    {/await}
+    {#key refresh}
+        {#await getfiles(currentLocation)}
+            <div class="mdc-typography--subtitle1 align center">...loading</div>
+        {:then _}
+            {#if fullfiles.length}
+                <VirtualCheckList
+                    on:fileselect
+                    bind:fileChecked
+                    {fileSelected}
+                    items={fullfiles}
+                    {markedFile}
+                    on:click={get_marked_file}
+                />
+            {:else if fullfiles.length <= 0}
+                <div>No {filetype} here! or try reload files</div>
+            {/if}
+            {#if otherfolders.length}
+                <div style="overflow-y: auto;">
+                    {#each otherfolders as folder (folder.id)}
+                        <div
+                            role="presentation"
+                            class="align"
+                            on:click={() => changeDirectory(folder.name)}
+                            transition:slide|local
+                        >
+                            <i role="presentation" class="material-symbols-outlined">keyboard_arrow_right</i>
+                            <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        {:catch error}
+            <div>{error}</div>
+        {/await}
+    {/key}
 </div>
 
 <style>
