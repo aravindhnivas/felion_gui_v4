@@ -56,8 +56,6 @@ export const handleError = (error: unknown) => {
     }
 }
 
-// window.tempdirPath = await tempdir()
-// console.warn('tempdirPath', tempdirPath)
 window.createToast = createToast
 window.handleError = handleError
 

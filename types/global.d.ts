@@ -38,7 +38,6 @@ declare global {
         sleep: (ms: number) => Promise<void>
         tempdirPath: string
         getID: () => string
-        clickOutside: (node: HTMLElement) => { destroy: () => void }
         error: unknown
     }
     interface Window extends Exposed {}

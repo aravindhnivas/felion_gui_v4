@@ -32,6 +32,18 @@ export default defineConfig({
         minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_DEBUG,
+        chunkSizeWarningLimit: 2000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    winbox: ['winbox/src/js/winbox'],
+                    interactjs: ['interactjs'],
+                    yaml: ['yaml'],
+                    'lodash-es': ['lodash-es'],
+                    plotly: ['plotly.js-basic-dist'],
+                },
+            },
+        },
     },
     resolve: {
         alias: {
