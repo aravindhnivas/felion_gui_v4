@@ -27,7 +27,6 @@ export default async function ({
     pyfile,
     args,
     computepyfile = 'main',
-    detached = false,
 }: Type): Promise<DataFromPython | undefined | string> {
     return new Promise(async (resolve) => {
         let outputFile: string
@@ -42,7 +41,6 @@ export default async function ({
             const outputFile = await path.join(window.tempdirPath, 'FELion_GUI3', filename)
             if (fs.exists(outputFile)) {
                 const output = await tryF(fs.removeFile(outputFile))
-
                 if (isError(output)) console.error(output)
             }
             target?.classList.toggle('is-loading')
@@ -60,15 +58,13 @@ export default async function ({
         const sendArgs = [pyfile, JSON.stringify(args)]
         const mainPyFile = await path.join(get(pythonscript), computepyfile + '.py')
 
-        const finalProgram = get(pyProgram).split(' ')
+        const command_suffix = get(developerMode) ? '-dev' : ''
         const pyArgs = get(developerMode) ? [mainPyFile, ...sendArgs] : sendArgs
-
-        const finalArgs = [...finalProgram.slice(1), ...pyArgs]
-        console.warn(finalProgram[0], { finalArgs })
-
-        // const py = window.spawn(finalProgram[0], finalArgs, opts)
-        const py = new shell.Command(finalProgram[0], finalArgs)
+        const cmd = `felionpy${command_suffix}`
+        console.log(cmd, pyArgs)
+        const py = new shell.Command(cmd, pyArgs)
         const pyChild = await py.spawn()
+
         if (pyfile !== 'server') {
             running_processes.update((p) => [
                 ...p,
@@ -93,8 +89,8 @@ export default async function ({
             return
         })
 
-        const logDir = await path.appLogDir()
-        const logFile = await path.join(logDir, pyfile + '_data.log')
+        // const logDir = await path.appLogDir()
+        // const logFile = await path.join(logDir, pyfile + '_data.log')
         // window.fs.ensureDirSync(window.path.dirname(logFile))
         // const loginfo = window.fs.createWriteStream(logFile)
 

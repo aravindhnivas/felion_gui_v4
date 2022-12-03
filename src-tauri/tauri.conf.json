@@ -41,6 +41,21 @@
                 "validator": "\\S+"
               }
             ]
+          },
+          {
+            "name": "felionpy-dev",
+            "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
+            "args": [
+              {
+                "validator": "\\S+"
+              },
+              {
+                "validator": "\\S+"
+              },
+              {
+                "validator": "\\S+"
+              }
+            ]
           }
         ]
       }

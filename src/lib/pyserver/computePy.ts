@@ -32,14 +32,6 @@ export default async function ({ e, target, pyfile, args, general }: Type) {
         console.log(`Running python in ${general ? 'subprocess' : 'server'} mode`)
         console.warn(`Running python in ${get(developerMode) ? 'developer' : 'production'} mode \n ${get(pyProgram)}`)
 
-        if (!get(pyServerReady)) {
-            await window.sleep(2000)
-            if (!get(pyServerReady)) {
-                const ready = await restartServer()
-                if (!ready) return Promise.resolve(null)
-            }
-        }
-
         console.warn({ pyfile, args, general })
         if (general) {
             if (target) {
@@ -58,6 +50,13 @@ export default async function ({ e, target, pyfile, args, general }: Type) {
                 args,
             })
         } else {
+            if (!get(pyServerReady)) {
+                await window.sleep(2000)
+                if (!get(pyServerReady)) {
+                    const ready = await restartServer()
+                    if (!ready) return Promise.resolve(null)
+                }
+            }
             dataFromPython = await computefromServer({
                 target,
                 general,
