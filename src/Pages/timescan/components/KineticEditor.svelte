@@ -1,5 +1,6 @@
 <script lang="ts">
-    import Editor from '$components/Editor.svelte'
+    import Editor from '$lib/Editor.svelte'
+    import { fs } from '@tauri-apps/api'
     import { computeKineticCodeScipy } from '../functions/computeKineticCode'
 
     export let location = ''
@@ -48,12 +49,15 @@
     let filenameOpts: string[] = []
 
     const filenameUpdate = async () => {
-        const files = await window.fs.readdir(location)
-        if (window.fs.isError(files)) {
+        const files = await tryF(fs.readDir(location))
+        if (isError(files)) {
             console.error(files)
             return
         }
-        filenameOpts = files.filter((f) => f.startsWith(selectedFile.split('.')[0])).filter((f) => f.endsWith('.md'))
+        filenameOpts = files
+            .map((f) => f.name)
+            .filter((f) => f.startsWith(selectedFile.split('.')[0]))
+            .filter((f) => f.endsWith('.md'))
     }
 
     $: if (selectedFile) {

@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte'
     import Modal from '$components/modal/Modal.svelte'
-    import CustomSelect from '$components/CustomSelect.svelte'
+    import Select from '$components/Select.svelte'
     import NumberDensity from '$src/Pages/misc/NumberDensity.svelte'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import { activePage } from '$src/sveltewritables'
-    // import { browse } from '$components/Layout.svelte'
+    import { dialog, fs, path } from '@tauri-apps/api'
 
     export let nHe = ''
     export let selectedFile = ''
@@ -15,23 +15,29 @@
     export let fileCollections = []
 
     let filename = 'kinetics.conditions.json'
-    $: savefilename = window.path.join(configDir, filename)
+    const update_file_kinetic = async (_loc: string, _file: string) => {
+        savefilename = await path.join(_loc, _file)
+    }
+    $: update_file_kinetic(configDir, filename)
+    let savefilename = ''
     let contents = {}
 
-    $: if (window.fs.isFile(savefilename)) {
+    $: if (savefilename) {
         readConfigFile()
     }
 
     const readConfigFile = async (toast = true) => {
-        if (!window.fs.isFile(savefilename)) {
+        if (!(await fs.exists(savefilename))) {
             if ($activePage === 'Kinetics') {
                 return window.createToast('No config file found. Just compute and press save to create one', 'danger')
             }
             return
         }
-        contents = window.fs.readJsonSync(savefilename)
-        if (window.fs.isError(contents)) return window.handleError(contents)
-        if (toast) window.createToast('file read: ' + window.path.basename(savefilename))
+        const content = await fs.readTextFile(savefilename)
+        contents = tryF(() => JSON.parse(content))
+        if (isError(contents)) return window.handleError(contents)
+
+        if (toast) window.createToast('file read: ' + (await path.basename(savefilename)))
         return await compute()
     }
 
@@ -49,13 +55,13 @@
 
         contents[selectedFile] = get_datas
 
-        const result = window.fs.outputJsonSync(savefilename, contents)
-        if (window.fs.isError(result)) return window.handleError(result)
+        const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
+        if (isError(result)) return window.handleError(result)
 
-        contents = window.fs.readJsonSync(savefilename)
-        if (window.fs.isError(contents)) return window.handleError(contents)
-
-        window.createToast(`File saved to ${window.path.basename(savefilename)} for ${selectedFile}`)
+        const content = await fs.readTextFile(savefilename)
+        contents = tryF(() => JSON.parse(content))
+        if (isError(contents)) return window.handleError(contents)
+        window.createToast(`File saved to ${await path.basename(savefilename)} for ${selectedFile}`)
     }
 
     const compute = async () => {
@@ -70,18 +76,23 @@
     }
 
     let config_file = ''
-    const browseFromConfigFile = () => {
+    const browseFromConfigFile = async () => {
         config_file = ''
-        const [result] = window.browse({ filetype: 'configs.json', dir: false })
+        const result = (await dialog.open({
+            directory: false,
+            filters: [{ name: 'JSON', extensions: ['configs.json'] }],
+        })) as string
         if (!result) return
         config_file = result
     }
 
     const loadFromConfigFile = async () => {
         if (!config_file) return window.createToast('No config file loaded')
-        const config_contents = window.fs.readJsonSync(config_file)
-        if (window.fs.isError(config_contents)) return window.handleError(config_contents)
-        window.createToast(`File read: ${window.path.basename(config_file)}`)
+        const content = await fs.readTextFile(config_file)
+        const config_contents = tryF(() => JSON.parse(content))
+        if (isError(config_contents)) return window.handleError(config_contents)
+
+        window.createToast(`File read: ${await path.basename(config_file)}`)
 
         const keys = Object.keys(config_contents)
         const contents = {}
@@ -92,9 +103,9 @@
             contents[key] = data
         }
 
-        const result = window.fs.outputJsonSync(savefilename, contents)
-        if (window.fs.isError(result)) return window.handleError(result)
-        window.createToast(`File saved to ${window.path.basename(savefilename)}`, 'success')
+        const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
+        if (isError(result)) return window.handleError(result)
+        window.createToast(`File saved to ${await path.basename(savefilename)}`, 'success')
         await readConfigFile()
     }
 
@@ -130,8 +141,8 @@
                         lookFor=".conditions.json"
                         lookIn={configDir}
                     />
-                    <button class="button is-link" on:click={readConfigFile}>Read file</button>
-                    <CustomSelect bind:value={selectedFile} label="Filename" options={fileCollections} />
+                    <button class="button is-link" on:click={async () => await readConfigFile()}>Read file</button>
+                    <Select bind:value={selectedFile} label="Filename" options={fileCollections} />
                     <span class="tag is-success" class:is-danger={!contents?.[selectedFile]}>
                         config {contents?.[selectedFile] ? 'found' : 'not found'}
                     </span>
@@ -140,8 +151,9 @@
         </NumberDensity>
     </svelte:fragment>
     <svelte:fragment slot="footer">
-        <button class="button is-warning" on:click={browseFromConfigFile}>browse config file</button>
-        <button class="button is-warning" on:click={loadFromConfigFile}>load config file</button>
-        <button class="button is-success has-green-background" on:click={save_datas}>Save</button>
+        <button class="button is-warning" on:click={async () => await browseFromConfigFile()}>browse config file</button
+        >
+        <button class="button is-warning" on:click={async () => await loadFromConfigFile()}>load config file</button>
+        <button class="button is-success has-green-background" on:click={async () => await save_datas()}>Save</button>
     </svelte:fragment>
 </Modal>

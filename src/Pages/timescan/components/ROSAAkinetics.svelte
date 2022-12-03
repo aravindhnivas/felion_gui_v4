@@ -3,12 +3,12 @@
     import { onMount } from 'svelte'
     import { cloneDeep } from 'lodash-es'
     import Textfield from '@smui/textfield'
-    import CustomTextSwitch from '$components/CustomTextSwitch.svelte'
-    import CustomSelect from '$components/CustomSelect.svelte'
-    import CustomCheckbox from '$components/CustomCheckbox.svelte'
+    import TextSwitch from '$components/TextSwitch.svelte'
+    import Select from '$components/Select.svelte'
+    import Checkbox from '$components/Checkbox.svelte'
     import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
-    import LayoutDiv from '$components/LayoutDiv.svelte'
-    import computePy_func from '$src/Pages/general/computePy'
+    import LayoutDiv from '$src/layout/misc/LayoutDiv.svelte'
+    import computePy_func from '$lib/pyserver/computePy'
     import KineticConfigTable from './controllers/KineticConfigTable.svelte'
 
     import KineticEditor from './KineticEditor.svelte'
@@ -19,10 +19,11 @@
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
     import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
     import Accordion from '@smui-extra/accordion'
-    import CustomPanel from '$components/CustomPanel.svelte'
+    import Panel from '$src/components/Panel.svelte'
     import BrowseTextfield from '$components/BrowseTextfield.svelte'
+    import { fs, path } from '@tauri-apps/api'
 
-    const currentLocation = window.persistentDB('kinetics_location', '')
+    const currentLocation = persistentWritable('kinetics_location', '')
 
     let timestartIndexScan = 0
     let fileCollections: string[] = []
@@ -32,13 +33,18 @@
     let selectedFile = ''
     let totalMassKey: Timescan.MassKey[] = []
 
-    const updateFiles = () => {
-        if (!window.fs.isDirectory($currentLocation)) {
+    const updateFiles = async () => {
+        if (!(await fs.exists($currentLocation))) {
             return window.createToast('Invalid location', 'danger', { target: 'left' })
         }
 
-        fileCollections = window.fs
-            .readdirSync($currentLocation)
+        const dirs = await tryF(fs.readDir($currentLocation))
+        if (isError(dirs)) {
+            window.handleError(dirs)
+            return
+        }
+        fileCollections = dirs
+            .map((f) => f.name)
             .filter((f) => f.endsWith('_scan.json'))
             .map((f) => f.split('.')[0].replace('_scan', '.scan'))
         console.log(fileCollections)
@@ -90,16 +96,20 @@
 
     let maxTimeIndex = 5
 
-    function computeParameters() {
+    async function computeParameters() {
         console.log('compute parameters')
         tagFile = ''
         timestartIndexScan = 0
         loss_channels = []
 
-        const currentJSONfile = window.path.join($currentLocation, selectedFile.replace('.scan', '_scan.json'))
+        const currentJSONfile = await path.join($currentLocation, selectedFile.replace('.scan', '_scan.json'))
+        const content = await fs.readTextFile(currentJSONfile)
+        currentData = tryF(() => JSON.parse(content))
+        if (isError(currentData)) {
+            window.handleError(currentData)
+            return
+        }
 
-        currentData = window.fs.readJsonSync(currentJSONfile)
-        if (window.fs.isError(currentData)) return
         currentDataBackup = cloneDeep(currentData)
         console.log({ currentData })
         const totalMass = Object.keys(currentData).filter((m) => m !== 'SUM')
@@ -116,7 +126,11 @@
 
     const kinetics_params_file = persistentWritable('kinetics_params_file', 'kinetics.params.json')
 
-    $: paramsFile = window.path.join(configDir, $kinetics_params_file || '')
+    const update_file = async (_loc: string, _file: string) => {
+        paramsFile = await path.join(_loc, _file || '')
+    }
+    let paramsFile = ''
+    $: update_file(configDir, $kinetics_params_file)
 
     $: paramsData = {
         legends,
@@ -161,11 +175,12 @@
         params_found = true
     }
 
-    const updateParamsFile = () => {
+    const updateParamsFile = async () => {
         let contents = {}
-        if (window.fs.isFile(paramsFile)) {
-            contents = window.fs.readJsonSync(paramsFile)
-            if (window.fs.isError(contents)) {
+        if (await fs.exists(paramsFile)) {
+            const content = await fs.readTextFile(paramsFile)
+            contents = tryF(() => JSON.parse(content))
+            if (isError(contents)) {
                 contents = {}
             }
         }
@@ -183,10 +198,10 @@
             contents[selectedFile].default = paramsData
         }
 
-        const result = window.fs.outputJsonSync(paramsFile, contents)
-        if (window.fs.isError(result)) return window.handleError(result)
+        const result = await tryF(fs.writeTextFile(paramsFile, JSON.stringify(contents, null, 4)))
+        if (isError(result)) return window.handleError(result)
         tagOptions = Object.keys(contents[selectedFile].tag)
-        window.createToast(`saved: ${window.path.basename(paramsFile)}`, 'success', {
+        window.createToast(`saved: ${await path.basename(paramsFile)}`, 'success', {
             target: 'left',
         })
         params_found = true
@@ -197,14 +212,14 @@
     let tagFile = ''
     let tagOptions: string[] = []
 
-    const readFromParamsFile = (event?: Event) => {
+    const readFromParamsFile = async (event?: Event) => {
         params_found = false
         tagOptions = []
-        if (!(useParamsFile && window.fs.isFile(paramsFile))) return
+        if (!(useParamsFile && (await fs.exists(paramsFile)))) return
 
-        const data = window.fs.readJsonSync(paramsFile)
-        if (window.fs.isError(data))
-            return window.createToast('no data found while reading file', 'danger', { target: 'left' })
+        const content = await fs.readTextFile(paramsFile)
+        const data = tryF(() => JSON.parse(content))
+        if (isError(data)) return window.createToast('no data found while reading file', 'danger', { target: 'left' })
 
         const contents = data[selectedFile]
         if (!contents) return window.createToast('no contents in the data', 'danger', { target: 'left' })
@@ -256,8 +271,9 @@
 
     // let numberDensity = 0
 
-    const update_kinetic_filename = (appendName: string) => {
-        kineticEditorFilename = window.path.basename(selectedFile).split('.')[0] + appendName
+    const update_kinetic_filename = async (appendName: string) => {
+        const name = await path.basename(selectedFile)
+        kineticEditorFilename = name.split('.')[0] + appendName
     }
     $: if (selectedFile.endsWith('.scan')) {
         computeParameters()
@@ -267,7 +283,11 @@
         update_kinetic_filename(`-${tagFile}-kineticModel.md`)
     }
 
-    $: configDir = window.path.join($currentLocation, '../configs')
+    const update_dir = async (_loc: string) => {
+        configDir = await path.join(_loc, '../configs')
+    }
+    let configDir = ''
+    $: update_dir($currentLocation)
 
     async function kineticSimulation(e: ButtonClickEvent) {
         try {
@@ -277,7 +297,7 @@
             if (!currentData) {
                 return window.handleError('No data available')
             }
-            if (!window.fs.isFile(kineticfile)) {
+            if (!(await fs.exists(kineticfile))) {
                 return window.handleError('Compute and save kinetic equation')
             }
 
@@ -337,9 +357,13 @@
 
     let defaultInitialValues = true
     let initialValues = ''
-    // let adjustConfig = false
     let kineticEditorFilename = ''
-    $: kineticfile = window.path.join($currentLocation, kineticEditorFilename)
+
+    const update_file_kinetic = async (_loc: string, _file: string) => {
+        kineticfile = await path.join(_loc, _file)
+    }
+    $: update_file_kinetic($currentLocation, kineticEditorFilename)
+    let kineticfile = ''
 
     let reportRead = false
     let reportSaved = false
@@ -371,14 +395,14 @@
             bind:value={$currentLocation}
             label="Timescan EXPORT data location"
             updateMode={true}
-            on:update={() => updateFiles()}
+            on:update={async () => await updateFiles()}
         />
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
         <div class="main_container__div">
             <Accordion multiple style="width: 100%;">
-                <CustomPanel loaded={nHe?.length > 0} label="Number density">
+                <Panel loaded={nHe?.length > 0} label="Number density">
                     <Textfield value={nHe || ''} label="numberDensity" disabled />
                     <button
                         class="button is-link"
@@ -392,7 +416,7 @@
                             show_fileConfigs = true
                         }}>Show file configs</button
                     >
-                </CustomPanel>
+                </Panel>
 
                 <RateInitialise
                     loaded={params_found}
@@ -404,7 +428,7 @@
                 >
                     <svelte:fragment slot="basic-infos">
                         <div class="align v-center">
-                            <CustomTextSwitch
+                            <TextSwitch
                                 max={maxTimeIndex}
                                 bind:value={timestartIndexScan}
                                 label="Time Index"
@@ -423,7 +447,9 @@
                                     lookFor=".params.json"
                                     lookIn={configDir}
                                 />
-                                <button class="button is-link" on:click={updateParamsFile}>save</button>
+                                <button class="button is-link" on:click={async () => await updateParamsFile()}
+                                    >save</button
+                                >
                             </div>
                         </div>
                     </svelte:fragment>
@@ -467,8 +493,8 @@
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
-        <CustomCheckbox on:change={computeParameters} bind:value={useParamsFile} label="useParams" />
-        <CustomCheckbox bind:value={useTaggedFile} label="useTag" />
+        <Checkbox on:change={async () => await computeParameters()} bind:value={useParamsFile} label="useParams" />
+        <Checkbox bind:value={useTaggedFile} label="useTag" />
         <TextAndSelectOptsToggler
             bind:value={tagFile}
             options={tagOptions}
@@ -479,8 +505,8 @@
     </svelte:fragment>
 
     <svelte:fragment slot="footer_content__slot">
-        <CustomSelect bind:value={selectedFile} label="Filename" options={fileCollections} />
-        <button class="button is-link" on:click={computeParameters}>compute</button>
+        <Select bind:value={selectedFile} label="Filename" options={fileCollections} />
+        <button class="button is-link" on:click={async () => await computeParameters()}>compute</button>
         <i
             role="presentation"
             class="material-symbols-outlined"

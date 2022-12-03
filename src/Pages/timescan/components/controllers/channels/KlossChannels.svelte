@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CustomSwitch from '$components/CustomSwitch.svelte'
-    import FileReadAndLoad from '$components/FileReadAndLoad.svelte'
+    import Switch from '$components/Switch.svelte'
+    import FileReadAndLoad from '$components/fs/FileReadAndLoad.svelte'
     import ChannelComponent from './ChannelComponent.svelte'
     import { onMount } from 'svelte'
     import { differenceBy, find } from 'lodash-es'
@@ -9,7 +9,7 @@
 
     // import type { loss_channelsType } from 'types/types'
 
-    import CustomPanel from '$components/CustomPanel.svelte'
+    import CustomPanel from '$src/components/Panel.svelte'
 
     export let loss_channels: Timescan.LossChannel[] = []
     export let nameOfReactants = ''
@@ -124,8 +124,8 @@
     <div class="align h-center">
         <button class="button is-link" on:click={addChannel}>Add channel</button>
         <button class="button is-warning" on:click={updateTrapLossChannel}>Add trap loss channel</button>
-        <CustomSwitch bind:selected={defaultMode} label="He-attachment mode" on:change={make_default_channels} />
-        <CustomSwitch
+        <Switch bind:selected={defaultMode} label="He-attachment mode" on:change={make_default_channels} />
+        <Switch
             bind:selected={rateConstantMode}
             label="rateConstant mode"
             on:change={trigger_rateConstantMode_change}

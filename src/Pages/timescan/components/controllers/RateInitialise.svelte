@@ -1,6 +1,6 @@
 <script lang="ts">
     import Textfield from '@smui/textfield'
-    import CustomPanel from '$components/CustomPanel.svelte'
+    import Panel from '$src/components/Panel.svelte'
     // import type { MassKey } from 'types/types'
     import { tick } from 'svelte'
     export let legends = ''
@@ -11,7 +11,7 @@
     export let computeOtherParameters = (_?: boolean): void => {}
 </script>
 
-<CustomPanel label="Labels" style="display: flex; flex-direction: column; gap: 1em;" {loaded}>
+<Panel label="Labels" style="display: flex; flex-direction: column; gap: 1em;" {loaded}>
     <slot name="basic-infos" />
     <div class="align h-center">
         <Textfield bind:value={nameOfReactants} label="nameOfReactants" style="width:30%" />
@@ -39,4 +39,4 @@
         <span class="tag is-danger"> atleast two reactants are required for kinetics </span>
     {/if}
     <slot name="rate-constants" />
-</CustomPanel>
+</Panel>

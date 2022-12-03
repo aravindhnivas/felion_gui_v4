@@ -1,6 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte'
-    import CustomSelect from '$components/CustomSelect.svelte'
+    import Select from '$components/Select.svelte'
     import Textfield from '@smui/textfield'
     // import type { LossChannel } from 'types/types'
     import { isUndefined } from 'lodash-es'
@@ -14,10 +14,10 @@
 
 <div class="channel_div">
     <i class="material-symbols-outlined">menu</i>
-    <CustomSelect bind:value={item.type} label="type" options={['forwards', 'backwards']} />
+    <Select bind:value={item.type} label="type" options={['forwards', 'backwards']} />
     <Textfield bind:value={item.name} label="name" />
-    <CustomSelect bind:value={item.lossFrom} label="lossFrom" options={['<resp. ion>', ...ions_lists]} />
-    <CustomSelect
+    <Select bind:value={item.lossFrom} label="lossFrom" options={['<resp. ion>', ...ions_lists]} />
+    <Select
         bind:value={item.attachTo}
         label="attachTo"
         options={['none', 'all', ...ions_lists.filter((n) => n !== item.lossFrom)]}

@@ -21,7 +21,7 @@
     </div> -->
 </div>
 
-<style lang="scss">
+<!-- <style lang="scss">
     .infos__div {
         display: flex;
         flex-direction: column;
@@ -32,4 +32,4 @@
             align-items: flex-end;
         }
     }
-</style>
+</style> -->
