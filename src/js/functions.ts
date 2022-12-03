@@ -69,3 +69,6 @@ window.addEventListener('DOMContentLoaded', async (event) => {
 })
 
 window.getID = () => Math.random().toString(32).substring(2)
+if (import.meta.env.PROD) {
+    window.document.addEventListener('contextmenu', (e) => e.preventDefault())
+}

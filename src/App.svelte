@@ -12,7 +12,7 @@
     // import THz from './Pages/THz.svelte'
 
     // import Kinetics from './Pages/Kinetics.svelte'
-    // import Misc from './Pages/Misc.svelte'
+    import Misc from './Pages/Misc.svelte'
     import Settings from './Pages/Settings.svelte'
     import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
@@ -21,7 +21,7 @@
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
     const pageIDs = ['Normline', 'Masspec']
-    const navItems = ['Home', ...pageIDs, 'Settings']
+    const navItems = ['Home', ...pageIDs, 'Misc', 'Settings']
     const PageComponents = {
         Normline,
         Masspec,
@@ -56,7 +56,7 @@
         {/each}
         <!-- <Kinetics /> -->
         <!-- <Powerfile /> -->
-        <!-- <Misc /> -->
+        <Misc />
         <Settings />
 
         {#if import.meta.env.MODE === 'development'}
