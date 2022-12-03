@@ -58,11 +58,11 @@ export default async function ({
         const sendArgs = [pyfile, JSON.stringify(args)]
         const mainPyFile = await path.join(get(pythonscript), computepyfile + '.py')
 
-        const command_suffix = get(developerMode) ? '-dev' : ''
+        // const command_suffix = get(developerMode) ? '-dev' : ''
         const pyArgs = get(developerMode) ? [mainPyFile, ...sendArgs] : sendArgs
-        const cmd = `felionpy${command_suffix}`
-        console.log(cmd, pyArgs)
-        const py = new shell.Command(cmd, pyArgs)
+        // const cmd = `felionpy${command_suffix}`
+        console.log(get(pyProgram), pyArgs)
+        const py = new shell.Command(get(pyProgram), pyArgs)
         const pyChild = await py.spawn()
 
         if (pyfile !== 'server') {

@@ -1,12 +1,12 @@
 <script lang="ts">
     import {
         pyVersion,
-        pythonpath,
+        // pythonpath,
         pythonscript,
         pyServerPORT,
         developerMode,
         pyServerReady,
-        felionpy,
+        // felionpy,
         currentTab,
         serverDebug,
     } from '$lib/pyserver/stores'
@@ -17,6 +17,7 @@
     import Switch from '$components/Switch.svelte'
     import Badge from '@smui-extra/badge'
     import { path } from '@tauri-apps/api'
+    import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 
     interface ServerInfo {
         value: string
@@ -26,15 +27,6 @@
     let showServerControls: boolean
     let serverInfo: ServerInfo[] = []
     let serverCurrentStatus: ServerInfo = { value: '', type: 'info' }
-
-    $: if ($pyServerReady) {
-        serverInfo = [...serverInfo, { value: 'fetching server status', type: 'info' }]
-        updateServerInfo()
-    } else {
-        serverCurrentStatus = { value: 'server closed', type: 'danger' }
-        dispatch('serverStatusChanged', { closed: true })
-        serverInfo = [...serverInfo, serverCurrentStatus]
-    }
 
     const updateServerInfo = async (e?: ButtonClickEvent) => {
         serverCurrentStatus = { value: 'server starting...', type: 'info' }
@@ -55,16 +47,18 @@
         }
     }
 
+    $: console.log({ $pyServerReady })
     onMount(async () => {
         try {
             $pythonscript = await path.resolve('./resources/python_files/')
-            // $felionpy = await path.resolve('./resources/felionpy/felionpy')
             if (!$pyVersion) {
                 console.warn('python is invalid. computing again')
                 await getPyVersion()
                 console.warn($pyVersion)
             }
-            $pyServerReady = JSON.parse(localStorage.getItem('pyServerReady') || 'false')
+
+            await startServer()
+            await updateServerInfo()
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
@@ -73,6 +67,10 @@
                 await updateServerInfo()
             }
         }
+    })
+
+    onDestroy(async () => {
+        await stopServer()
     })
     const dispatch = createEventDispatcher()
 </script>
@@ -96,29 +94,7 @@
                 Developer mode: {$developerMode}
             </button>
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
-
-            {#if $developerMode}
-                <div class="align">
-                    <BrowseTextfield
-                        class="two_col_browse"
-                        bind:value={$pythonpath}
-                        label="pythonpath"
-                        dir={false}
-                        lock={true}
-                    />
-                    <BrowseTextfield class="two_col_browse" bind:value={$pythonscript} label="pythonscript" />
-                    <button
-                        class="button is-warning ml-auto"
-                        on:click={async () => {
-                            const output = await getPyVersion()
-                            // if (output instanceof Error) window.handleError(output)
-                        }}>Save</button
-                    >
-                </div>
-            {/if}
         </div>
-        <BrowseTextfield class="three_col_browse" bind:value={$felionpy} label="felionpy" lock={true} dir={true} />
-
         <button class="button is-link" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls
             {#if !$pyServerReady}
@@ -139,7 +115,10 @@
                 <button
                     class="button is-link"
                     class:is-loading={serverCurrentStatus.value.includes('starting')}
-                    on:click={window.startServer}
+                    on:click={async () => {
+                        await startServer()
+                        await updateServerInfo()
+                    }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
                 >
                     STARTserver
@@ -149,7 +128,15 @@
                 </button>
 
                 {#if $pyServerReady && serverCurrentStatus.value.includes('running')}
-                    <button class="button is-danger" on:click={window.stopServer}> STOPserver </button>
+                    <button
+                        class="button is-danger"
+                        on:click={async () => {
+                            await stopServer()
+                            await updateServerInfo()
+                        }}
+                    >
+                        STOPserver
+                    </button>
                 {/if}
             </div>
 
