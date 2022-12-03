@@ -57,8 +57,10 @@
                 console.warn($pyVersion)
             }
 
-            await startServer()
-            await updateServerInfo()
+            if (import.meta.env.PROD) {
+                await startServer()
+                await updateServerInfo()
+            }
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
@@ -70,7 +72,9 @@
     })
 
     onDestroy(async () => {
-        await stopServer()
+        if ($pyServerReady) {
+            await stopServer()
+        }
     })
     const dispatch = createEventDispatcher()
 </script>
