@@ -37,7 +37,6 @@
     const update_felixfiles = async (_files: string[], _loc: string) => {
         felixfiles = await Promise.all(_files.map(async (f) => await path.resolve(_loc, f)))
     }
-    // $: felixfiles = fileChecked.map((file) => window.path.resolve(currentLocation, file))
     let felixfiles: string[] = []
     $: update_felixfiles(fileChecked, currentLocation)
 
@@ -60,11 +59,6 @@
     }
     let output_namelists = []
     $: update_output_namelists(plottedFiles, addedfiles)
-    // $: output_namelists = [
-    //     'averaged',
-    //     ...plottedFiles,
-    //     ...addedfiles.map((file) => window.path.basename(file)).map((file) => file.split('.')[0]),
-    // ]
 
     // OPO
     let OPOLocation = localStorage.getItem('ofelix_location') || currentLocation
@@ -105,11 +99,6 @@
             }
         }
     }
-
-    // $: fullfiles = $opoMode[uniqueID]
-    //     ? [...opofiles, ...addedfiles, window.path.resolve(currentLocation, 'averaged.felix')]
-    //     : [...felixfiles, ...addedfiles, window.path.resolve(currentLocation, 'averaged.felix')]
-
     let fullfiles: string[] = []
     const update_fullfiles = async (mode) => {
         const avgfile = await path.resolve(currentLocation, 'averaged.felix')

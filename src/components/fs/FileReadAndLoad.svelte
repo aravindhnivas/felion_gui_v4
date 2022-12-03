@@ -56,7 +56,6 @@
 
             saveDataForFile ??= { default: dataToSave }
 
-            // const result = await fs.outputJsonSync(savefilename, saveDataForFile)
             const result = await fs.writeTextFile(savefilename, JSON.stringify(saveDataForFile, null, 4))
             if (isError(result)) return window.handleError(`Error writing ${filename}\n${result.message}`)
             return notify()
@@ -64,7 +63,6 @@
 
         let data = {}
         if (await fs.exists(savefilename)) {
-            // data = window.fs.readJsonSync(savefilename)
             const content = await fs.readTextFile(savefilename)
             data = tryF(() => JSON.parse(content))
             if (isError(data)) return window.handleError(data)
@@ -81,7 +79,6 @@
             data[selectedFile]['default'] = dataToSave
         }
 
-        // const result = window.fs.outputJsonSync(savefilename, data)
         const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(data, null, 4)))
         if (isError(result)) return window.handleError(`Error writing ${filename}\n${result.message}`)
         data_loaded = true
@@ -106,7 +103,6 @@
             return window.createToast(`File does not exists. Save it first.`, 'danger', toastOpts)
         }
 
-        // const data = window.fs.readJsonSync(loadfilename)
         const content = await fs.readTextFile(loadfilename)
         const data = tryF(() => JSON.parse(content))
         if (isError(data)) return window.handleError(`Error reading ${filename}\n${data.message}`)

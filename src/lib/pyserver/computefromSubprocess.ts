@@ -89,11 +89,6 @@ export default async function ({
             return
         })
 
-        // const logDir = await path.appLogDir()
-        // const logFile = await path.join(logDir, pyfile + '_data.log')
-        // window.fs.ensureDirSync(window.path.dirname(logFile))
-        // const loginfo = window.fs.createWriteStream(logFile)
-
         let error = ''
         let dataReceived = ''
         dispatchEvent(target, { py, pyfile }, 'pyEvent')

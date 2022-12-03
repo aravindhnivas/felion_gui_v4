@@ -29,7 +29,6 @@
         felixOpoDatLocation = await path.resolve(loc, '../EXPORT')
     }
     $: update_loc($felixopoLocation[uniqueID])
-    // $: felixOpoDatLocation = window.path.resolve($felixopoLocation[uniqueID], '../EXPORT')
     onMount(() => {
         frequencyDatas.init(uniqueID)
         fitted_data.init(uniqueID)
