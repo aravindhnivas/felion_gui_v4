@@ -270,19 +270,19 @@
             updatePower()
         }
     }
-
     let configsBaseName = 'files'
+
     async function setConfig() {
         try {
             $configLoaded = false
-
             const fileRead = await tryF(fs.readTextFile($configFile))
             if (isError(fileRead)) return window.handleError(fileRead)
-
             const CONFIG = Yml(fileRead)
             console.table(CONFIG)
             ;({ numberDensity: $numberDensity } = CONFIG)
+
             console.warn({ $numberDensity })
+
             await tick()
 
             let attachmentRateConstants: {
