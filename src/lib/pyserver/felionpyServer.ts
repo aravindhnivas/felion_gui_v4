@@ -5,11 +5,10 @@ import {
     pyServerPORT,
     pythonscript,
     serverDebug,
+    pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
-import { invoke, path, shell } from '@tauri-apps/api'
-import type { Child } from '@tauri-apps/api/shell'
-export let pyChildProcess: Child = null
+import { path, shell } from '@tauri-apps/api'
 
 export async function startServer() {
     if (get(pyServerReady)) return console.info('Server already running')
@@ -27,7 +26,7 @@ export async function startServer() {
         const pyArgs = get(developerMode) ? [mainPyFile, ...sendArgs] : sendArgs
         console.log(get(pyProgram), pyArgs)
         const py = new shell.Command(get(pyProgram), pyArgs)
-        pyChildProcess = await py.spawn()
+        pyChildProcess.set(await py.spawn())
 
         pyServerReady.set(true)
         py.on('close', () => {
@@ -39,7 +38,7 @@ export async function startServer() {
         })
 
         py.stderr.on('data', (stderr) => {
-            console.warn('STDERR: ', stderr)
+            console.warn("Server's stderr", stderr)
         })
 
         py.stdout.on('data', (stdout) => {
@@ -51,8 +50,20 @@ export async function startServer() {
 }
 
 export async function stopServer() {
-    if (!get(pyServerReady)) return console.info('Server already stopped')
-    pyServerReady.set(false)
-    pyChildProcess.kill()
-    pyChildProcess = null
+    try {
+        if (!get(pyServerReady)) {
+            console.info('Server already stopped')
+            return
+        }
+
+        get(pyChildProcess).kill()
+        console.log(get(pyChildProcess))
+        pyServerReady.set(false)
+        // pyChildProcess = null
+        return Promise.resolve(true)
+    } catch (error) {
+        if (error instanceof Error) {
+            window.handleError(error)
+        }
+    }
 }

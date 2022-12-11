@@ -47,7 +47,6 @@
         }
     }
 
-    $: console.log({ $pyServerReady })
     onMount(async () => {
         try {
             $pythonscript = await path.resolve('./resources/python_files/')
@@ -57,25 +56,21 @@
                 console.warn($pyVersion)
             }
 
-            if (import.meta.env.PROD) {
+            if (!$pyServerReady) {
+                console.log('starting server')
                 await startServer()
+                await updateServerInfo()
+            } else {
+                console.log('server already running')
                 await updateServerInfo()
             }
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
             serverInfo = [...serverInfo, { value: `pyVersion: ${$pyVersion}`, type: 'info' }]
-            if ($pyServerReady) {
-                await updateServerInfo()
-            }
         }
     })
 
-    onDestroy(async () => {
-        if ($pyServerReady) {
-            await stopServer()
-        }
-    })
     const dispatch = createEventDispatcher()
 </script>
 

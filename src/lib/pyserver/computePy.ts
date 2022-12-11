@@ -2,7 +2,7 @@ import computefromServer from './computefromServer'
 import computefromSubprocess from './computefromSubprocess'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
 import { startServer } from './felionpyServer'
-
+import { confirm } from '@tauri-apps/api/dialog'
 interface Type {
     pyfile: string
     args: Object
@@ -12,7 +12,7 @@ interface Type {
 }
 
 const restartServer = async () => {
-    const restartPyServer = await window.confirm('Restart Python server?')
+    const restartPyServer = await confirm('Restart Python server?')
     if (!restartPyServer) return Promise.resolve(null)
     await startServer()
     window.createToast('Python server is ready')
