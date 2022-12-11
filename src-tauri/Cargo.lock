@@ -572,7 +572,7 @@ dependencies = [
 
 [[package]]
 name = "felion_gui_v4"
-version = "0.0.0"
+version = "4.0.0-alpha.1"
 dependencies = [
  "get-port",
  "serde",

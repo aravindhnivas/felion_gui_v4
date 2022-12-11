@@ -24,38 +24,12 @@
           {
             "name": "felionpy",
             "cmd": "$RESOURCE/resources/felionpy/felionpy.exe",
-            "args": [
-              {
-                "validator": "\\S+"
-              },
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "args": true
           },
           {
             "name": "python",
             "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
-            "args": [
-              {
-                "validator": "\\S+"
-              }
-            ]
-          },
-          {
-            "name": "felionpy-dev",
-            "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
-            "args": [
-              {
-                "validator": "\\S+"
-              },
-              {
-                "validator": "\\S+"
-              },
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "args": true
           }
         ]
       }

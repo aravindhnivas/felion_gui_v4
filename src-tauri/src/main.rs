@@ -13,8 +13,8 @@ fn get_tcp_port() -> u16 {
     let tcp_port = TcpPort::in_range(
         "127.0.0.1",
         Range {
-            min: 6000,
-            max: 7000,
+            min: 5051,
+            max: 6000,
         },
     )
     .unwrap();
