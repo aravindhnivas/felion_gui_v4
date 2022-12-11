@@ -17,6 +17,10 @@
     import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
 
+    import { appWindow } from '@tauri-apps/api/window'
+    import { confirm } from '@tauri-apps/api/dialog'
+    import { stopServer } from '$lib/pyserver/felionpyServer'
+
     // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     // const pageIDs = []
@@ -32,7 +36,23 @@
     if (import.meta.env.MODE === 'development') {
         navItems.push('Test')
     }
+
     const toastOpts = { reversed: true, intro: { y: 100 } }
+
+    const unlisten = appWindow.onCloseRequested(async (event) => {
+        const confirmed = await confirm('Are you sure?')
+        if (!confirmed) {
+            event.preventDefault()
+        }
+        await stopServer()
+    })
+
+    onDestroy(async () => {
+        // you need to call unlisten if your handler goes out of scope e.g. the component is unmounted
+        const unlistner = await unlisten
+        unlistner()
+        console.log('App destroyed')
+    })
 </script>
 
 <PreModal />
