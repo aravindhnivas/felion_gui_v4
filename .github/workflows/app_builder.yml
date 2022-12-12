@@ -18,18 +18,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          draft: false
+          draft: true
           prerelease: false
-      - name: Create MSI File
-        run: |
-          # Create MSI file using your build tools
-          # and save it to the workspace
-          build-msi
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_path: ./src-tauri/target/release/bundle/msi
-          asset_name: felion*.msi*
-          asset_content_type: application/octet-stream
+      
