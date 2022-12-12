@@ -31,3 +31,4 @@ src-tauri/binaries/*
 src/resources/configs/autopy-config.json
 *py3*
 *.egg-info
+felion.keys.txt
