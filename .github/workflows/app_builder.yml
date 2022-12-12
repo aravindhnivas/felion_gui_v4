@@ -30,7 +30,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: D:/github_projects/felion_gui_v4/src-tauri/target/release/bundle/
-          asset_name: felion*.msi
+          asset_path: ./src-tauri/target/release/bundle/msi
+          asset_name: felion*.msi*
           asset_content_type: application/octet-stream
