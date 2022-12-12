@@ -44,4 +44,6 @@ export const running_processes = writable<
     }[]
 >([])
 
-export const updateInterval = writable(parseInt(localStorage.getItem('updateInterval')) || 15)
+export const updateInterval = persistentWritable('updateInterval', 15)
+export const updateError = writable('')
+export const updateStatus = writable('')

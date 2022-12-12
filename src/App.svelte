@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+    import { updateStatus, updateError } from '$src/sveltewritables'
     import { SvelteToast } from '@zerodevx/svelte-toast'
     import Navbar from '$src/layout/main//Navbar.svelte'
     import Footer from '$src/layout/main/Footer.svelte'
@@ -20,10 +21,8 @@
     import { appWindow } from '@tauri-apps/api/window'
     import { confirm } from '@tauri-apps/api/dialog'
     import { stopServer } from '$lib/pyserver/felionpyServer'
+    import { listen } from '@tauri-apps/api/event'
 
-    // const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
-    // const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
-    // const pageIDs = []
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -39,7 +38,8 @@
 
     const toastOpts = { reversed: true, intro: { y: 100 } }
 
-    const unlisten = appWindow.onCloseRequested(async (event) => {
+    let unlistenList: Promise<import('@tauri-apps/api/event').UnlistenFn>[] = []
+    unlistenList[0] = appWindow.onCloseRequested(async (event) => {
         const confirmed = await confirm('Are you sure?')
         if (!confirmed) {
             event.preventDefault()
@@ -47,10 +47,20 @@
         await stopServer()
     })
 
+    onMount(async () => {
+        unlistenList[1] = listen('tauri://update-available', function (res) {
+            console.log('New version available: ', res)
+        })
+        // res.payload.status    [ERROR/PENDING/DONE]
+        unlistenList[2] = listen('tauri://update-status', function (res) {
+            console.log('New status: ', res)
+        })
+
+        console.log('App mounted')
+    })
     onDestroy(async () => {
-        // you need to call unlisten if your handler goes out of scope e.g. the component is unmounted
-        const unlistner = await unlisten
-        unlistner()
+        const unlistner = await Promise.all(unlistenList)
+        unlistner.forEach((unlisten) => unlisten())
         console.log('App destroyed')
     })
 </script>

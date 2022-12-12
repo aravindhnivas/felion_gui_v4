@@ -12,7 +12,7 @@ export async function getPyVersion(e?: ButtonClickEvent) {
         const { stdout } = output
 
         pyVersion.set(stdout?.trim() || '')
-        window.createToast('python location updated', 'success')
+        // window.createToast('python location updated', 'success')
         return
     }
 
@@ -39,5 +39,5 @@ export async function getPyVersion(e?: ButtonClickEvent) {
 
     const [version] = stdout?.split('\n').filter?.((line) => line.includes('Python')) || ['']
     pyVersion.set(version?.trim() || '')
-    window.createToast('python location updated', 'success')
+    // window.createToast('python location updated', 'success')
 }
