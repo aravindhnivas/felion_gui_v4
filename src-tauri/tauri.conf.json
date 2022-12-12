@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "felion_gui_v4",
-    "version": "0.0.0"
+    "version": "4.0.0-alpha.1"
   },
   "tauri": {
     "allowlist": {
@@ -73,15 +73,20 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": [
+        "https://releases.myapp.com/{{target}}/{{current_version}}"
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJERkFCNEYzNDExRjYyRTIKUldUaVloOUI4N1Q2dmVqZDVwUEVjYytMa1VUZEVlUVhsN1ZLdlFISjM4Wkp5Y1pYcGtVdHd2cGwK"
     },
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 700,
         "resizable": true,
-        "title": "felion_gui_v4",
-        "width": 800
+        "title": "FELion v4",
+        "width": 1200
       }
     ]
   }
