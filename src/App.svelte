@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { pyServerReady } from '$lib/pyserver/stores'
     import { updateStatus, updateError } from '$src/sveltewritables'
     import { SvelteToast } from '@zerodevx/svelte-toast'
     import Navbar from '$src/layout/main//Navbar.svelte'

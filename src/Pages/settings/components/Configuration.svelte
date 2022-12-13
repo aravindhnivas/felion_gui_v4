@@ -18,6 +18,7 @@
     import Badge from '@smui-extra/badge'
     import { path } from '@tauri-apps/api'
     import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+    import { invoke } from '@tauri-apps/api/tauri'
 
     interface ServerInfo {
         value: string
@@ -56,12 +57,9 @@
                 console.warn($pyVersion)
             }
 
-            if (!$pyServerReady) {
+            if (import.meta.env.PROD) {
                 console.log('starting server')
                 await startServer()
-                await updateServerInfo()
-            } else {
-                console.log('server already running')
                 await updateServerInfo()
             }
         } catch (error) {
@@ -102,6 +100,14 @@
         </button>
         <div id="serverControllers" class="align server-control" class:hide={!showServerControls}>
             <div class="align">
+                <span
+                    role="presentation"
+                    class="material-symbols-outlined"
+                    on:click={async () => {
+                        if ($pyServerReady) return window.createToast('server already running')
+                        $pyServerPORT = await invoke('get_tcp_port')
+                    }}>refresh</span
+                >
                 <BrowseTextfield
                     type="number"
                     bind:value={$pyServerPORT}
@@ -110,6 +116,7 @@
                     lock={true}
                     style="display: flex;"
                 />
+
                 <Switch bind:selected={$serverDebug} label="debug mode" />
                 <button
                     class="button is-link"

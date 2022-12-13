@@ -8,6 +8,7 @@ import {
     pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
+
 import { path, shell } from '@tauri-apps/api'
 
 export async function startServer() {
@@ -59,7 +60,6 @@ export async function stopServer() {
         get(pyChildProcess).kill()
         console.log(get(pyChildProcess))
         pyServerReady.set(false)
-        // pyChildProcess = null
         return Promise.resolve(true)
     } catch (error) {
         if (error instanceof Error) {
