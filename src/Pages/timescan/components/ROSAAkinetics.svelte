@@ -102,8 +102,14 @@
         timestartIndexScan = 0
         loss_channels = []
 
+        if (!selectedFile) return window.createToast('No file selected', 'danger')
         const currentJSONfile = await path.join($currentLocation, selectedFile.replace('.scan', '_scan.json'))
-        const content = await fs.readTextFile(currentJSONfile)
+        const content = await tryF(fs.readTextFile(currentJSONfile))
+        if (isError(content)) {
+            window.handleError(currentData)
+            return
+        }
+
         currentData = tryF(() => JSON.parse(content))
         if (isError(currentData)) {
             window.handleError(currentData)
@@ -275,7 +281,7 @@
         const name = await path.basename(selectedFile)
         kineticEditorFilename = name.split('.')[0] + appendName
     }
-    $: if (selectedFile.endsWith('.scan')) {
+    $: if (selectedFile?.endsWith('.scan')) {
         computeParameters()
         update_kinetic_filename('-kineticModel.md')
     }

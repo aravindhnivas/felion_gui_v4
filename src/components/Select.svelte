@@ -6,7 +6,6 @@
     export let label = ''
     export let value: string[] | string = ''
     export let multiple = false
-
     export let update: ((toast?: boolean) => void) | null = null
     export let auto_init = false
     export let lookIn: string = ''
@@ -24,15 +23,16 @@
                     return
                 }
                 const folders = await fs.readDir(lookIn)
-                options = folders.filter((n) => n.name.endsWith(lookFor)).map((n) => n.name)
+                options = folders?.filter((n) => n.name.endsWith(lookFor)).map((n) => n.name)
                 if (toast) window.createToast(`Found ${options.length} files`, 'success')
-                console.log(options)
+                // console.log(options)
                 if (auto_init && value && options.length === 0) {
                     if (typeof value === 'string') options[0] = value
                 }
             }
             update(false)
-
+            // if (!value && options.length > 0) value = options[0]
+            console.log('update', options, value)
             value ||= options[0] || ''
         }
     })

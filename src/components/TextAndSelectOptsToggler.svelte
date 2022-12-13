@@ -3,7 +3,7 @@
     import Select from '$components/Select.svelte'
     export let value = ''
     export let label = ''
-    export let toggle = true
+    export let toggle = false
 </script>
 
 <svelte:component
