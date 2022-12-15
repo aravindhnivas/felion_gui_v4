@@ -1,25 +1,32 @@
 <script lang="ts">
     import { currentTab } from '$lib/pyserver/stores'
+    import { currentVersion } from '$src/js/functions'
+    import Notify from '$lib/notifier/Notify.svelte'
     import { updateInterval, updateError } from '$src/sveltewritables'
     import { activateChangelog } from '$src/js/functions'
-    import Notify from '$lib/notifier/Notify.svelte'
-    import { getVersion } from '@tauri-apps/api/app'
     import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
+    import { confirm } from '@tauri-apps/api/dialog'
 
     const check_for_update = async () => {
         try {
             if (devMODE) return window.createToast('Update check skipped in dev mode', 'danger')
-
             console.warn('Checking for updates...')
             lastUpdateCheck = new Date().toLocaleString()
-            const { shouldUpdate } = await checkUpdate()
-            console.log(shouldUpdate)
-            if (shouldUpdate) {
-                await stopServer()
-                await installUpdate()
-                await relaunch()
+            const update = await checkUpdate()
+            console.log(update)
+            if (update.shouldUpdate) {
+                const newVersion = update.manifest?.version
+                const install = await confirm(`Do you want to install the latest update and restart.`, {
+                    title: `Update available ${newVersion}`,
+                })
+                if (install) {
+                    await stopServer()
+                    console.log(`Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`)
+                    await installUpdate()
+                    await relaunch()
+                }
             }
         } catch (error) {
             $updateError = error
@@ -31,8 +38,10 @@
     let lastUpdateCheck: string = 'Not checked yet'
 
     const devMODE = import.meta.env.DEV
+
     onMount(async () => {
         if (devMODE) return
+
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
 
@@ -47,12 +56,9 @@
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
     <h1>Update</h1>
-    {#await getVersion() then currentVersion}
-        <div class="subtitle" style="width: 100%;">
-            Current version: {currentVersion}
-        </div>
-    {/await}
-
+    <div class="subtitle" style="width: 100%;">
+        Current version: {$currentVersion}
+    </div>
     <div class="align">
         <div class="align">
             <button

@@ -11,6 +11,10 @@ export const newVersion = writable('')
 export const updating = writable(false)
 export { plot, subplot, plotlyClick, plotlyEventsInfo } from './plot'
 
+import { getVersion } from '@tauri-apps/api/app'
+
+export const currentVersion = writable('')
+
 type ToastThemeOpts = {
     [key in 'info' | 'success' | 'warning' | 'danger']: { [key: string]: string }
 }
@@ -63,6 +67,7 @@ window.sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 window.addEventListener('DOMContentLoaded', async (event) => {
     console.log('DOM fully loaded and parsed')
+    currentVersion.set(await getVersion())
     windowLoaded.set(true)
     bulmaQuickview.attach()
     window.tempdirPath = await tempdir()
