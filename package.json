@@ -1,7 +1,7 @@
 {
   "name": "felion_gui_v4",
   "private": true,
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
     "@formkit/auto-animate": "^1.0.0-beta.5",
+    "@octokit/rest": "^19.0.5",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltejs/vite-plugin-svelte": "^1.4.0",
     "@tauri-apps/cli": "^1.2.2",
@@ -39,7 +40,6 @@
     "interactjs": "^1.10.17",
     "lodash-es": "^4.17.21",
     "material-symbols": "^0.4.2",
-    "octokit": "^2.0.10",
     "plotly.js-basic-dist": "^2.16.4",
     "prettier-plugin-svelte": "^2.9.0",
     "regression": "^2.0.1",
