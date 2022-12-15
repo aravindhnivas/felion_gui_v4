@@ -5,13 +5,11 @@ import { stopServer } from '$lib/pyserver/felionpyServer'
 
 export const update_status = writable('')
 
-const update_events = {
-    CHECK_UPDATE: 'tauri://update',
-    UPDATE_AVAILABLE: 'tauri://update-available',
-    INSTALL_UPDATE: 'tauri://update-install',
-    STATUS_UPDATE: 'tauri://update-status',
-    DOWNLOAD_PROGRESS: 'tauri://update-download-progress',
-}
+// const update_events = {
+//     INSTALL_UPDATE: 'tauri://update-install',
+//     STATUS_UPDATE: 'tauri://update-status',
+//     DOWNLOAD_PROGRESS: 'tauri://update-download-progress',
+// }
 
 export const events_listeners = async () => {
     const unlisten_closeEvent = await appWindow.onCloseRequested(async (event) => {
@@ -21,14 +19,17 @@ export const events_listeners = async () => {
         }
         await stopServer()
     })
-    let unlisteners: UnlistenFn[] = []
-    let i = 0
-    for (const event in update_events) {
-        unlisteners[i] = await listen(update_events[event], function (res) {
-            console.log(res)
-            update_status.set(JSON.stringify(res))
-        })
-        i++
-    }
-    return Promise.resolve([unlisten_closeEvent, ...unlisteners])
+    // let unlisteners: UnlistenFn[] = []
+    // let i = 0
+    // for (const event in update_events) {
+    //     unlisteners[i] = await listen(update_events[event], function (res) {
+    //         console.log(res)
+    //         if (res.payload) {
+    //             update_status.set(`${res.event}: ${JSON.stringify(res.payload)}`)
+    //         }
+    //     })
+    //     i++
+    // }
+    // return Promise.resolve([unlisten_closeEvent, ...unlisteners])
+    return Promise.resolve([unlisten_closeEvent])
 }

@@ -17,6 +17,7 @@
 
 <style lang="scss">
     .output__div {
+        user-select: text;
         overflow-x: auto;
         background-color: whitesmoke;
         height: 300px;
@@ -27,6 +28,9 @@
         ul,
         ul > li {
             width: 100%;
+        }
+        ul li {
+            white-space: pre-line;
         }
         &::-webkit-scrollbar-thumb {
             background-color: grey;

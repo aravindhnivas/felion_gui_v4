@@ -144,3 +144,10 @@ button.mdc-segmented-button__segment.mdc-ripple-upgraded {
 .smui-text-field--standard {
   height: 47px;
 }
+.mdc-linear-progress__bar.mdc-linear-progress__secondary-bar {
+
+  background-color: red!important;
+}
+.mdc-linear-progress__bar-inner {
+    color: red;
+}

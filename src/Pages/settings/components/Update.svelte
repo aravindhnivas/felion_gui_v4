@@ -10,6 +10,8 @@
     import { confirm } from '@tauri-apps/api/dialog'
     import { update_status } from '$lib/event_listeneres'
     import OutputBox from '$src/lib/OutputBox.svelte'
+    import { listen } from '@tauri-apps/api/event'
+    import LinearProgress from '@smui/linear-progress'
 
     const check_for_update = async () => {
         try {
@@ -38,6 +40,17 @@
     $: if ($update_status) {
         update_output($update_status)
     }
+
+    let download_progress = 0.5
+
+    const listen_download_progress = listen('tauri://update-download-progress', function (res) {
+        console.log(res)
+        update_status.set(`${res.event}: ${JSON.stringify(res.payload)}`)
+        if (res.payload) {
+            const { chunkLength, contentLength } = res.payload as { chunkLength: string; contentLength: string }
+            download_progress += +chunkLength / +contentLength
+        }
+    })
     let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
@@ -50,7 +63,9 @@
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
 
-        return () => {
+        return async () => {
+            const unlisten = await listen_download_progress
+            unlisten()
             console.warn('Update page unmounted')
             if (updateIntervalCycle) {
                 clearInterval(updateIntervalCycle)
@@ -66,6 +81,7 @@
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
+    <LinearProgress progress={download_progress} closed={false} />
     <h1>Update</h1>
     <div class="subtitle" style="width: 100%;">
         Current version: {$currentVersion}
