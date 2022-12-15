@@ -13,7 +13,6 @@
 
             console.warn('Checking for updates...')
             lastUpdateCheck = new Date().toLocaleString()
-
             const { shouldUpdate } = await checkUpdate()
             if (shouldUpdate) {
                 await installUpdate()
@@ -25,12 +24,8 @@
     }
 
     let updateIntervalCycle: NodeJS.Timer | null = null
-
     let updateReadyToInstall = false
-    // const dispatch = createEventDispatcher()
-
     let lastUpdateCheck: string = 'Not checked yet'
-    // const updateStatus = { text: '', type: 'info' }
     let currentVersion: string = ''
 
     const devMODE = import.meta.env.DEV
@@ -61,11 +56,9 @@
             <button
                 class="button is-link"
                 class:is-warning={updateReadyToInstall}
-                disabled={!devMODE}
                 id="updateCheckBtn"
                 on:click={() => {
                     checkupdate()
-                    // updateReadyToInstall ? window.quitAndInstall() : window.checkupdate()
                 }}
             >
                 {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
