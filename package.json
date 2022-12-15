@@ -4,8 +4,12 @@
   "version": "0.0.8",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run tauri dev",
+    "build": "npm run tauri build ",
+    "dev:vite": "vite",
+    "build:vite": "vite build",
+    "publish": "tsx .\\scripts\\gh-release.ts",
+    "bpublish": "npm run build && tsx .\\scripts\\gh-release.ts",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri"
