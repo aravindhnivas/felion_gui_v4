@@ -58,10 +58,8 @@
 
     onMount(async () => {
         if (devMODE) return
-
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-
         return async () => {
             const unlisten = await listen_download_progress
             unlisten()
@@ -71,6 +69,7 @@
             }
         }
     })
+
     let outputs: string[] = []
     let allow_to_check_update = false
     export const update_output = (val: string | Object) => {
@@ -80,7 +79,6 @@
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
-    <LinearProgress progress={download_progress} closed={false} />
     <h1>Update</h1>
     <div class="subtitle" style="width: 100%;">
         Current version: {$currentVersion}
@@ -115,6 +113,10 @@
         </div>
         <Notify bind:label={$updateError} type="danger" />
     </div>
+
+    {#if download_progress}
+        <LinearProgress progress={download_progress} />
+    {/if}
 
     <OutputBox
         items={outputs}
