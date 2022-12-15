@@ -7,13 +7,14 @@
     import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
     import { relaunch } from '@tauri-apps/api/process'
 
-    const checkupdate = async () => {
+    const check_for_update = async () => {
         try {
             if (devMODE) return window.createToast('Update check skipped in dev mode', 'danger')
 
             console.warn('Checking for updates...')
             lastUpdateCheck = new Date().toLocaleString()
             const { shouldUpdate } = await checkUpdate()
+            console.log(shouldUpdate)
             if (shouldUpdate) {
                 await installUpdate()
                 await relaunch()
@@ -33,8 +34,8 @@
         currentVersion = await getVersion()
 
         if (devMODE) return
-        checkupdate()
-        updateIntervalCycle = setInterval(checkupdate, $updateInterval * 60 * 1000)
+        check_for_update()
+        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
 
         return () => {
             console.warn('Update page unmounted')
@@ -58,7 +59,7 @@
                 class:is-warning={updateReadyToInstall}
                 id="updateCheckBtn"
                 on:click={() => {
-                    checkupdate()
+                    check_for_update()
                 }}
             >
                 {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
