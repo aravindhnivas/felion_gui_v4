@@ -6,6 +6,7 @@
     import { getVersion } from '@tauri-apps/api/app'
     import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
     import { relaunch } from '@tauri-apps/api/process'
+    import { stopServer } from '$src/lib/pyserver/felionpyServer'
 
     const check_for_update = async () => {
         try {
@@ -16,6 +17,7 @@
             const { shouldUpdate } = await checkUpdate()
             console.log(shouldUpdate)
             if (shouldUpdate) {
+                await stopServer()
                 await installUpdate()
                 await relaunch()
             }
@@ -27,12 +29,9 @@
     let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
-    let currentVersion: string = ''
 
     const devMODE = import.meta.env.DEV
     onMount(async () => {
-        currentVersion = await getVersion()
-
         if (devMODE) return
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
@@ -48,9 +47,11 @@
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
     <h1>Update</h1>
-    <div class="subtitle" style="width: 100%;">
-        Current version: {currentVersion}
-    </div>
+    {#await getVersion() then currentVersion}
+        <div class="subtitle" style="width: 100%;">
+            Current version: {currentVersion}
+        </div>
+    {/await}
 
     <div class="align">
         <div class="align">
@@ -58,8 +59,8 @@
                 class="button is-link"
                 class:is-warning={updateReadyToInstall}
                 id="updateCheckBtn"
-                on:click={() => {
-                    check_for_update()
+                on:click={async () => {
+                    await check_for_update()
                 }}
             >
                 {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
