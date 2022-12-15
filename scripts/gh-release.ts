@@ -2,8 +2,8 @@ import { Octokit } from '@octokit/rest'
 import fs from 'fs'
 import { resolve, join } from 'path'
 import pkg from '../package.json'
-
-const asset_dir = resolve('./', 'src-tauri/target/release/bundle/msi')
+console.log('working dir:', resolve('./'))
+const asset_dir = resolve('./src-tauri/target/release/bundle/msi')
 const asset_bin = `${pkg.name}_${pkg.version}_x64_en-US.msi.zip`
 const asset_sig = `${pkg.name}_${pkg.version}_x64_en-US.msi.zip.sig`
 const octokit = new Octokit({ auth: process.env.GH_FULL_CONTROL })
@@ -18,7 +18,6 @@ const Release = await octokit.rest.repos.createRelease({
     owner: 'aravindhnivas', // the owner of the repository
     repo: pkg.name, // the name of the repository
     tag_name: pkg.version, // the name of the release
-    // tag_name: '0.0.7', // the name of the release
     target_commitish: 'main', // the name of the branch
     name: `Release v${pkg.version}`, // the title of the release
     draft: true,
