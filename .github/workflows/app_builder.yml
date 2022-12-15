@@ -3,15 +3,15 @@ name: Release on Publish
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 jobs:
   release:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Create Release
+        id: create-new-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -20,4 +20,10 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
           prerelease: false
+      - name: Upload release binaries
+        uses: alexellis/upload-assets@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./src-tauri/target/release/bundle/msi/felion_gui_v4_${{ github.ref }}_x64_en-US.msi.*"]'
       
