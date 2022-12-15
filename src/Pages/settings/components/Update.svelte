@@ -8,18 +8,23 @@
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
     import { confirm } from '@tauri-apps/api/dialog'
-    import { update_status } from '$lib/event_listeneres'
     import OutputBox from '$src/lib/OutputBox.svelte'
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
+    import Switch from '$src/components/Switch.svelte'
 
     const check_for_update = async () => {
         try {
-            if (devMODE) return window.createToast('Update check skipped in dev mode', 'danger')
+            if (allow_to_check_update || devMODE)
+                return window.createToast('Update check skipped in dev mode', 'danger')
+
             update_output('Checking for updates...')
+            download_progress = 0
             lastUpdateCheck = new Date().toLocaleString()
+
             const update = await checkUpdate()
             update_output(update)
+
             if (update.shouldUpdate) {
                 const newVersion = update.manifest?.version
                 const install = await confirm(`Do you want to install the latest update and restart.`, {
@@ -37,15 +42,9 @@
         }
     }
 
-    $: if ($update_status) {
-        update_output($update_status)
-    }
-
-    let download_progress = 0.5
+    let download_progress = 0
 
     const listen_download_progress = listen('tauri://update-download-progress', function (res) {
-        console.log(res)
-        update_status.set(`${res.event}: ${JSON.stringify(res.payload)}`)
         if (res.payload) {
             const { chunkLength, contentLength } = res.payload as { chunkLength: string; contentLength: string }
             download_progress += +chunkLength / +contentLength
@@ -73,7 +72,7 @@
         }
     })
     let outputs: string[] = []
-
+    let allow_to_check_update = false
     export const update_output = (val: string | Object) => {
         if (!val) return
         outputs = [JSON.stringify(val), ...outputs]
@@ -86,6 +85,7 @@
     <div class="subtitle" style="width: 100%;">
         Current version: {$currentVersion}
     </div>
+
     <div class="align">
         <div class="align">
             <button
@@ -106,18 +106,14 @@
                 }}>What's New</button
             >
         </div>
-
         {#if devMODE}
-            <div class="updateCheck_status_div">
-                <span>Last checked</span>
-                <span class="tag is-warning" id="update-check-status">{lastUpdateCheck}</span>
-            </div>
-            <div id="update-progress-container" style="display:none;">
-                <label for="update-progress">Download progress:</label>
-                <progress id="update-progress" max="100" value="0"> 0%</progress>
-            </div>
-            <Notify bind:label={$updateError} type="danger" />
+            <Switch bind:selected={allow_to_check_update} />
         {/if}
+        <div class="updateCheck_status_div">
+            <span>Last checked</span>
+            <span class="tag is-warning" id="update-check-status">{lastUpdateCheck}</span>
+        </div>
+        <Notify bind:label={$updateError} type="danger" />
     </div>
 
     <OutputBox
@@ -135,15 +131,5 @@
         align-items: flex-end;
         flex-direction: column;
         margin-left: auto;
-    }
-    #update-progress-container {
-        progress {
-            width: 100%;
-        }
-        display: grid;
-        width: 100%;
-        gap: 1em;
-        grid-template-columns: auto 1fr;
-        align-items: center;
     }
 </style>
