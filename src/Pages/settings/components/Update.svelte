@@ -8,14 +8,16 @@
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
     import { confirm } from '@tauri-apps/api/dialog'
+    import { update_status } from '$lib/event_listeneres'
+    import OutputBox from '$src/lib/OutputBox.svelte'
 
     const check_for_update = async () => {
         try {
             if (devMODE) return window.createToast('Update check skipped in dev mode', 'danger')
-            console.warn('Checking for updates...')
+            update_output('Checking for updates...')
             lastUpdateCheck = new Date().toLocaleString()
             const update = await checkUpdate()
-            console.log(update)
+            update_output(update)
             if (update.shouldUpdate) {
                 const newVersion = update.manifest?.version
                 const install = await confirm(`Do you want to install the latest update and restart.`, {
@@ -23,7 +25,7 @@
                 })
                 if (install) {
                     await stopServer()
-                    console.log(`Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`)
+                    update_output(`Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`)
                     await installUpdate()
                     await relaunch()
                 }
@@ -33,6 +35,9 @@
         }
     }
 
+    $: if ($update_status) {
+        update_output($update_status)
+    }
     let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
@@ -52,6 +57,12 @@
             }
         }
     })
+    let outputs: string[] = []
+
+    export const update_output = (val: string | Object) => {
+        if (!val) return
+        outputs = [JSON.stringify(val), ...outputs]
+    }
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
@@ -92,6 +103,13 @@
             <Notify bind:label={$updateError} type="danger" />
         {/if}
     </div>
+
+    <OutputBox
+        items={outputs}
+        on:clear={() => {
+            outputs = []
+        }}
+    />
 </div>
 
 <style lang="scss">

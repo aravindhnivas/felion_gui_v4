@@ -3,6 +3,8 @@ import { appWindow } from '@tauri-apps/api/window'
 import { confirm } from '@tauri-apps/api/dialog'
 import { stopServer } from '$lib/pyserver/felionpyServer'
 
+export const update_status = writable('')
+
 const update_events = {
     CHECK_UPDATE: 'tauri://update',
     UPDATE_AVAILABLE: 'tauri://update-available',
@@ -23,7 +25,8 @@ export const events_listeners = async () => {
     let i = 0
     for (const event in update_events) {
         unlisteners[i] = await listen(update_events[event], function (res) {
-            console.log('New status: ', res)
+            console.log(res)
+            update_status.set(JSON.stringify(res))
         })
         i++
     }
