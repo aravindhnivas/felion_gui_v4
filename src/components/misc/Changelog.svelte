@@ -11,8 +11,8 @@
     }
 
     const readChangelog = async () => {
-        const changelogFile = await path.resolve('./resources/CHANGELOG.md')
-        console.log(changelogFile)
+        const changelogFile = await tryF(path.resolve('./resources/CHANGELOG.md'))
+        if (isError(changelogFile)) return window.handleError(changelogFile)
         const fileRead = await fs.readTextFile(changelogFile)
         if (isError(fileRead)) return window.handleError(fileRead)
         source = fileRead

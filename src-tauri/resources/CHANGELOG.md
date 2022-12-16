@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v3.9.0-UNRELEASED
+## v4.0.0-UNRELEASED
 
 - New features
   - Multi tab feature for Normline, Masspec, Timescan and THz mode
@@ -8,7 +8,7 @@
   - Normline different mode (FELIX or OPO) at topbar
 - System update
   - Python 3.11.0
-  - Electron packages update
+  - Electron.js is replaced with Tauri.js (based on Rust)
 - Bug fixes
 
 ---
