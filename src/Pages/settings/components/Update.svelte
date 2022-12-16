@@ -12,11 +12,15 @@
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
     import Switch from '$src/components/Switch.svelte'
+    import { persistentWritable } from '$src/js/persistentStore'
 
     const check_for_update = async () => {
         try {
-            if (allow_to_check_update || devMODE)
-                return window.createToast('Update check skipped in dev mode', 'danger')
+            if (devMODE) {
+                if (!$allow_to_check_update) {
+                    return window.createToast('Update check skipped in dev mode', 'danger')
+                }
+            }
 
             update_output('Checking for updates...')
             download_progress = 0
@@ -38,12 +42,16 @@
                 }
             }
         } catch (error) {
-            $updateError = error
+            if (typeof error === 'string' && error.includes('Json Error: EOF')) {
+                version_info = 'latest version installed'
+            } else {
+                $updateError = error
+            }
         }
     }
 
     let download_progress = 0
-
+    let version_info = ''
     const listen_download_progress = listen('tauri://update-download-progress', function (res) {
         if (res.payload) {
             const { chunkLength, contentLength } = res.payload as { chunkLength: string; contentLength: string }
@@ -71,7 +79,7 @@
     })
 
     let outputs: string[] = []
-    let allow_to_check_update = false
+    const allow_to_check_update = persistentWritable('allow_to_check_update', false)
     export const update_output = (val: string | Object) => {
         if (!val) return
         outputs = [JSON.stringify(val), ...outputs]
@@ -82,6 +90,7 @@
     <h1>Update</h1>
     <div class="subtitle" style="width: 100%;">
         Current version: {$currentVersion}
+        <span class="tag is-success">{version_info}</span>
     </div>
 
     <div class="align">
@@ -105,7 +114,7 @@
             >
         </div>
         {#if devMODE}
-            <Switch bind:selected={allow_to_check_update} />
+            <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
         {/if}
         <div class="updateCheck_status_div">
             <span>Last checked</span>
