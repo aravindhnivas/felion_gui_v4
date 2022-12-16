@@ -13,6 +13,7 @@
     import LinearProgress from '@smui/linear-progress'
     import Switch from '$src/components/Switch.svelte'
     import { persistentWritable } from '$src/js/persistentStore'
+    import { footerMsg } from '$src/layout/main/Footer.svelte'
 
     const check_for_update = async (log = false) => {
         try {
@@ -29,7 +30,7 @@
             const update = await checkUpdate()
             if (log) update_output(update)
 
-            if (update.shouldUpdate) {
+            if (!devMODE && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
                 const install = await confirm(`Do you want to install the latest update and restart.`, {
                     title: `Update available ${newVersion}`,
@@ -54,13 +55,18 @@
     }
 
     let download_progress = 0
+
     let version_info = ''
-    const listen_download_progress = listen('tauri://update-download-progress', function (res) {
+
+    const listen_download_progress = listen('tauri://update-download-progress', async function (res) {
         if (res.payload) {
             const { chunkLength, contentLength } = res.payload as { chunkLength: string; contentLength: string }
+
             download_progress += +chunkLength / +contentLength
+            $footerMsg = `Update downloaded ${Number(download_progress * 100).toFixed(2)} %`
         }
     })
+
     let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'

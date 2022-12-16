@@ -1,3 +1,7 @@
+<script context="module">
+    export const footerMsg = writable('')
+</script>
+
 <script lang="ts">
     import { running_processes } from '$src/sveltewritables'
     import { fade } from 'svelte/transition'
@@ -16,6 +20,11 @@
         </div>
 
         <div class="navbar-end">
+            {#if $footerMsg}
+                <div transition:fade class="navbar-item">
+                    {$footerMsg}
+                </div>
+            {/if}
             {#if $running_processes.length > 0}
                 <MenuSurface
                     style="background: var(--background-color);"
@@ -46,7 +55,9 @@
     .process__notify_container {
         cursor: pointer;
     }
-    .navbar-end .navbar-item:not(:only-child) {
-        border-left: solid 1px;
+    .navbar-end {
+        .navbar-item:not(:only-child) {
+            border-left: solid 1px;
+        }
     }
 </style>
