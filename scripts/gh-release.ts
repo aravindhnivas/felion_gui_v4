@@ -26,7 +26,7 @@ const Release = await octokit.rest.repos.createRelease({
     tag_name: pkg.version, // the name of the release
     target_commitish: 'main', // the name of the branch
     name: `Release v${pkg.version}`, // the title of the release
-    draft: true,
+    draft: false,
 })
 
 // Upload an asset to the release
