@@ -42,6 +42,9 @@
                 }
             }
         } catch (error) {
+            // since the update URL for latest version return undefined object
+            // therefore, JSON.parse throws an error
+            // following is the solution however it is not the best solution
             if (typeof error === 'string' && error.includes('Json Error: EOF')) {
                 version_info = 'latest version installed'
             } else {
