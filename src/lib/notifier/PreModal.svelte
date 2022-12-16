@@ -12,7 +12,7 @@
     $: if ($mainPreModal.open) {
         openModal()
     }
-    $: console.log($mainPreModal)
+    // $: console.log($mainPreModal)
     let headerBackground = '#836ac05c'
     $: if (active) {
         headerBackground = $mainPreModal.type === 'danger' ? '#f14668' : '#836ac05c'
