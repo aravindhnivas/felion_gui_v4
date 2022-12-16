@@ -52,7 +52,7 @@ export const createToast = (description: string, type?: keyof ToastThemeOpts, op
 
 export const handleError = (error: unknown) => {
     window.error = error
-    console.error(error)
+    // console.error(error)
     if (typeof error === 'string') {
         mainPreModal.error(error)
     } else {
