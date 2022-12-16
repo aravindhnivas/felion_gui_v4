@@ -23,7 +23,7 @@ const repo = pkg.name
 const Release = await octokit.rest.repos.createRelease({
     owner, // the owner of the repository
     repo, // the name of the repository
-    tag_name: pkg.version, // the name of the release
+    tag_name: `v${pkg.version}`, // the name of the release
     target_commitish: 'main', // the name of the branch
     name: `Release v${pkg.version}`, // the title of the release
     draft: false,
