@@ -46,10 +46,8 @@
         selectAll = false
         filesLoaded = false
 
-        const folderfile = await tryF(fs.readDir(loc))
-        if (isError(folderfile)) {
-            throw folderfile
-        }
+        const [_err, folderfile] = await oO(fs.readDir(loc))
+        if (_err) return window.handleError(_err)
 
         const fileIncludePattern = new RegExp(`.+\\.[^fr]?${filetype}`) // f or r keyword is to avoid getting fscan and rscan files
 

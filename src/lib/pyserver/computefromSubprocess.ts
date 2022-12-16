@@ -40,8 +40,8 @@ export default async function ({
             const filename = pyfile.split('.').at(-1) + '_data.json'
             const outputFile = await path.join(window.tempdirPath, 'FELion_GUI3', filename)
             if (fs.exists(outputFile)) {
-                const output = await tryF(fs.removeFile(outputFile))
-                if (isError(output)) console.error(output)
+                const [_err] = await oO(fs.removeFile(outputFile))
+                if (_err) console.error(_err)
             }
             target?.classList.toggle('is-loading')
         }
@@ -124,10 +124,9 @@ export default async function ({
                 return resolve(undefined)
             }
 
-            const output = await tryF(fs.readTextFile(outputFile))
-            if (isError(output)) {
-                return window.handleError(output)
-            }
+            const [_err, output] = await oO(fs.readTextFile(outputFile))
+            if (_err) return window.handleError(_err)
+
             const dataFromPython: DataFromPython = tryF(() => JSON.parse(output))
             if (isError(dataFromPython)) {
                 resolve(undefined)

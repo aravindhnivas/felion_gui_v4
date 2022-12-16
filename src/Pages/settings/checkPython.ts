@@ -4,9 +4,9 @@ import { Command } from '@tauri-apps/api/shell'
 export async function getPyVersion(e?: ButtonClickEvent) {
     if (get(developerMode)) {
         const command = new Command('python', ['-V'])
-        const output = await tryF(command.execute())
-        if (isError(output)) {
-            window.createToast(output.message, 'danger')
+        const [_err, output] = await oO(command.execute())
+        if (typeof _err === 'string') {
+            window.createToast(_err, 'danger')
             return
         }
         const { stdout } = output
@@ -19,14 +19,10 @@ export async function getPyVersion(e?: ButtonClickEvent) {
     const target = e?.target as HTMLButtonElement
     target?.classList.toggle('is-loading')
 
-    // console.log('getPyVersion', get(felionpy))
-    // const command = Command.sidecar(get(felionpy), ['getVersion', '{}'])
-    // const output = await tryF(command.execute())
     const command = new Command('felionpy', ['getVersion', '{}'])
-    const output = await tryF(command.execute())
-    console.log(output)
-    if (isError(output)) {
-        window.createToast(output.message, 'danger')
+    const [_err, output] = await oO(command.execute())
+    if (typeof _err === 'string') {
+        window.createToast(_err, 'danger')
         target?.classList.toggle('is-loading')
         console.error(output)
         return

@@ -10,11 +10,9 @@
 
     const writePowfile = async () => {
         const contents = `${initContent.trim()}\n${powerfileContent}`.trim()
-        const output = await tryF(fs.writeTextFile(powfile, contents))
 
-        if (isError(output)) {
-            return window.handleError(output)
-        }
+        const [_err] = await oO(fs.writeTextFile(powfile, contents))
+        if (_err) return window.handleError(_err)
 
         window.createToast('Power file saved', 'success', { target: 'left' })
         console.log('powerfile writted: ', powfile)

@@ -30,6 +30,7 @@
     "@types/plotly.js-basic-dist": "^1.54.1",
     "@types/winbox": "^0.2.1",
     "@zerodevx/svelte-toast": "^0.8.2",
+    "@zmotivat0r/o0": "^1.0.2",
     "animate.css": "^4.1.1",
     "buffer": "^6.0.3",
     "bulma": "^0.9.4",

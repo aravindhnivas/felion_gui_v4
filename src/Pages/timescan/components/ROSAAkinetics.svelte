@@ -38,11 +38,8 @@
             return window.createToast('Invalid location', 'danger', { target: 'left' })
         }
 
-        const dirs = await tryF(fs.readDir($currentLocation))
-        if (isError(dirs)) {
-            window.handleError(dirs)
-            return
-        }
+        const [_err, dirs] = await oO(fs.readDir($currentLocation))
+        if (_err) return window.handleError(_err)
         fileCollections = dirs
             .map((f) => f.name)
             .filter((f) => f.endsWith('_scan.json'))
@@ -104,11 +101,8 @@
 
         if (!selectedFile) return window.createToast('No file selected', 'danger')
         const currentJSONfile = await path.join($currentLocation, selectedFile.replace('.scan', '_scan.json'))
-        const content = await tryF(fs.readTextFile(currentJSONfile))
-        if (isError(content)) {
-            window.handleError(currentData)
-            return
-        }
+        const [_err, content] = await oO(fs.readTextFile(currentJSONfile))
+        if (_err) return window.handleError(_err)
 
         currentData = tryF(() => JSON.parse(content))
         if (isError(currentData)) {
@@ -204,8 +198,8 @@
             contents[selectedFile].default = paramsData
         }
 
-        const result = await tryF(fs.writeTextFile(paramsFile, JSON.stringify(contents, null, 4)))
-        if (isError(result)) return window.handleError(result)
+        const [_err] = await oO(fs.writeTextFile(paramsFile, JSON.stringify(contents, null, 4)))
+        if (_err) return window.handleError(_err)
         tagOptions = Object.keys(contents[selectedFile].tag)
         window.createToast(`saved: ${await path.basename(paramsFile)}`, 'success', {
             target: 'left',

@@ -56,19 +56,19 @@
 
             saveDataForFile ??= { default: dataToSave }
 
-            const result = await fs.writeTextFile(savefilename, JSON.stringify(saveDataForFile, null, 4))
-            if (isError(result)) return window.handleError(`Error writing ${filename}\n${result.message}`)
+            const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(saveDataForFile, null, 4)))
+            if (_err) return window.handleError(_err)
             return notify()
         }
 
         let data = {}
         if (await fs.exists(savefilename)) {
             const content = await fs.readTextFile(savefilename)
+
             data = tryF(() => JSON.parse(content))
             if (isError(data)) return window.handleError(data)
         }
 
-        // data ??= {}
         if (!selectedFile) return window.createToast('No file selected', 'danger', toastOpts)
         data[selectedFile] ??= { tags: {}, default: {} }
 
@@ -79,8 +79,9 @@
             data[selectedFile]['default'] = dataToSave
         }
 
-        const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(data, null, 4)))
-        if (isError(result)) return window.handleError(`Error writing ${filename}\n${result.message}`)
+        const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(data, null, 4)))
+        if (_err) return window.handleError(_err)
+
         data_loaded = true
         return notify()
     }

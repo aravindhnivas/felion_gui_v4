@@ -275,8 +275,10 @@
     async function setConfig() {
         try {
             $configLoaded = false
-            const fileRead = await tryF(fs.readTextFile($configFile))
-            if (isError(fileRead)) return window.handleError(fileRead)
+
+            const [_err, fileRead] = await oO(fs.readTextFile($configFile))
+            if (_err) return window.handleError(_err)
+
             const CONFIG = Yml(fileRead)
             console.table(CONFIG)
             ;({ numberDensity: $numberDensity } = CONFIG)

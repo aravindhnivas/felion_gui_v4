@@ -35,8 +35,8 @@
             dataToSave[freq] = { amp, fG, fL }
         })
 
-        const result = await tryF(fs.writeTextFile(saveParamsToFile, JSON.stringify(dataToSave, null, 4)))
-        if (isError(result)) return window.handleError(result)
+        const [_err] = await oO(fs.writeTextFile(saveParamsToFile, JSON.stringify(dataToSave, null, 4)))
+        if (_err) return window.handleError(_err)
         window.createToast('file saved')
     }
 

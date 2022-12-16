@@ -66,11 +66,9 @@
     const writeReport = async (info = 'saved') => {
         const contents = editor?.getData()
 
-        const output = await tryF(fs.writeTextFile(reportFile, contents))
+        const [_err] = await oO(fs.writeTextFile(reportFile, contents))
+        if (_err) return window.handleError(_err)
 
-        if (isError(output)) {
-            return window.handleError(output)
-        }
         const type = info === 'saved' ? 'success' : 'warning'
         window.createToast(`${await path.basename(reportFile)}: report ${info}`, type)
         console.log('report writted: ', await path.basename(reportFile))
@@ -127,8 +125,8 @@
             return window.createToast('No report file named ' + (await path.basename(reportFile)), 'danger')
         }
 
-        const fileRead = await tryF(fs.readTextFile(reportFile))
-        if (isError(fileRead)) return window.handleError(fileRead)
+        const [_err, fileRead] = await oO(fs.readTextFile(reportFile))
+        if (_err) return window.handleError(_err)
 
         editor?.setData(fileRead)
         reportRead = true

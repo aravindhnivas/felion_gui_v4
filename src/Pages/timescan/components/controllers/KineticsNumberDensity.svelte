@@ -55,8 +55,8 @@
 
         contents[selectedFile] = get_datas
 
-        const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
-        if (isError(result)) return window.handleError(result)
+        const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
+        if (_err) return window.handleError(_err)
 
         const content = await fs.readTextFile(savefilename)
         contents = tryF(() => JSON.parse(content))
@@ -103,8 +103,8 @@
             contents[key] = data
         }
 
-        const result = await tryF(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
-        if (isError(result)) return window.handleError(result)
+        const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
+        if (_err) return window.handleError(_err)
         window.createToast(`File saved to ${await path.basename(savefilename)}`, 'success')
         await readConfigFile()
     }

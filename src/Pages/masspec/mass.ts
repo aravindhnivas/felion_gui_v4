@@ -19,8 +19,8 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
                 continue
             }
 
-            const fileContents = await tryF(fs.readTextFile(filename))
-            if (isError(fileContents)) {
+            const [_err, fileContents] = await oO(fs.readTextFile(filename))
+            if (_err) {
                 // window.handleError(fileContents)
                 window.createToast(`${filename} couldn't be opened`, 'danger')
                 continue

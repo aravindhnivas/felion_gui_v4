@@ -49,9 +49,9 @@
     let filenameOpts: string[] = []
 
     const filenameUpdate = async () => {
-        const files = await tryF(fs.readDir(location))
-        if (isError(files)) {
-            console.error(files)
+        const [_err, files] = await oO(fs.readDir(location))
+        if (_err) {
+            console.error(_err)
             return
         }
         filenameOpts = files

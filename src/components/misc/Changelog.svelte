@@ -4,23 +4,26 @@
     import SvelteMarkdown from 'svelte-markdown'
     import { onMount } from 'svelte'
     import { fs, path } from '@tauri-apps/api'
-    
+
     let source: string
+
     $: if (import.meta.env.DEV && $activateChangelog) {
         readChangelog()
     }
 
     const readChangelog = async () => {
-        const changelogFile = await tryF(path.resolve('./resources/CHANGELOG.md'))
-        if (isError(changelogFile)) return window.handleError(changelogFile)
-        const fileRead = await fs.readTextFile(changelogFile)
-        if (isError(fileRead)) return window.handleError(fileRead)
+        source = ''
+        const changelogFile = await path.resolve('./resources/CHANGELOG.md')
+
+        const [_err, fileRead] = await oO(fs.readTextFile(changelogFile))
+        if (_err) return window.handleError(_err)
+
         source = fileRead
     }
     onMount(readChangelog)
 </script>
 
-{#if $activateChangelog}
+{#if $activateChangelog && source}
     <SModal
         bind:active={$activateChangelog}
         id="changelog"

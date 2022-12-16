@@ -49,8 +49,8 @@
     async function dir_changed() {
         if (!(await fs.exists(currentLocation))) return console.error('Not a directory')
 
-        const dirRead = await tryF(fs.readDir(currentLocation))
-        if (isError(dirRead)) return console.error(dirRead)
+        const [_err, dirRead] = await oO(fs.readDir(currentLocation))
+        if (_err) return window.handleError(_err)
 
         fullfiles = dirRead.map((f) => f.name).filter((file) => file.endsWith('.scan'))
     }

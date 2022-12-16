@@ -15,6 +15,7 @@ declare global {
   const getContext: typeof import('svelte')['getContext']
   const hasContext: typeof import('svelte')['hasContext']
   const isError: typeof import('ts-try')['isError']
+  const oO: typeof import('@zmotivat0r/o0')['oO']
   const onDestroy: typeof import('svelte')['onDestroy']
   const onMount: typeof import('svelte')['onMount']
   const readable: typeof import('svelte/store')['readable']

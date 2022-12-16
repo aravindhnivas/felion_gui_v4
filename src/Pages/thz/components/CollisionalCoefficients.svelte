@@ -76,8 +76,10 @@
             $collisionalCoefficient_balance,
         }
 
-        const result = await tryF(fs.writeTextFile(collisionalCoefficientJSONFile, JSON.stringify(saveJSON, null, 4)))
-        if (isError(result)) return window.handleError(result)
+        const [_err, result] = await oO(
+            fs.writeTextFile(collisionalCoefficientJSONFile, JSON.stringify(saveJSON, null, 4))
+        )
+        if (_err) return window.handleError(_err)
 
         console.log(`${collisionalCoefficientJSONFile} saved`)
         window.createToast('Saved: ' + (await path.basename(collisionalCoefficientJSONFile)))
