@@ -14,7 +14,7 @@
     import Switch from '$src/components/Switch.svelte'
     import { persistentWritable } from '$src/js/persistentStore'
 
-    const check_for_update = async () => {
+    const check_for_update = async (log = false) => {
         try {
             if (devMODE) {
                 if (!$allow_to_check_update) {
@@ -22,12 +22,12 @@
                 }
             }
 
-            update_output('Checking for updates...')
+            if (log) update_output('Checking for updates...')
             download_progress = 0
             lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
-            update_output(update)
+            if (log) update_output(update)
 
             if (update.shouldUpdate) {
                 const newVersion = update.manifest?.version
@@ -106,7 +106,7 @@
                 class:is-warning={updateReadyToInstall}
                 id="updateCheckBtn"
                 on:click={async () => {
-                    await check_for_update()
+                    await check_for_update(true)
                 }}
             >
                 {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
@@ -122,7 +122,7 @@
         {#if devMODE}
             <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
         {/if}
-        <Switch bind:selected={showOutput} label="Update logs" />
+        <Switch bind:selected={showOutput} label="show update logs" />
 
         <div class="updateCheck_status_div">
             <span>Last checked</span>
