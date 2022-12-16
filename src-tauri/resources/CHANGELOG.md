@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v4.0.0-UNRELEASED
+## v4.0.0
 
 - New features
   - Multi tab feature for Normline, Masspec, Timescan and THz mode
