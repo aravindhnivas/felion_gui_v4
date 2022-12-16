@@ -43,10 +43,6 @@ console.log(`${Sig_asset.data.name}: ${Sig_asset.data.state}`)
 
 const data = await fs.promises.readFile(join(asset_dir, asset_bin))
 console.log('Uploading binaries. This may take a while, please wait...')
-// Track the upload progress
-const progress = (uploadProgress) => {
-    console.log(`Upload progress: ${uploadProgress.percent}%`)
-}
 
 // Upload an asset to the release
 const Bin_asset = await octokit.rest.repos.uploadReleaseAsset({
@@ -56,7 +52,6 @@ const Bin_asset = await octokit.rest.repos.uploadReleaseAsset({
     name: asset_bin, // the name of the asset
     data,
     contentType: 'application/zip', // the content type of the asset
-    progress,
 })
 
 console.log(`${Bin_asset.data.name}: ${Bin_asset.data.state}`)
