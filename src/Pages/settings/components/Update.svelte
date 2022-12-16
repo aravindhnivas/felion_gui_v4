@@ -82,11 +82,14 @@
     })
 
     let outputs: string[] = []
+
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
     export const update_output = (val: string | Object) => {
         if (!val) return
         outputs = [JSON.stringify(val), ...outputs]
     }
+
+    let showOutput = devMODE
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
@@ -119,6 +122,8 @@
         {#if devMODE}
             <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
         {/if}
+        <Switch bind:selected={showOutput} label="Update logs" />
+
         <div class="updateCheck_status_div">
             <span>Last checked</span>
             <span class="tag is-warning" id="update-check-status">{lastUpdateCheck}</span>
@@ -130,12 +135,14 @@
         <LinearProgress progress={download_progress} />
     {/if}
 
-    <OutputBox
-        items={outputs}
-        on:clear={() => {
-            outputs = []
-        }}
-    />
+    {#if showOutput}
+        <OutputBox
+            items={outputs}
+            on:clear={() => {
+                outputs = []
+            }}
+        />
+    {/if}
 </div>
 
 <style lang="scss">
