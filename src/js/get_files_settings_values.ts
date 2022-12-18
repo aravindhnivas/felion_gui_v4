@@ -7,12 +7,9 @@ function validate_line(line: string): boolean {
 
 export default function (filename: string): Promise<{ [name: string]: number }> {
     return new Promise(async (resolve, reject) => {
-        if (!(await fs.exists(filename))) return reject('Invalid file')
-
-        if (!(await fs.exists(filename))) return reject(`${filename} does not exist`)
-
+        if (!filename || !(await fs.exists(filename))) return reject(`${filename} does not exist`)
         const [_err, fileContents] = await oO(fs.readTextFile(filename))
-        if (_err) return window.handleError(_err)
+        if (_err) return reject(_err)
 
         const variableValues: { [name: string]: number } = {}
         for (const line of fileContents.split('\n')) {
