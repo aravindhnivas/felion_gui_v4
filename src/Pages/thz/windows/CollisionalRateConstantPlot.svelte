@@ -7,7 +7,10 @@
     import colors from '$lib/misc/colors'
     import { react } from 'plotly.js-basic-dist'
     import Checkbox from '$components/Checkbox.svelte'
+    import { fs } from '@tauri-apps/api'
+
     import WinBox from 'winbox'
+
     export let active = false
     export let collisionalFilename = ''
 
@@ -28,11 +31,11 @@
     let givenTemperature: number[] = []
     let tempIndex = 0
     async function readCollisionalDataFromFile() {
-        console.info(collisionalFilename)
-        if (!window.fs.isFile(collisionalFilename)) return window.handleError(`File not found : ${collisionalFilename}`)
+        if (!(await fs.exists(collisionalFilename)))
+            return window.handleError(`File not found : ${collisionalFilename}`)
 
-        const fileContents = window.fs.readFileSync(collisionalFilename)
-        if (window.fs.isError(fileContents)) return null
+        const [_err, fileContents] = await oO(fs.readTextFile(collisionalFilename))
+        if (_err) return null
 
         const data = fileContents
             .split('\n')
@@ -194,7 +197,12 @@
                 }}
             />
             <Textfield bind:value={tempIndex} label="Temperature Index" />
-            <button class="button is-link" on:click={readCollisionalDataFromFile}>Read data</button>
+            <button
+                class="button is-link"
+                on:click={async () => {
+                    await readCollisionalDataFromFile()
+                }}>Read data</button
+            >
             <button class="button is-link" on:click={rescaleData}>Rescale Data</button>
             <Textfield bind:value={$collisionalTemp} label="collisionalTemp" />
             <button class="button is-link" on:click={fitDataFunction}>Fit Data</button>

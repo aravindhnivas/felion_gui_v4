@@ -60,7 +60,6 @@
     }
     $: update_output_file($output_dir, $trapTemp)
     let outputFile = ''
-    // $: outputFile = window.path.join($output_dir, `boltzman/boltzman_distribution${$trapTemp}K.dat`)
 
     const saveData = async () => {
         const length = plotData[0].length
@@ -78,7 +77,6 @@
         }
 
         const figsDir = await path.join($currentLocation, '../output/figs')
-        // window.fs.ensureDirSync(figsDir)
         if (!(await fs.exists(figsDir))) {
             await fs.createDir(figsDir)
         }

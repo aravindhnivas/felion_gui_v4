@@ -131,7 +131,6 @@
             }
         }
 
-        // window.fs.ensureDirSync(data_dir)
         if (!fs.exists(data_dir)) await fs.createDir(data_dir)
 
         const args = {
