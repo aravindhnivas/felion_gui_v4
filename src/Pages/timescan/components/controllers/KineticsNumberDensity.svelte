@@ -22,28 +22,24 @@
     let savefilename = ''
     let contents = {}
 
-    $: if (savefilename) {
-        readConfigFile()
-    }
-
     const readConfigFile = async (toast = true) => {
+        await update_file_kinetic(configDir, filename)
         if (!(await fs.exists(savefilename))) {
             if ($activePage === 'Kinetics') {
-                return window.createToast('No config file found. Just compute and press save to create one', 'danger')
+                const errMsg = 'No config file found. Just compute and press save to create one'
+                console.error(errMsg)
+                return window.createToast(errMsg, 'danger')
             }
             return
         }
-        const content = await fs.readTextFile(savefilename)
+        const [_err, content] = await oO(fs.readTextFile(savefilename))
+        if (_err) return window.handleError(_err)
         contents = tryF(() => JSON.parse(content))
         if (isError(contents)) return window.handleError(contents)
 
         if (toast) window.createToast('file read: ' + (await path.basename(savefilename)))
         return await compute()
     }
-
-    onMount(async () => {
-        await readConfigFile(false)
-    })
 
     let updateCurrentConfig
     let get_datas
@@ -58,8 +54,10 @@
         const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
         if (_err) return window.handleError(_err)
 
-        const content = await fs.readTextFile(savefilename)
+        const [_err2, content] = await oO(fs.readTextFile(savefilename))
+        if (_err2) return window.handleError(_err2)
         contents = tryF(() => JSON.parse(content))
+
         if (isError(contents)) return window.handleError(contents)
         window.createToast(`File saved to ${await path.basename(savefilename)} for ${selectedFile}`)
     }
