@@ -8,5 +8,5 @@ export const events_listeners = async () => {
         }
         await stopServer()
     })
-    return Promise.resolve([unlisten_closeEvent])
+    return unlisten_closeEvent
 }
