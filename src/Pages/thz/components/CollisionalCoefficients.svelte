@@ -76,32 +76,26 @@
             $collisionalCoefficient_balance,
         }
 
-        const [_err, result] = await oO(
-            fs.writeTextFile(collisionalCoefficientJSONFile, JSON.stringify(saveJSON, null, 4))
-        )
+        const [_err] = await oO(fs.writeTextFile(collisionalCoefficientJSONFile, JSON.stringify(saveJSON, null, 4)))
         if (_err) return window.handleError(_err)
 
         console.log(`${collisionalCoefficientJSONFile} saved`)
         window.createToast('Saved: ' + (await path.basename(collisionalCoefficientJSONFile)))
     }
 
-    const update_config_dir = async (_loc: string) => {
-        if (!(await fs.exists(_loc))) return
-        configFileDir = await path.dirname(_loc)
+    const update_collsional_file = async () => {
+        const configFileDir = await path.dirname(collisionalFilename)
+        collisionalCoefficientJSONFile = await path.join(configFileDir, 'collisionalCoefficients.json')
     }
-    $: update_config_dir(collisionalFilename)
-    let configFileDir = ''
-
-    const update_collsional_file = async (_loc: string) => {
-        collisionalCoefficientJSONFile = await path.join(_loc, 'collisionalCoefficients.json')
-    }
-    $: update_collsional_file(configFileDir)
     let collisionalCoefficientJSONFile = ''
 
     const readcollisionalCoefficientJSONFile = async (toast = true) => {
+        await update_collsional_file()
+
         if (!(await fs.exists(collisionalCoefficientJSONFile))) {
             if (!toast) return console.warn(`${collisionalCoefficientJSONFile} does not exist`)
-            return window.createToast('File not found', 'danger')
+            console.warn({ collisionalCoefficientJSONFile })
+            return window.createToast('Collisional coeff. file not found', 'danger')
         }
 
         console.log('loading: ', collisionalCoefficientJSONFile)
@@ -129,7 +123,6 @@
     }
 
     let fullTable = ''
-
     const copyAsTeXTable = () => {
         const caption = `Derived collisional rates at $T=${$collisionalTemp}$ K, ${moleculeName} collision with ${tagName} [${formatNumber(
             $numberDensity
