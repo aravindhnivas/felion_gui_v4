@@ -3,7 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 const PACKAGE_ROOT = __dirname
-// https://vitejs.dev/config/
+
 export default defineConfig({
     plugins: [
         svelte(),
