@@ -220,7 +220,6 @@
     <div class="align h-center">
         <Textfield bind:value={$numberDensity} label="numberDensity (cm-3)" />
     </div>
-
     <div class="align h-center">
         {#each $collisionalRates as { label, value, id } (id)}
             <Textfield bind:value {label} />
