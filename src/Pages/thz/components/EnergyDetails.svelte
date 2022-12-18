@@ -6,7 +6,7 @@
     import IconButton from '$src/components/IconButton.svelte'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import Textfield from '@smui/textfield'
-    import WinBox from 'winbox'
+    import type WinBox from 'winbox'
     import { wavenumberToMHz, MHzToWavenumber, getYMLFileContents, setID } from '$src/js/utils'
     import BoltzmanDistribution from '../windows/BoltzmanDistribution.svelte'
     import { tick } from 'svelte'

@@ -9,12 +9,12 @@
     import Checkbox from '$components/Checkbox.svelte'
     import { fs } from '@tauri-apps/api'
 
-    import WinBox from 'winbox'
+    import type WinBox from 'winbox'
 
     export let active = false
     export let collisionalFilename = ''
 
-    let graphWindow: WinBox | null = null
+    let graphWindow: WinBox
     let windowReady = false
 
     $: if (windowReady) {

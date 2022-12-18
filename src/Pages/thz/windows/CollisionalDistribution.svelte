@@ -14,7 +14,7 @@
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
     import { plt_styles } from '$src/js/constants'
     import { save_data_to_file, replaceMathFormats } from '../functions/utils'
-    import WinBox from 'winbox'
+    import type WinBox from 'winbox'
     import { fs, path } from '@tauri-apps/api'
 
     export let active: boolean = false

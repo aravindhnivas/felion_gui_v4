@@ -8,7 +8,7 @@
     import { sumBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
-    import WinBox from 'winbox'
+    import type WinBox from 'winbox'
     import { save_data_to_file } from '../functions/utils'
     import { fs, path } from '@tauri-apps/api'
 
