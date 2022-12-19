@@ -1,6 +1,5 @@
 <script>
-    import Modal from '$components/modal/Modal.svelte'
-    import Table from '$components/tables/Table.svelte'
+    import { Modal, Table } from '$src/components'
 
     export let rows = []
     export let keys = []

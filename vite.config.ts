@@ -14,6 +14,8 @@ export default defineConfig({
                 'svelte/transition',
                 { 'ts-try': ['tryF', 'isError'] },
                 { '@zmotivat0r/o0': ['oO'] },
+                { '@tauri-apps/api': ['fs', 'path', 'dialog', 'shell'] },
+                { 'plotly.js-basic-dist': ['relayout', 'deleteTraces', 'react', 'addTraces'] },
             ],
             dts: './src/auto-imports.d.ts',
         }),

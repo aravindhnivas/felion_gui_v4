@@ -1,7 +1,6 @@
 <script>
     import { persistentWritable } from '$src/js/persistentStore'
-    import Modal from '$components/modal/Modal.svelte'
-    import STable from '$components/tables/STable.svelte'
+    import { Modal, STable } from '$src/components'
     export let configDir = ''
     export let active = false
 
@@ -20,7 +19,7 @@
     const addNewRow = () => ({ ...defaultRow, id: window.getID() })
 </script>
 
-<Modal bind:active title="Kinetics config table" maxwidth="95vw" minheight="70vh">
+<Modal bind:active title="Kinetics config table">
     <svelte:fragment slot="content">
         <STable
             rowKeys={configKeys}

@@ -1,9 +1,6 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
-    import ModalTable from '$components/modal/ModalTable.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
+    import { Textfield, ModalTable, Checkbox } from '$src/components'
     import { plotlyEventsInfo } from '$src/js/functions'
-    import { fs, path } from '@tauri-apps/api'
 
     export let varyAll = false
     export let active = false

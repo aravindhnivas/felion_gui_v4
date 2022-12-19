@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield';
+    import { Textfield } from '$src/components';
    
     let CONFIGS = {}
     const update_list = () => {

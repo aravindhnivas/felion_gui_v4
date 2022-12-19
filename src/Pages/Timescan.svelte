@@ -1,18 +1,12 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
+    import { Textfield, Switch, Select, ButtonBadge } from '$src/components'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import ButtonBadge from '$components/ButtonBadge.svelte'
-    import Select from '$components/Select.svelte'
-    import Switch from '$components/Switch.svelte'
     import { plot } from '../js/functions'
-    import { relayout } from 'plotly.js-basic-dist'
     import { cloneDeep } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
     import MenuSurface from '@smui/menu-surface'
-
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
     import { persistentWritable } from '$src/js/persistentStore'
-    import { fs, path } from '@tauri-apps/api'
 
     /////////////////////////////////////////////////////////////////////////
     let surface: MenuSurfaceComponentDev

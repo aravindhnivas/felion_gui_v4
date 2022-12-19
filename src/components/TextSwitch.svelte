@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
 
     export let min: number | string = 0
     export let max: number | string = null

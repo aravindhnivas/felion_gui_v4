@@ -1,15 +1,9 @@
 <script lang="ts">
-    import { onMount, createEventDispatcher, tick } from 'svelte'
     import { fly, fade } from 'svelte/transition'
-    import { relayout } from 'plotly.js-basic-dist'
-    // import WinBox from 'winbox/src/js/winbox.js'
-    import FileBrowser from '$components/common/FileBrowser.svelte'
-    import Modal from '$components/modal/Modal.svelte'
     import Editor from '$lib/Editor.svelte'
-    import BrowseTextfield from '$components/BrowseTextfield.svelte'
     import { graph_detached } from '$src/js/plot'
     import { resizableDiv } from '$src/js/resizableDiv.js'
-    import IconButton from '$components/IconButton.svelte'
+    import { IconButton, BrowseTextfield, Modal, FileBrowser } from '$src/components'
 
     export let id: string
     export let display = 'none'

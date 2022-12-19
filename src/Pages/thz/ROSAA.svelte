@@ -17,20 +17,23 @@
         figs_dir,
     } from './stores/common'
     import { collisionalRateConstants } from './stores/collisional'
-    // import { tick } from 'svelte'
-    import Textfield from '@smui/textfield'
+    import {
+        Checkbox,
+        TextSwitch,
+        Textfield,
+        Select,
+        Panel,
+        SeparateWindow,
+        SegBtn,
+        BrowseTextfield,
+    } from '$src/components'
     import Accordion from '@smui-extra/accordion'
     import { parse as Yml } from 'yaml'
-    import Select from '$components/Select.svelte'
     import LayoutDiv from '$src/layout/misc/LayoutDiv.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
-    import TextSwitch from '$components/TextSwitch.svelte'
     import EinsteinCoefficients from './components/EinsteinCoefficients.svelte'
     import CollisionalCoefficients from './components/CollisionalCoefficients.svelte'
     import AttachmentCoefficients from './components/AttachmentCoefficients.svelte'
     import ROSAA_Footer from './ROSAA_layout/ROSAA_Footer.svelte'
-    import Panel from '$components/Panel.svelte'
-    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
     import EnergyDetails from './components/EnergyDetails.svelte'
     import {
         amuToKG,
@@ -44,10 +47,7 @@
     import computePy_func from '$lib/pyserver/computePy'
     import { persistentWritable } from '$src/js/persistentStore'
     import { setID, correctObjValue } from '$src/js/utils'
-    import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
-    import SegBtn from '$src/components/SegBtn.svelte'
     import VariableSelector from './components/header/VariableSelector.svelte'
-    import { fs, path } from '@tauri-apps/api'
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let [mainParameters, simulationParameters, dopplerLineshape, powerBroadening]: Coefficients[] = Array(4).fill([])

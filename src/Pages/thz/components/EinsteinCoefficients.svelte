@@ -3,7 +3,7 @@
     import { einsteinCoefficientA, einsteinCoefficientB, einsteinCoefficientB_rateConstant } from '../stores/einstein'
     import { trapArea, configLoaded } from '../stores/common'
     import { cloneDeep, find, isArray } from 'lodash-es'
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { PlanksConstant, SpeedOfLight } from '$src/js/constants'
     import { computeStatisticalWeight } from '../functions/balance_distribution'
@@ -13,7 +13,7 @@
     import { tick } from 'svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTable, formatNumber } from '../functions/utils'
-    import { fs } from '@tauri-apps/api'
+    // import { fs } from '@tauri-apps/api'
 
     export let lorrentz = 0.32
     export let gaussian = 0.21

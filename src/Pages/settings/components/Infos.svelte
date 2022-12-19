@@ -1,6 +1,6 @@
 <script>
     import { currentTab } from '$lib/pyserver/stores'
-    // import Textfield from '@smui/textfield'
+    // import { Textfield } from '$src/components'
 </script>
 
 <div class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'Infos'}>

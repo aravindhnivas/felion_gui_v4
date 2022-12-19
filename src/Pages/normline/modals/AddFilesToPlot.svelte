@@ -1,10 +1,7 @@
 <script lang="ts">
-    import { addTraces } from 'plotly.js-basic-dist'
-    import Textfield from '@smui/textfield'
-    import Modal from '$components/modal/Modal.svelte'
+    import { Textfield, Modal } from '$src/components'
     import { opoMode } from '../functions/svelteWritables'
     import computePy_func from '$lib/pyserver/computePy'
-    import { dialog } from '@tauri-apps/api'
 
     export let active = false
     export let fileChecked = []

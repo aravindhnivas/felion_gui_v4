@@ -1,8 +1,6 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield';
-    import Switch from '$components/Switch.svelte'
+    import { Textfield, Switch } from '$src/components';
     import computePy_func from '$lib/pyserver/computePy'
-    // import { createEventDispatcher, tick } from 'svelte';
     import { cloneDeep } from 'lodash-es';
 
     // let args = {};

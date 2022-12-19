@@ -1,10 +1,6 @@
 <script lang="ts">
     import { felixOutputName, felixopoLocation } from '../../functions/svelteWritables'
-    import Select from '$components/Select.svelte'
-    import Switch from '$components/Switch.svelte'
-    import { createEventDispatcher } from 'svelte'
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
-    import { path } from '@tauri-apps/api'
+    import { Select, Switch, TextAndSelectOptsToggler } from '$src/components'
 
     export let writeFile: boolean = false
     export let writeFileName = 'average_normline.dat'

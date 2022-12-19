@@ -1,8 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte'
     import { felixPeakTable } from '../functions/svelteWritables'
-    import Modal from '$components/modal/Modal.svelte'
-    import STable from '$components/tables/STable.svelte'
+    import { Modal, STable } from '$src/components'
 
     export let active = false
 

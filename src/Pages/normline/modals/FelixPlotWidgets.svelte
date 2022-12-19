@@ -2,11 +2,7 @@
     import { felixopoLocation } from '../functions/svelteWritables'
     import { getfiles } from '../functions/stores/func'
     import { fade } from 'svelte/transition'
-    import Textfield from '@smui/textfield'
-    import CheckList from '$components/lists/CheckList.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
-    import { path } from '@tauri-apps/api'
-    // import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
+    import { Textfield, CheckList, Checkbox } from '$src/components'
 
     export let felixPlotCheckboxes = []
     export let theoryLocation: string

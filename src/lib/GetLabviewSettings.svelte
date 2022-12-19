@@ -1,12 +1,7 @@
 <script lang="ts">
-    import Modal from '$components/modal/Modal.svelte'
-    import Textfield from '@smui/textfield'
-    import Select from '$src/components/Select.svelte'
-    import Switch from '$src/components/Switch.svelte'
-    import Notify from '$components/alert/Notify.svelte'
+    import { Textfield, Select, Modal, Switch, Notify } from '$src/components'
     import settings_key_value_infos from '$lib/configs/settings_key_value_infos.json'
     import get_files_settings_values from '$src/js/get_files_settings_values'
-    import { path } from '@tauri-apps/api'
     export let currentLocation = ''
     export let fullfileslist = []
     export let fileChecked = []

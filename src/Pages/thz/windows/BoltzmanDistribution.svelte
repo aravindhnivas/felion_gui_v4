@@ -1,16 +1,12 @@
 <script lang="ts">
     import { trapTemp, currentLocation, output_dir } from '../stores/common'
-    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
-    import Notify from '$lib/notifier/Notify.svelte'
-    import TextSwitch from '$components/TextSwitch.svelte'
+    import { TextSwitch, Notify, SeparateWindow, ButtonBadge } from '$src/components'
     import { plot } from '../../../js/functions'
     import boltzman_distribution from '../functions/boltzman_distribution'
     import { sumBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
-    import ButtonBadge from '$src/components/ButtonBadge.svelte'
     import type WinBox from 'winbox'
     import { save_data_to_file } from '../functions/utils'
-    import { fs, path } from '@tauri-apps/api'
 
     export let active = false
     export let graphWindow: WinBox | null = null

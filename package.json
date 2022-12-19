@@ -38,6 +38,7 @@
     "concurrently": "^7.6.0",
     "cooltipz-css": "^2.1.1",
     "cross-env": "^7.0.3",
+    "echarts": "^5.4.1",
     "eslint": "^8.29.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "gridjs": "^5.1.0",

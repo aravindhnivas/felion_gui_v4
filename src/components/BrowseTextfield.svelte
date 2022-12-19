@@ -1,8 +1,5 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
-    import IconButton from '$components/IconButton.svelte'
-    import { createEventDispatcher } from 'svelte'
-    import { dialog } from '@tauri-apps/api'
+    import { Textfield, IconButton } from '$src/components'
 
     export let value: string | number = ''
     export let label: string = ''
@@ -12,8 +9,8 @@
     export let lock: boolean | null = null
     export let type: string = 'text'
     export let updateMode: boolean | null = null
-
     export let style: string = ''
+
     let className: string = ''
     export { className as class }
 

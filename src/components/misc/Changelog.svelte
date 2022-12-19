@@ -1,9 +1,7 @@
 <script lang="ts">
     import { activateChangelog } from '$src/js/functions'
-    import SModal from '$components/modal/SModal.svelte'
+    import { SModal } from '$src/components'
     import SvelteMarkdown from 'svelte-markdown'
-    import { onMount } from 'svelte'
-    import { fs, path } from '@tauri-apps/api'
 
     let source: string
 

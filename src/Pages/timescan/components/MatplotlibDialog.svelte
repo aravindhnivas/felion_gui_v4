@@ -2,7 +2,7 @@
     import HelperText from '@smui/textfield/helper-text'
     import Dialog, { Title, Content, Actions } from '@smui/dialog'
     import Button, { Label } from '@smui/button'
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     export let open = false
     export let value
 </script>

@@ -1,24 +1,18 @@
 <script lang="ts">
     import { opoMode, normMethods, Ngauss_sigma, felixopoLocation } from './normline/functions/svelteWritables'
-
-    import AddFilesToPlot from './normline/modals/AddFilesToPlot.svelte'
-    import FrequencyTable from './normline/components/FrequencyTable.svelte'
-    import InitFunctionRow from './normline/widgets/preprocessing/InitFunctionRow.svelte'
-    import OPORow from './normline/widgets/preprocessing/OPORow.svelte'
-    import AdjustInitialGuess from './normline/modals/AdjustInitialGuess.svelte'
-    import TheoryRow from './normline/widgets/preprocessing/TheoryRow.svelte'
-    import GetFileInfoTable from './normline/widgets/preprocessing/GetFileInfoTable.svelte'
-    import WriteFunctionContents from './normline/widgets/postprocessing/WriteFunctionContents.svelte'
-    import ExecuteFunctionContents from './normline/widgets/postprocessing/ExecuteFunctionContents.svelte'
-
-    import Select from '$components/Select.svelte'
-    import Switch from '$components/Switch.svelte'
+    import {
+        OPORow,
+        TheoryRow,
+        AddFilesToPlot,
+        FrequencyTable,
+        InitFunctionRow,
+        GetFileInfoTable,
+        AdjustInitialGuess,
+        WriteFunctionContents,
+        ExecuteFunctionContents,
+    } from './normline'
+    import { Select, Switch, Radio, SegBtn } from '$src/components'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import Radio from '$src/components/Radio.svelte'
-    import SegBtn from '$src/components/SegBtn.svelte'
-
-    import { deleteTraces } from 'plotly.js-basic-dist'
-    import { path } from '@tauri-apps/api'
     ///////////////////////////////////////////////////////////////////////
 
     export let id = 'Normline'

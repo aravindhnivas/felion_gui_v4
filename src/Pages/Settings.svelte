@@ -2,14 +2,12 @@
     import { currentTab } from '$lib/pyserver/stores'
     import Changelog from '$components/misc/Changelog.svelte'
     import Configuration from './settings/components/Configuration.svelte'
-    // import Infos from './settings/components/Infos.svelte'
     import About from './settings/components/About.svelte'
     import Update from './settings/components/Update.svelte'
     import Badge from '@smui-extra/badge'
 
     const tabs = ['Configuration', 'Update', 'About', 'Infos']
     const id = 'Settings'
-    // let updateBackgroundColor = ''
 
     let display = 'none'
     let navbarBadgeSettings: HTMLElement

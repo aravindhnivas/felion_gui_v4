@@ -1,7 +1,5 @@
 <script lang="ts">
-    import ButtonBadge from '$components/ButtonBadge.svelte'
-    import Select from '$components/Select.svelte'
-    import { tick } from 'svelte'
+    import { ButtonBadge, Select } from '$src/components'
 
     export let progress = 0
     export let showreport = false

@@ -1,7 +1,6 @@
 
 <script>
-    import Textfield from '@smui/textfield'
-    // import CustomSwitch from '$components/CustomSwitch.svelte'
+    import { Textfield } from '$src/components'
     import {boltzmanConstant, PlanksConstant, electricCharge, SpeedOfLight} from '$src/js/constants';
 
     let fixedDigit = 3

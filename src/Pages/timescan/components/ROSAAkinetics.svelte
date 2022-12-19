@@ -2,26 +2,26 @@
     import { persistentWritable } from '$src/js/persistentStore'
     import { onMount } from 'svelte'
     import { cloneDeep } from 'lodash-es'
-    import Textfield from '@smui/textfield'
-    import TextSwitch from '$components/TextSwitch.svelte'
-    import Select from '$components/Select.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
+    import {
+        Textfield,
+        TextSwitch,
+        Select,
+        Checkbox,
+        TextAndSelectOptsToggler,
+        Panel,
+        BrowseTextfield,
+        ButtonBadge,
+    } from '$src/components'
     import LayoutDiv from '$src/layout/misc/LayoutDiv.svelte'
     import computePy_func from '$lib/pyserver/computePy'
     import KineticConfigTable from './controllers/KineticConfigTable.svelte'
-
     import KineticEditor from './KineticEditor.svelte'
     import MatplotlibDialog from './MatplotlibDialog.svelte'
-    import ButtonBadge from '$components/ButtonBadge.svelte'
     import RateConstants from './controllers/RateConstants.svelte'
     import RateInitialise from './controllers/RateInitialise.svelte'
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
     import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
     import Accordion from '@smui-extra/accordion'
-    import Panel from '$src/components/Panel.svelte'
-    import BrowseTextfield from '$components/BrowseTextfield.svelte'
-    import { fs, path } from '@tauri-apps/api'
 
     const currentLocation = persistentWritable('kinetics_location', '')
 
@@ -79,7 +79,7 @@
 
         if (useParamsFile) {
             const masses = totalMassKey.filter((m) => m.included).map(({ mass }) => mass.trim())
-            const parentCounts = currentData?.[masses[0]]?.['y']?.[0]?.toFixed(0)
+            const parentCounts = Number(currentData?.[masses[0]]?.['y']?.[0])?.toFixed(0)
             if (!defaultInitialValues) return
             initialValues = [parentCounts, ...Array(masses.length - 1).fill(1)].join(', ')
 
@@ -251,7 +251,7 @@
         const masses = totalMassKey.filter((m) => m.included).map(({ mass }) => mass.trim())
         if (masses.length < 2) return
 
-        const parentCounts = currentData?.[masses[0]]?.['y']?.[0]?.toFixed(0)
+        const parentCounts = Number(currentData?.[masses[0]]?.['y']?.[0])?.toFixed(0)
         if (forTagged) return
         if (defaultInitialValues) {
             initialValues = [parentCounts, ...Array(masses.length - 1).fill(1)].join(', ')

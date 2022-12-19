@@ -3,16 +3,9 @@
     import { plot, plotlyEventsInfo } from '$src/js/functions'
     import computePy_func from '$lib/pyserver/computePy'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
-    import TextSwitch from '$components/TextSwitch.svelte'
-    import Select from '$components/Select.svelte'
-    import STable from '$components/tables/STable.svelte'
+    import { Textfield, STable, Select, TextSwitch, Checkbox } from '$src/components'
     import THzFitParamsTable from './thz/components/THzFitParamsTable.svelte'
     import Matplotlib from './thz/Matplotlib.svelte'
-    import { onDestroy } from 'svelte'
-
-    import Textfield from '@smui/textfield'
-    import { path } from '@tauri-apps/api'
 
     export let id = 'THz'
     export let display = 'grid'

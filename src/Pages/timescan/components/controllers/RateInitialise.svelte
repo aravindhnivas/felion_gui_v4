@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     import Panel from '$src/components/Panel.svelte'
     // import type { MassKey } from 'types/types'
     import { tick } from 'svelte'

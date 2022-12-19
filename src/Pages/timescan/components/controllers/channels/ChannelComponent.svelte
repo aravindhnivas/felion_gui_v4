@@ -1,8 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte'
-    import Select from '$components/Select.svelte'
-    import Textfield from '@smui/textfield'
-    // import type { LossChannel } from 'types/types'
+    import { Textfield, Select } from '$src/components'
     import { isUndefined } from 'lodash-es'
 
     export let item: Timescan.LossChannel

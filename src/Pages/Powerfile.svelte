@@ -1,11 +1,9 @@
 <script lang="ts">
     import { showConfirm } from '$lib/alert/store'
-    import Textfield from '@smui/textfield'
+    import { Textfield, BrowseTextfield } from '$src/components'
     import HelperText from '@smui/textfield/helper-text'
     import Checkbox from '@smui/checkbox'
     import FormField from '@smui/form-field'
-    import BrowseTextfield from '$components/BrowseTextfield.svelte'
-    import { fs, path } from '@tauri-apps/api'
     import { persistentWritable } from '$src/js/persistentStore'
 
     const writePowfile = async () => {

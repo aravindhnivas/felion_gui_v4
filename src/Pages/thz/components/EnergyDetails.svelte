@@ -5,12 +5,12 @@
     import Select from '$src/components/Select.svelte'
     import IconButton from '$src/components/IconButton.svelte'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     import type WinBox from 'winbox'
     import { wavenumberToMHz, MHzToWavenumber, getYMLFileContents, setID } from '$src/js/utils'
     import BoltzmanDistribution from '../windows/BoltzmanDistribution.svelte'
     import { tick } from 'svelte'
-    import { fs, path } from '@tauri-apps/api'
+    // import { fs, path } from '@tauri-apps/api'
 
     export let energyFilename: string = ''
 

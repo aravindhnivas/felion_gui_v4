@@ -1,7 +1,6 @@
 <script lang="ts">
-    import Modal from '$components/modal/Modal.svelte'
+    import { Modal } from '$src/components'
     import FelixPlotWidgets from './FelixPlotWidgets.svelte'
-    import { createEventDispatcher } from 'svelte'
     export let active = false
     export let felixPlotCheckboxes = []
     export let theoryLocation: string

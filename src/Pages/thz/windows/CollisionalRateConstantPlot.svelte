@@ -2,13 +2,9 @@
     import { collisionalCoefficient } from '../stores/collisional'
     import { collisionalTemp } from '../stores/common'
     import { polynomial } from 'regression'
-    import Textfield from '@smui/textfield'
-    import SeparateWindow from '$components/misc/SeparateWindow.svelte'
+    import { Textfield, Checkbox, SeparateWindow } from '$src/components'
     import colors from '$lib/misc/colors'
     import { react } from 'plotly.js-basic-dist'
-    import Checkbox from '$components/Checkbox.svelte'
-    import { fs } from '@tauri-apps/api'
-
     import type WinBox from 'winbox'
 
     export let active = false

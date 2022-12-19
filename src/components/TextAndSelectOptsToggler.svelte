@@ -1,6 +1,5 @@
 <script>
-    import Textfield from '@smui/textfield'
-    import Select from '$components/Select.svelte'
+    import { Textfield, Select } from '$src/components'
     export let value = ''
     export let label = ''
     export let toggle = false

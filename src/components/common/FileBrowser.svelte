@@ -1,10 +1,8 @@
 <script lang="ts">
     import { slide } from 'svelte/transition'
-    import Textfield from '@smui/textfield'
+    import { Textfield, VirtualCheckList, IconSwitch } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
-    import IconSwitch from '$components/IconSwitch.svelte'
-    import VirtualCheckList from '$src/components/lists/VirtualCheckList.svelte'
-    import { path, fs } from '@tauri-apps/api'
+
     export let filetype = '*.*'
     export let markedFile = ''
     export let fileChecked = []
@@ -12,6 +10,7 @@
     export let currentLocation = ''
 
     const dispatch = createEventDispatcher()
+
     let searchSurface = null
     let fullfiles: { name: string; id: string }[] = []
     let selectAll = false

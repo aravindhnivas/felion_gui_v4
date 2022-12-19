@@ -7,7 +7,7 @@
     } from '../stores/collisional'
     import { numberDensity, collisionalTemp, configLoaded } from '../stores/common'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     import { find, cloneDeep, isEmpty } from 'lodash-es'
     import { tick } from 'svelte'
 
@@ -17,7 +17,7 @@
     import Panel from '$src/components/Panel.svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTableRow, makeTable, formatNumber } from '../functions/utils'
-    import { fs, path } from '@tauri-apps/api'
+    // import { fs, path } from '@tauri-apps/api'
 
     export let collisionalFilename = ''
     export let moleculeName = ''

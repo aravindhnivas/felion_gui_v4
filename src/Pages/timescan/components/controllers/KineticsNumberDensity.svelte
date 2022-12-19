@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
-    import Modal from '$components/modal/Modal.svelte'
-    import Select from '$components/Select.svelte'
+    // import { onMount } from 'svelte'
+    import { Modal, Select } from '$src/components'
     import NumberDensity from '$src/Pages/misc/NumberDensity.svelte'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import { activePage } from '$src/sveltewritables'
-    import { dialog, fs, path } from '@tauri-apps/api'
 
     export let nHe = ''
     export let selectedFile = ''

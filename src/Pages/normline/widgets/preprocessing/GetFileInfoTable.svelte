@@ -1,11 +1,9 @@
 <script lang="ts">
     import { opoMode, felixopoLocation } from '../../functions/svelteWritables'
-    import IconSwitch from '$components/IconSwitch.svelte'
-    import Table from '$components/tables/Table.svelte'
+    import { IconSwitch, Table } from '$src/components'
     import { savefile, loadfile } from '../../functions/misc'
     import computePy_func from '$lib/pyserver/computePy'
     import { get_details_func } from '../../functions/get_details'
-    import { onMount } from 'svelte'
 
     export let felixfiles: string[]
     export let opofiles: string[]

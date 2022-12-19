@@ -1,6 +1,6 @@
 <script lang="ts">
     import Editor from '$lib/Editor.svelte'
-    import { fs } from '@tauri-apps/api'
+    // import { fs } from '@tauri-apps/api'
     import { computeKineticCodeScipy } from '../functions/computeKineticCode'
 
     export let location = ''

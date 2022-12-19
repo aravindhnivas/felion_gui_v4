@@ -1,12 +1,8 @@
 <script lang="ts">
     import { felixopoLocation } from '../../functions/svelteWritables'
     import { theory_func } from '../../functions/theory'
-    import TextSwitch from '$components/TextSwitch.svelte'
-    import QuickBrowser from '$components/quickDrawers/QuickBrowser.svelte'
-    import Switch from '$components/Switch.svelte'
+    import { TextSwitch, Switch, QuickBrowser, BrowseTextfield } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
-    import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
-    import { fs, path } from '@tauri-apps/api'
 
     let className = ''
     export { className as class }

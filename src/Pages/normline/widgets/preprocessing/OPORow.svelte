@@ -1,16 +1,11 @@
 <script lang="ts">
     import { opoMode, felixPlotAnnotations } from '../../functions/svelteWritables'
     import { felix_opo_func } from '../../functions/felix_opo_func'
-
     import plotIndividualDataIntoGraph from '../../functions/plotIndividualDataIntoGraph'
-    import Select from '$components/Select.svelte'
-    import QuickBrowser from '$components/quickDrawers/QuickBrowser.svelte'
-    import TextSwitch from '$components/TextSwitch.svelte'
+    import { Select, QuickBrowser, TextSwitch, BrowseTextfield } from '$src/components'
     import { plot } from '$src/js/functions'
     import computePy_func from '$lib/pyserver/computePy'
-    import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import { plotlayout } from '../../functions/plot_labels'
-    import { fs, path } from '@tauri-apps/api'
 
     /////////////////////////////////////////////////////////////////////////
 

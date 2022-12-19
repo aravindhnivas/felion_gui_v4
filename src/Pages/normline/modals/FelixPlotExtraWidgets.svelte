@@ -1,7 +1,5 @@
 <script>
-    import Modal from '$components/modal/Modal.svelte'
-    import Textfield from '@smui/textfield'
-    import { createEventDispatcher } from 'svelte'
+    import { Textfield, Modal } from '$src/components'
     export let active = false
     export let extraWidget = { label: '', value: '', step: '' }
     export let widgetType = 'text'

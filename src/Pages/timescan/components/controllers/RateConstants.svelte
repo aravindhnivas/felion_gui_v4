@@ -1,8 +1,5 @@
 <script lang="ts">
-    import Textfield from '@smui/textfield'
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
-    import Switch from '$components/Switch.svelte'
-
+    import { Textfield, Switch, TextAndSelectOptsToggler } from '$src/components'
     export let defaultInitialValues = true
     export let initialValues = ''
     export let kinetics_fitfile = ''

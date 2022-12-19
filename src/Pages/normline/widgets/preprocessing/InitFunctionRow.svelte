@@ -13,12 +13,9 @@
 
     import plotIndividualDataIntoGraph from '../../functions/plotIndividualDataIntoGraph'
     import { felix_opo_func } from '../../functions/felix_opo_func'
-    import TextSwitch from '$components/TextSwitch.svelte'
-    import ButtonBadge from '$components/ButtonBadge.svelte'
+    import { TextSwitch, ButtonBadge } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { plotlayout } from '../../functions/plot_labels'
-    import { relayout } from 'plotly.js-basic-dist'
-    import { path } from '@tauri-apps/api'
     ///////////////////////////////////////////////////////////////////////////
 
     export let plotfile = 'average'

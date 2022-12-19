@@ -1,8 +1,6 @@
 <script lang="ts">
     import QuickView from './QuickView.svelte'
     import FileBrowser from '$components/common/FileBrowser.svelte'
-    import { createEventDispatcher } from 'svelte'
-
     export let active = false
     export let currentLocation: string
     export let fileChecked: string[]

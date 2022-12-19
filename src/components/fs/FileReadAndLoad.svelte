@@ -1,11 +1,8 @@
 <script lang="ts">
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
     import { isEmpty, uniqBy } from 'lodash-es'
-    import Textfield from '@smui/textfield'
+    import { Textfield, TextAndSelectOptsToggler } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
-    // import { tick } from 'svelte'
-    import { fs, path } from '@tauri-apps/api'
     export let configDir: string = ''
     export let selectedFile: string = ''
     export let options_filter: string = '.json'

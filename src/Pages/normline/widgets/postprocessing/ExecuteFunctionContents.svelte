@@ -12,21 +12,19 @@
     import { savefile, loadfile } from '../../functions/misc'
     import { NGauss_fit_func } from '../../functions/NGauss_fit'
     import { exp_fit_func } from '../../functions/exp_fit'
-    import { relayout, deleteTraces } from 'plotly.js-basic-dist'
     import { dropRight, sortBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
-    import Switch from '$components/Switch.svelte'
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
+    import { Switch, TextAndSelectOptsToggler } from '$src/components'
     // //////////////////////////////////////////////////////////////////////
 
     export let writeFile: boolean = false
     export let normMethod: string
     export let showall = true
-    export let fullfiles
-    export let addedFileCol
-    export let writeFileName
-    export let addedFileScale
-    export let overwrite_expfit
+    export let fullfiles: string[]
+    export let addedFileCol: string
+    export let writeFileName: string
+    export let addedFileScale: string
+    export let overwrite_expfit: boolean
     export let modalActivate = false
     export let adjustPeakTrigger = false
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { plot_colors } from '../../stores/common'
-    import Textfield from '@smui/textfield'
+    import { Textfield } from '$src/components'
     import Checkbox from '$src/components/Checkbox.svelte'
     import Select from '$src/components/Select.svelte'
     import MenuSurface from '@smui/menu-surface'

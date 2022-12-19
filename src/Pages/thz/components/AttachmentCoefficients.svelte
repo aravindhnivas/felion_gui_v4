@@ -1,13 +1,9 @@
 <script lang="ts">
     import { numberDensity } from '../stores/common'
-    import Textfield from '@smui/textfield'
+    import { Textfield, TextSwitch, Panel } from '$src/components'
     import { cloneDeep } from 'lodash-es'
-    import TextSwitch from '$components/TextSwitch.svelte'
-    import Panel from '$src/components/Panel.svelte'
-    // import { tick } from 'svelte'
 
     export let attachmentCoefficients: ValueLabel[] = []
-
     export let k3: AttachmentRate = { constant: [], rate: [] }
     export let kCID: AttachmentRate = { constant: [], rate: [] }
 

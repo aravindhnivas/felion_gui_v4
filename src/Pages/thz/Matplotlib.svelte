@@ -1,23 +1,19 @@
 <script lang="ts">
-    import Modal from '$components/modal/Modal.svelte'
-    import VirtualCheckList from '$components/lists/VirtualCheckList.svelte'
-    import Checkbox from '$components/Checkbox.svelte'
-    // import { createEventDispatcher, onMount } from 'svelte'
-    import ButtonBadge from '$components/ButtonBadge.svelte'
-    import { fs, path } from '@tauri-apps/api'
+    import { Checkbox, Modal, ButtonBadge, VirtualCheckList } from '$src/components'
 
     export let active = false
     export let currentLocation = ''
+
     let thzfiles: string[] = []
 
     const dispatch = createEventDispatcher()
-
     const update_file_config = async (_loc: string) => {
         data_location = await path.join(_loc, 'EXPORT')
     }
-    $: update_file_config(currentLocation)
-    let data_location = ''
 
+    $: update_file_config(currentLocation)
+
+    let data_location = ''
     $: if (data_location) {
         thzfiles = []
         loadfiles()

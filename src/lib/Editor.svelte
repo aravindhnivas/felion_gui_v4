@@ -1,11 +1,7 @@
 <script lang="ts">
     import { showConfirm } from '$src/lib/alert/store'
-    import { onDestroy } from 'svelte'
-    import Switch from '$components/Switch.svelte'
-    import BrowseTextfield from '$components/BrowseTextfield.svelte'
+    import { BrowseTextfield, Switch, TextAndSelectOptsToggler } from '$src/components'
     import WinBox from 'winbox/src/js/winbox.js'
-    import TextAndSelectOptsToggler from '$components/TextAndSelectOptsToggler.svelte'
-    import { path, fs } from '@tauri-apps/api'
     export let id = window.getID()
     export let location = ''
 

@@ -1,7 +1,6 @@
 <script lang="ts">
     import DataTable, { Head, Body, Row, Cell } from '@smui/data-table'
     import { orderBy, uniqBy } from 'lodash-es'
-    import { createEventDispatcher, onMount } from 'svelte'
     import IconButton, { Icon } from '@smui/icon-button'
     import FileReadAndLoad from '$components/fs/FileReadAndLoad.svelte'
     export let idKey: string = 'id'

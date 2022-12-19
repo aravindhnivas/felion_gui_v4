@@ -1,10 +1,7 @@
 <script lang="ts">
-    import Switch from '$components/Switch.svelte'
-    import FileReadAndLoad from '$components/fs/FileReadAndLoad.svelte'
     import ChannelComponent from './ChannelComponent.svelte'
-    import { onMount } from 'svelte'
     import { differenceBy, find } from 'lodash-es'
-    import Textfield from '@smui/textfield'
+    import { Textfield, Switch, FileReadAndLoad } from '$src/components'
     import default_channels, { get_slider_controller, base_slider_values_str } from './default_channels'
 
     // import type { loss_channelsType } from 'types/types'

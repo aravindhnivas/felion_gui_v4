@@ -1,25 +1,19 @@
 <script lang="ts">
     import {
         pyVersion,
-        // pythonpath,
         pythonscript,
         pyServerPORT,
         developerMode,
         pyServerReady,
-        // felionpy,
         currentTab,
         serverDebug,
     } from '$lib/pyserver/stores'
-
-    import BrowseTextfield from '$components/BrowseTextfield.svelte'
+    import { BrowseTextfield, Switch } from '$src/components'
     import { getPyVersion } from '../checkPython'
     import { fetchServerROOT } from '../serverConnections'
-    import Switch from '$components/Switch.svelte'
     import Badge from '@smui-extra/badge'
-    import { path } from '@tauri-apps/api'
     import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-
     interface ServerInfo {
         value: string
         type: 'info' | 'danger' | 'warning' | 'success'
