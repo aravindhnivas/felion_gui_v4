@@ -163,6 +163,7 @@
         <i class="material-symbols-outlined">keyboard_arrow_right</i>
         <div class="folder_name__div">
             <!-- {#if currentLocation} -->
+            <!-- svelte-ignore missing-declaration -->
             {#await path.basename(currentLocation) then name}
                 <div>{name}</div>
             {:catch _}
