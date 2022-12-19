@@ -55,8 +55,6 @@ export default defineConfig({
     resolve: {
         alias: {
             $src: join(PACKAGE_ROOT, 'src'),
-            $components: join(PACKAGE_ROOT, 'src/components'),
-            $computeCode: join(PACKAGE_ROOT, 'src/Pages/computeCode'),
             $lib: join(PACKAGE_ROOT, 'src/lib'),
         },
     },

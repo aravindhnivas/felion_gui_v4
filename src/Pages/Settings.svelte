@@ -1,6 +1,6 @@
 <script lang="ts">
     import { currentTab } from '$lib/pyserver/stores'
-    import Changelog from '$components/misc/Changelog.svelte'
+    import Changelog from '$src/components/misc/Changelog.svelte'
     import Configuration from './settings/components/Configuration.svelte'
     import About from './settings/components/About.svelte'
     import Update from './settings/components/Update.svelte'
