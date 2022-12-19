@@ -2,7 +2,7 @@
     import DataTable, { Head, Body, Row, Cell } from '@smui/data-table'
     import { orderBy, uniqBy } from 'lodash-es'
     import IconButton, { Icon } from '@smui/icon-button'
-    import FileReadAndLoad from '$components/fs/FileReadAndLoad.svelte'
+    import { FileReadAndLoad } from '$src/components'
     export let idKey: string = 'id'
     export let rowKeys: string[]
     export let rows = []
