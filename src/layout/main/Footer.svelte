@@ -5,7 +5,7 @@
 <script lang="ts">
     import { running_processes } from '$src/sveltewritables'
     import { fade } from 'svelte/transition'
-    import STable from '$components/tables/STable.svelte'
+    import { STable } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
     let surface: MenuSurfaceComponentDev
