@@ -1,8 +1,6 @@
 <script lang="ts">
-    // import { onMount } from 'svelte'
-    import { Modal, Select } from '$src/components'
+    import { Modal, Select, TextAndSelectOptsToggler } from '$src/components'
     import NumberDensity from '$src/Pages/misc/NumberDensity.svelte'
-    import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import { activePage } from '$src/sveltewritables'
 
     export let nHe = ''
