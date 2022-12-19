@@ -1,15 +1,12 @@
 <script lang="ts">
-    import { relayout } from 'plotly.js-basic-dist'
     import { showConfirm } from '$src/lib/alert/store'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import Switch from '$src/components/Switch.svelte'
+    import { Switch, ButtonBadge } from '$src/components'
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
     import { readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
-    import ButtonBadge from '$components/ButtonBadge.svelte'
-
     export let id = 'Masspec'
     export let display = 'grid'
     export let saveLocationToDB = true
@@ -96,7 +93,7 @@
         if (filetype == 'mass' && massfiles) {
             const dataFromPython = await readMassFile(massfiles, btnID)
             if (dataFromPython === null) return
-            console.log({ dataFromPython })
+            edata = dataFromPython
             plot('Mass spectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale, true)
             // graphPlotted = true
             return
@@ -113,6 +110,7 @@
 
     let fullfileslist: string[] = []
     let logScale = true
+    let edata
 </script>
 
 <Layout {display} {filetype} {id} bind:currentLocation bind:fileChecked bind:fullfileslist>
@@ -127,6 +125,7 @@
 
     <svelte:fragment slot="plotContainer">
         <div id={plotID} class="graph__div" />
+        <!-- <MasspecEchart {edata} /> -->
     </svelte:fragment>
 
     <svelte:fragment slot="config">
