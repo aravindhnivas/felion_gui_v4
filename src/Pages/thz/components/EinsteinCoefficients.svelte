@@ -13,7 +13,6 @@
     import { tick } from 'svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTable, formatNumber } from '../functions/utils'
-    // import { fs } from '@tauri-apps/api'
 
     export let lorrentz = 0.32
     export let gaussian = 0.21

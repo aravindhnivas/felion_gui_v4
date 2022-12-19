@@ -17,7 +17,6 @@
     import Panel from '$src/components/Panel.svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTableRow, makeTable, formatNumber } from '../functions/utils'
-    // import { fs, path } from '@tauri-apps/api'
 
     export let collisionalFilename = ''
     export let moleculeName = ''

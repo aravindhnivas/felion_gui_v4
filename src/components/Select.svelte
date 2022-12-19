@@ -1,7 +1,4 @@
 <script lang="ts">
-    // import { fs } from '@tauri-apps/api'
-    import { onMount } from 'svelte'
-
     export let options: string[] = []
     export let label = ''
     export let value: string[] | string = ''

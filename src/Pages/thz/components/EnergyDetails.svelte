@@ -9,9 +9,6 @@
     import type WinBox from 'winbox'
     import { wavenumberToMHz, MHzToWavenumber, getYMLFileContents, setID } from '$src/js/utils'
     import BoltzmanDistribution from '../windows/BoltzmanDistribution.svelte'
-    import { tick } from 'svelte'
-    // import { fs, path } from '@tauri-apps/api'
-
     export let energyFilename: string = ''
 
     let openBoltzmanWindow = false

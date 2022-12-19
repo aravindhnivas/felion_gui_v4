@@ -1,5 +1,4 @@
 <script lang="ts">
-    // import { dialog } from '@tauri-apps/api'
     import { fade } from 'svelte/transition'
 
     export let style = ''

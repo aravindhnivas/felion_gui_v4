@@ -9,7 +9,6 @@
     import { readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
     import ButtonBadge from '$components/ButtonBadge.svelte'
-    // import { fs, path } from '@tauri-apps/api'
 
     export let id = 'Masspec'
     export let display = 'grid'

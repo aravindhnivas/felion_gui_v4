@@ -16,9 +16,6 @@
             {/await}
             <li>{$pyVersion}</li>
             <hr />
-            <!-- {#each Object.keys(window.versions) as key}
-                <li>{key}: {window.versions[key]}</li>
-            {/each} -->
         </ul>
     </div>
 </div>
