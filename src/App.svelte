@@ -16,9 +16,8 @@
     import Settings from './Pages/Settings.svelte'
     import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
-    import { attachConsole } from 'tauri-plugin-log-api'
-    import { appWindow } from '@tauri-apps/api/window'
-    import { stopServer } from '$lib/pyserver/felionpyServer'
+    import { events_listeners } from '$src/lib/event_listeneres'
+
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -35,10 +34,11 @@
     const toastOpts = { reversed: true, intro: { y: 100 } }
 
     onMount(async () => {
-        const detach = await attachConsole()
+        const unlisteners = await events_listeners()
         console.log('App mounted')
+
         return () => {
-            detach()
+            unlisteners.forEach((unlisten) => unlisten())
             console.log('App destroyed')
         }
     })
