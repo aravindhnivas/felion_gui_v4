@@ -15,7 +15,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.2.0"
+    "@tauri-apps/api": "^1.2.0",
+    "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#dev"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
