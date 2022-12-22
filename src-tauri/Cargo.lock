@@ -581,7 +581,7 @@ dependencies = [
 
 [[package]]
 name = "felion_gui_v4"
-version = "4.0.4"
+version = "4.0.6"
 dependencies = [
  "port-killer",
  "portpicker",
