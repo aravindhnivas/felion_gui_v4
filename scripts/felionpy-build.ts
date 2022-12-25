@@ -11,8 +11,6 @@ const mainfile = path.join(pyfiles, 'main.py')
 const args = `--noconfirm --onedir --console --icon ${icon} --name felionpy --debug noarchive --noupx --additional-hooks-dir ${hooks} --hidden-import felionlib --paths ${pyfiles} --distpath ${resource} ${mainfile}`.split(' ')
 console.log(args)
 
-// const cmd = `pyinstaller --noconfirm --onedir --console --icon "${icon}" --name "felionpy" --debug "noarchive" --noupx --additional-hooks-dir "D:/FELion_GUI3/resources/python_files/hooks" --hidden-import "felionlib" --paths "D:/FELion_GUI3/resources/python_files"  "D:/FELion_GUI3/resources/python_files/main.py" --distpath `
-
 const py = spawn('pyinstaller', args)
 py.stdout.on('data', (data) => console.log(data.toString("utf8")))
 py.stderr.on('data', (data) => console.log(data.toString("utf8")))
