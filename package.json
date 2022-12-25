@@ -12,7 +12,8 @@
     "bpublish": "npm run build && tsx .\\scripts\\gh-release.ts",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "buildpy": "tsx .\\scripts\\felionpy-build.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0"
