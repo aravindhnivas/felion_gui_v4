@@ -29,13 +29,13 @@
     let showOPOFiles = false
     let OPOcalibFiles = []
 
-    const update_opo_files = async (loc) => {
-        const dirs = await fs.readDir(OPOLocation)
+    const update_opo_files = async (loc, files: string[]) => {
+        const dirs = await fs.readDir(loc)
         OPOcalibFiles = dirs.map((f) => f.name).filter((file) => file.endsWith('.calibOPO'))
-        opofiles = await Promise.all(OPOfilesChecked.map(async (file) => await path.resolve(OPOLocation, file)))
+        opofiles = await Promise.all(files.map(async (file) => await path.resolve(loc, file)))
     }
 
-    $: update_opo_files(OPOLocation)
+    $: update_opo_files(OPOLocation, OPOfilesChecked)
 
     let dataReady = false
     const fullData = {}
@@ -43,7 +43,7 @@
     function plotData({ e = null, tkplot = 'run', general = false } = {}) {
         removeExtraFile()
 
-        if (opofiles.length < 1) return window.createToast('No files selected', 'danger')
+        if (opofiles.length < 1) return window.createToast('No OPO files selected', 'danger')
         $felixPlotAnnotations[uniqueID] = []
 
         const args = { opofiles, tkplot, $deltaOPO: deltaOPO, calibFile, opoPower }
