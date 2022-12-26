@@ -8,7 +8,6 @@
     let className = ''
     export { className as class }
     export let items = []
-    // export let height = 'calc(65vh - 4rem)'
     export let markedFile = ''
     export let fileChecked = []
     export let fileSelected = []
@@ -21,6 +20,7 @@
     }
 
     const fullfileslist = items.map((file) => (file = file.name))
+    // $: console.warn({ items })
     // $: console.warn({ fileSelected })
     // $: console.info({ fileChecked })
     function selectRange(event, lastfile) {
