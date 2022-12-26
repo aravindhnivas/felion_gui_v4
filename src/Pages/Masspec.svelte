@@ -29,7 +29,8 @@
         const files = checked.map(async (file) => await path.resolve(currentLocation, file))
         massfiles = await Promise.all(files)
         if (massfiles.length > 0) {
-            plotData()
+            await plotData()
+            console.log('plotted')
         }
     }
 
