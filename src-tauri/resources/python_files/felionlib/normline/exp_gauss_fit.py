@@ -61,7 +61,7 @@ def main(args, getvalue=False):
     index = np.logical_and(wn > start_wn, wn < end_wn)
     wn = wn[index]
     inten = inten[index]
-    _sig = "\u03C3"
+    # _sig = "\u03C3"
     _del = "\u0394"
     model = gauss_fit(wn, inten)
 
