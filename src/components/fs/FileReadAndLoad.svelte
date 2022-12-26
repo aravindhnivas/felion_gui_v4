@@ -165,7 +165,7 @@
 </script>
 
 <div class="container mb-5">
-    <button class="button is-warning" on:click={() => load_data()}>Load</button>
+    <button class="button is-warning" on:click={async () => await load_data()}>Load</button>
     <TextAndSelectOptsToggler
         bind:value={filename}
         label={`config file (*${options_filter})`}
