@@ -79,9 +79,17 @@
     }
 
     let sortFile = false
-    $: sortFile
-        ? (fullfiles = fullfiles.sort((a, b) => (a.name > b.name ? 1 : -1)))
-        : (fullfiles = fullfiles.sort((a, b) => (a.name < b.name ? 1 : -1)))
+
+    const sort_files = (mode: boolean) => {
+        if (mode) {
+            fullfiles = fullfiles.sort((a, b) => (a.name > b.name ? 1 : -1))
+        } else {
+            fullfiles = fullfiles.sort((a, b) => (a.name < b.name ? 1 : -1))
+        }
+        // console.log(fileChecked)
+        // fileSelected = fileChecked
+    }
+    $: sort_files(sortFile)
 
     const changeDirectory = async (goto) => {
         currentLocation = await path.resolve(currentLocation, goto)
