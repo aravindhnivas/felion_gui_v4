@@ -94,11 +94,11 @@
         }
     }
     let fullfiles: string[] = []
-    const update_fullfiles = async (mode) => {
+    const update_fullfiles = async (opofiles: string[], felixfiles: string[], addedfiles: string[]) => {
         const avgfile = await path.resolve(currentLocation, 'averaged.felix')
-        fullfiles = mode ? [...opofiles, ...addedfiles, avgfile] : [...felixfiles, ...addedfiles, avgfile]
+        fullfiles = $opoMode[uniqueID] ? [...opofiles, ...addedfiles, avgfile] : [...felixfiles, ...addedfiles, avgfile]
     }
-    $: update_fullfiles($opoMode[uniqueID])
+    $: update_fullfiles(opofiles, felixfiles, addedfiles)
 
     let activateConfigModal = false
     let modalActivate = false
