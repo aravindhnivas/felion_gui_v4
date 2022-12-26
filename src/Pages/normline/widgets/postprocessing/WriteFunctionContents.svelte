@@ -10,9 +10,11 @@
     const dispatch = createEventDispatcher()
     const uniqueID = getContext<string>('uniqueID')
     let lookIn = ''
+
     onMount(async () => {
         lookIn = await path.resolve($felixopoLocation[uniqueID], '../EXPORT')
     })
+    // $: console.log(output_namelists)
 </script>
 
 <div class="align">
