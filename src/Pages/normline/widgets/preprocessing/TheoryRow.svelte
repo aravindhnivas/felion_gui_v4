@@ -14,17 +14,17 @@
     let sigma = 7
     let scale = 1
     let tkplot = false
-    let theoryfiles = []
+    let theoryfiles: string[] = []
     let showTheoryFiles = false
-    let theoryfilesChecked = []
+    let theoryfilesChecked: string[] = []
 
     const uniqueID = getContext<string>('uniqueID')
 
-    const update_files = async (loc) => {
+    const update_files = async (loc: string, checked: string[]) => {
         if (!(await fs.exists(loc))) return
-        theoryfiles = theoryfilesChecked.map(async (file) => await path.resolve(loc, file))
+        theoryfiles = await Promise.all(checked.map(async (file) => await path.resolve(loc, file)))
     }
-    $: update_files(theoryLocation)
+    $: update_files(theoryLocation, theoryfilesChecked)
 
     async function plotData(e = null) {
         const pyfile = 'normline.theory'
