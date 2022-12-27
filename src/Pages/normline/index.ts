@@ -1,21 +1,9 @@
-import AddFilesToPlot from './modals/AddFilesToPlot.svelte'
-import FrequencyTable from './components/FrequencyTable.svelte'
-import InitFunctionRow from './widgets/preprocessing/InitFunctionRow.svelte'
-import OPORow from './widgets/preprocessing/OPORow.svelte'
-import AdjustInitialGuess from './modals/AdjustInitialGuess.svelte'
-import TheoryRow from './widgets/preprocessing/TheoryRow.svelte'
-import GetFileInfoTable from './widgets/preprocessing/GetFileInfoTable.svelte'
-import WriteFunctionContents from './widgets/postprocessing/WriteFunctionContents.svelte'
-import ExecuteFunctionContents from './widgets/postprocessing/ExecuteFunctionContents.svelte'
-
-export {
-    AddFilesToPlot,
-    FrequencyTable,
-    InitFunctionRow,
-    OPORow,
-    AdjustInitialGuess,
-    TheoryRow,
-    GetFileInfoTable,
-    WriteFunctionContents,
-    ExecuteFunctionContents,
-}
+export { default as AddFilesToPlot } from './modals/AddFilesToPlot.svelte'
+export { default as FrequencyTable } from './components/FrequencyTable.svelte'
+export { default as InitFunctionRow } from './widgets/preprocessing/InitFunctionRow.svelte'
+export { default as OPORow } from './widgets/preprocessing/OPORow.svelte'
+export { default as AdjustInitialGuess } from './modals/AdjustInitialGuess.svelte'
+export { default as TheoryRow } from './widgets/preprocessing/TheoryRow.svelte'
+export { default as GetFileInfoTable } from './widgets/preprocessing/GetFileInfoTable.svelte'
+export { default as WriteFunctionContents } from './widgets/postprocessing/WriteFunctionContents.svelte'
+export { default as ExecuteFunctionContents } from './widgets/postprocessing/ExecuteFunctionContents.svelte'
