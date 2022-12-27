@@ -1,12 +1,10 @@
 <script lang="ts">
     import { currentTab } from '$lib/pyserver/stores'
     import Changelog from '$src/components/misc/Changelog.svelte'
-    import Configuration from './settings/components/Configuration.svelte'
-    import About from './settings/components/About.svelte'
-    import Update from './settings/components/Update.svelte'
-    import Badge from '@smui-extra/badge'
+    import { Configuration, About, Update, Credits } from './settings/components/'
+    import { Badge } from '$src/components'
 
-    const tabs = ['Configuration', 'Update', 'About', 'Infos']
+    const tabs = ['Configuration', 'Update', 'About', 'Credits']
     const id = 'Settings'
 
     let display = 'none'
@@ -72,7 +70,7 @@
                     }}
                 />
                 <About />
-                <!-- <Infos /> -->
+                <Credits />
             </div>
         </div>
     </div>

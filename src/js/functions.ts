@@ -41,9 +41,16 @@ export const callback_toast = (message: string, theme: keyof ToastThemeOpts = 'i
     })
 }
 
-export const createToast = (description: string, type?: keyof ToastThemeOpts, opts: SvelteToastOptions = {}) => {
-    if (!type) type = 'info'
-    toast.push(description, {
+type toastType = keyof ToastThemeOpts
+const toastIcons: { [name in toastType]: string } = {
+    info: '',
+    success: `<lord-icon trigger="loop" src="/assets/icons/lottie/confetti.json"></lord-icon>`,
+    danger: `<lord-icon trigger="loop" src="/assets/icons/lottie/error.json"></lord-icon>`,
+    warning: `<lord-icon trigger="loop" src="/assets/icons/lottie/error.json"></lord-icon>`,
+}
+export const createToast = (description: string, type: toastType = 'info', opts: SvelteToastOptions = {}) => {
+    const description_modified = `<div class='align'>${toastIcons[type]} <div>${description}</div></div>`
+    toast.push(description_modified, {
         theme: toastTheme[type],
         pausable: true,
         ...opts,

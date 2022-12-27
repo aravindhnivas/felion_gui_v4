@@ -21,8 +21,12 @@
 
         <div class="navbar-end">
             {#if $footerMsg}
-                <div transition:fade class="navbar-item">
+                <!-- <div transition:fade class="navbar-item">
                     {$footerMsg}
+                </div> -->
+                <div class="icon-footer">
+                    <span>Update downloading</span>
+                    <lord-icon trigger="loop" src="/assets/icons/lottie/loader.json" />
                 </div>
             {/if}
             {#if $running_processes.length > 0}
@@ -56,6 +60,12 @@
         cursor: pointer;
     }
     .navbar-end {
+        .icon-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-right: 0.5em;
+        }
         .navbar-item:not(:only-child) {
             border-left: solid 1px;
         }

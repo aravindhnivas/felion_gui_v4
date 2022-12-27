@@ -46,6 +46,8 @@
     "gridjs-svelte": "^2.1.1",
     "interactjs": "^1.10.17",
     "lodash-es": "^4.17.21",
+    "lord-icon-element": "^4.0.1",
+    "lottie-web": "^5.10.0",
     "material-symbols": "^0.4.2",
     "plotly.js-basic-dist": "^2.16.5",
     "prettier-plugin-svelte": "^2.9.0",

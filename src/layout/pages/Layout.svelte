@@ -132,7 +132,6 @@
                     on:click={() => (activateConfigModal = true)}>build</span
                 >
             </div>
-
             {#if browse_location_div_toggle}
                 <BrowseTextfield class="three_col_browse" bind:value={currentLocation} label="Current location" />
             {/if}
