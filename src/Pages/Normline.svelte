@@ -168,6 +168,7 @@
         }
         react(`${uniqueID}-avgplot`, [], dataLayout, { editable: true })
         graphPlotted = true
+        window.createToast('Demo plotted', 'success')
     }
 </script>
 
