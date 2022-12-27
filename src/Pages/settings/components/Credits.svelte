@@ -13,7 +13,7 @@
 
         {
             primary: 'Svelte',
-            secondary: ['CYBERNETICALLY ENHANCED WEB APPS'],
+            secondary: ['Cybernatically enhanced web apps'],
             link: 'https://svelte.dev/',
             id: window.getID(),
         },
