@@ -7,19 +7,21 @@
             secondary: [
                 'Build an optimized, secure, and frontend-independent application for multi-platform deployment',
             ],
-            link: '',
+            link: 'https://tauri.app/',
             id: window.getID(),
         },
 
         {
             primary: 'Svelte',
             secondary: ['CYBERNETICALLY ENHANCED WEB APPS'],
+            link: 'https://svelte.dev/',
             id: window.getID(),
         },
 
         {
             primary: 'Vite',
             secondary: ['Next Generation Frontend Tooling'],
+            link: 'https://vitejs.dev/',
             id: window.getID(),
         },
 
@@ -47,6 +49,7 @@
         {
             primary: 'SMUI',
             secondary: ['Material UI components for Svelte apps'],
+            link: 'https://sveltematerialui.com/',
             id: window.getID(),
         },
 
@@ -60,6 +63,7 @@
         {
             primary: 'Lordicons',
             secondary: ['Animated icons by Lordicon.com'],
+            link: 'https://lordicon.com/',
             id: window.getID(),
         },
 
@@ -95,7 +99,6 @@
 <style>
     .credits__div {
         display: grid;
-        user-select: text;
         max-height: 75vh;
         overflow: auto;
     }
