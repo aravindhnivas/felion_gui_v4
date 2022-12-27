@@ -13,6 +13,7 @@
     } from './normline'
     import { Select, Switch, Radio, SegBtn } from '$src/components'
     import Layout from '$src/layout/pages/Layout.svelte'
+    import { plotlayout } from './normline/functions/plot_labels'
     ///////////////////////////////////////////////////////////////////////
 
     export let id = 'Normline'
@@ -137,21 +138,37 @@
         felixopoLocation.init(uniqueID)
         mounted = true
         console.warn('Normline mounted')
-    })
-    onDestroy(() => {
-        opoMode.remove(uniqueID)
-        Ngauss_sigma.remove(uniqueID)
-        felixopoLocation.remove(uniqueID)
-        console.warn('Normline destroyed')
+        return () => {
+            opoMode.remove(uniqueID)
+            Ngauss_sigma.remove(uniqueID)
+            felixopoLocation.remove(uniqueID)
+            console.warn('Normline destroyed')
+        }
     })
 
     let felix_toggle = true
     let opo_toggle = true
     let theory_toggle = true
-
     let showall = true
     let normMethod: string = normMethods[1]
     let theoryRow = false
+
+    let graphWidth: number
+
+    const demo_plot = () => {
+        const { yaxis, xaxis, title } = plotlayout[normMethod]
+        const dataLayout: Partial<Plotly.Layout> = {
+            title,
+            xaxis,
+            yaxis,
+            hovermode: 'closest',
+            autosize: true,
+            height: 450,
+            width: graphWidth,
+        }
+        react(`${uniqueID}-avgplot`, [], dataLayout, { editable: true })
+        graphPlotted = true
+    }
 </script>
 
 <AddFilesToPlot
@@ -171,6 +188,15 @@
         {#if $opoMode[uniqueID]}
             <span class="tag" style="border: solid 1px; background-color: #ffa94d33;">OPO Mode</span>
         {/if}
+        <div
+            role="presentation"
+            class="tag is-link"
+            aria-label="show graph"
+            data-cooltipz-dir="bottom"
+            on:click={() => demo_plot()}
+        >
+            <span class="material-symbols-outlined"> insights </span>
+        </div>
     </svelte:fragment>
 
     <svelte:fragment slot="buttonContainer">
@@ -220,6 +246,7 @@
             <div id="{uniqueID}-bplot" class="graph__div" class:hide={!showRawData} />
             <div id="{uniqueID}-saPlot" class="graph__div" class:hide={!showPowerData} />
             <div
+                bind:clientWidth={graphWidth}
                 id="{uniqueID}-avgplot"
                 class="graph__div"
                 on:plotted={(e) => {
