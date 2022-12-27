@@ -5,6 +5,7 @@
 <script lang="ts">
     import { running_processes } from '$src/sveltewritables'
     import { pyServerReady } from '$lib/pyserver/stores'
+    import { activePage } from '$src/sveltewritables'
     import { fade } from 'svelte/transition'
     import { STable } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
@@ -22,7 +23,16 @@
 
         <div class="navbar-end">
             {#if !$pyServerReady}
-                <div class="tag is-danger">python server not ready</div>
+                <div
+                    role="presentation"
+                    class="tag is-danger"
+                    style="cursor: pointer;"
+                    on:click={() => {
+                        $activePage = 'Settings'
+                    }}
+                >
+                    python server not ready
+                </div>
             {/if}
             {#if $footerMsg}
                 <div class="icon-footer">

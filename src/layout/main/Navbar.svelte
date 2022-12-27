@@ -16,6 +16,9 @@
         })
     }
 
+    $: if ($activePage) {
+        navigate()
+    }
     onMount(() => {
         document.getElementById('navbar').style.display = 'block'
         navigate()
