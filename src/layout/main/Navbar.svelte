@@ -3,7 +3,7 @@
     import Tab, { Label } from '@smui/tab'
     import TabBar from '@smui/tab-bar'
     import { onMount } from 'svelte'
-    import Badge from '@smui-extra/badge'
+    import { Badge } from '$src/components'
 
     export let navItems: string[] = []
 
@@ -36,12 +36,7 @@
         <Tab {tab}>
             <Label>
                 <span class="mr-3">{tab}</span>
-                <Badge
-                    class="navbar-badge"
-                    aria-label="{tab}-navbar-status-badge"
-                    id="navbar-badge-{tab}"
-                    style="min-height: 10px; min-width: 10px; padding: 0; background: '';"
-                />
+                <Badge class="navbar-badge" aria-label="{tab}-navbar-status-badge" id="navbar-badge-{tab}" />
             </Label>
         </Tab>
     </TabBar>
