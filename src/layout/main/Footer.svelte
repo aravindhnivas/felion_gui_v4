@@ -4,6 +4,7 @@
 
 <script lang="ts">
     import { running_processes } from '$src/sveltewritables'
+    import { pyServerReady } from '$lib/pyserver/stores'
     import { fade } from 'svelte/transition'
     import { STable } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
@@ -20,10 +21,10 @@
         </div>
 
         <div class="navbar-end">
+            {#if !$pyServerReady}
+                <div class="tag is-danger">python server not ready</div>
+            {/if}
             {#if $footerMsg}
-                <!-- <div transition:fade class="navbar-item">
-                    {$footerMsg}
-                </div> -->
                 <div class="icon-footer">
                     <span>Update downloading</span>
                     <lord-icon trigger="loop" src="/assets/icons/lottie/loader.json" />
@@ -60,14 +61,19 @@
         cursor: pointer;
     }
     .navbar-end {
+        display: flex;
         .icon-footer {
             display: flex;
             align-items: center;
             gap: 0.5em;
-            margin-right: 0.5em;
         }
         .navbar-item:not(:only-child) {
             border-left: solid 1px;
+        }
+
+        div {
+            align-self: center;
+            margin-right: 0.5em;
         }
     }
 </style>
