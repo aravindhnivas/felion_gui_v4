@@ -35,7 +35,7 @@
         {
             primary: 'Google fonts',
             secondary: ['Material Symbols and fonts'],
-            link: 'https://fonts.google.com/icons',
+            link: 'https://fonts.google.com/icons/',
             id: window.getID(),
         },
 
