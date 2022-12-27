@@ -23,7 +23,7 @@
     export let fullfiles: string[]
     export let addedFileCol: string
     export let writeFileName: string
-    export let addedFileScale: string
+    export let addedFileScale: number
     export let overwrite_expfit: boolean
     export let modalActivate = false
     export let adjustPeakTrigger = false
