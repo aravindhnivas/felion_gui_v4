@@ -79,7 +79,7 @@
 
         <div class="right_container__div box background-body pt-1" id="{uniqueID}__mainContainer__div">
             <div class="align" style="justify-content: end; gap: 0.2em;">
-                <div class="mr-auto"><slot name="toggle_row" /></div>
+                <div class="top-row mr-auto"><slot name="toggle_row" /></div>
                 <div class="tag is-link" aria-label="fullscreen" data-cooltipz-dir="bottom">
                     <IconButton
                         on:click={() => {
@@ -241,5 +241,9 @@
         gap: 0.5em;
         overflow: auto;
         min-height: 3rem;
+    }
+    .top-row {
+        display: flex;
+        gap: 0.5em;
     }
 </style>
