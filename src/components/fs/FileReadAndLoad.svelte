@@ -18,7 +18,7 @@
 
     let surface: MenuSurfaceComponentDev
 
-    console.log({ filename, configDir })
+    // console.log({ filename, configDir })
     const toastOpts = {
         target: 'left',
     }
