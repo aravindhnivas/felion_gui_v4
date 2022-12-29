@@ -209,7 +209,7 @@
             display: grid;
             grid-template-rows: auto 1fr;
             width: 100%;
-            min-width: 300px;
+            max-width: 300px;
         }
 
         .left_container__div,
