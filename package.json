@@ -1,5 +1,5 @@
 {
-  "name": "felion_gui_v4",
+  "name": "felion_gui",
   "private": true,
   "version": "4.0.8",
   "type": "module",
@@ -52,7 +52,7 @@
     "plotly.js-basic-dist": "^2.16.5",
     "prettier-plugin-svelte": "^2.9.0",
     "regression": "^2.0.1",
-    "sass": "^1.57.0",
+    "sass": "^1.57.1",
     "svelte": "^3.55.0",
     "svelte-check": "^2.10.2",
     "svelte-clipboard": "^1.0.0",
