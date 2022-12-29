@@ -6,7 +6,7 @@ export const pythonpath = persistentWritable('pythonpath', 'python')
 export const pythonscript = persistentWritable('pythonscript', '')
 export const felionpy = persistentWritable('felionpy', 'binaries/felionpy')
 
-export const developerMode = persistentWritable('developerMode', import.meta.env.DEV)
+export const developerMode = writable(import.meta.env.DEV)
 export const pyProgram = derived([developerMode], ([$developerMode]) => {
     return $developerMode ? 'python' : 'felionpy'
 })

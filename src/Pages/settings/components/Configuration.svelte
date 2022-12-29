@@ -44,7 +44,7 @@
 
     onMount(async () => {
         try {
-            $pythonscript = await path.resolve('./resources/python_files/')
+            $pythonscript = await path.resolve('../src-python/')
             if (!$pyVersion) {
                 console.warn('python is invalid. computing again')
                 await getPyVersion()
@@ -62,7 +62,6 @@
             serverInfo = [...serverInfo, { value: `pyVersion: ${$pyVersion}`, type: 'info' }]
         }
     })
-
     const dispatch = createEventDispatcher()
 </script>
 
@@ -81,9 +80,11 @@
         {/if}
 
         <div class="align">
-            <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
-                Developer mode: {$developerMode}
-            </button>
+            {#if import.meta.env.DEV}
+                <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
+                    Developer mode: {$developerMode}
+                </button>
+            {/if}
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
         </div>
         <button class="button is-link" on:click={() => (showServerControls = !showServerControls)}>
