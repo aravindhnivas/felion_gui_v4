@@ -27,9 +27,9 @@
         THz,
     }
 
-    if (import.meta.env.MODE === 'development') {
-        navItems.push('Test')
-    }
+    // if (import.meta.env.MODE === 'development') {
+    //     navItems.push('Test')
+    // }
 
     const toastOpts = { reversed: true, intro: { y: 100 } }
 
@@ -68,9 +68,9 @@
         <Misc />
         <Settings />
 
-        {#if import.meta.env.MODE === 'development'}
+        <!-- {#if import.meta.env.MODE === 'development'}
             <Test />
-        {/if}
+        {/if} -->
     </div>
     <Footer />
 </div>

@@ -13,7 +13,10 @@
         </svelte:fragment>
 
         <svelte:fragment slot="footer">
-            <p>Developed at Dr.Br&uuml;nken's group FELion@FELIX | 2021 &copy; AN Marimuthu</p>
+            <p>
+                Developed at {import.meta.env.VITE_GROUP} FELion@FELIX | {import.meta.env.VITE_YEAR} &copy; {import.meta
+                    .env.VITE_AUTHOUR}
+            </p>
         </svelte:fragment>
     </Simplewave>
     <!-- {/await}
