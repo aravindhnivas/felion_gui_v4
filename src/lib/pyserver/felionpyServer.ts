@@ -27,9 +27,13 @@ export async function startServer() {
         const pyArgs = get(developerMode) ? [mainPyFile, ...sendArgs] : sendArgs
         console.log(get(pyProgram), pyArgs)
         const py = new shell.Command(get(pyProgram), pyArgs)
-        pyChildProcess.set(await py.spawn())
 
+        const pyChild = await py.spawn()
+        pyChildProcess.set(pyChild)
         pyServerReady.set(true)
+
+        localStorage.setItem('pyserver-pid', `${pyChild.pid}`)
+
         py.on('close', () => {
             pyServerReady.set(false)
         })
@@ -56,10 +60,13 @@ export async function stopServer() {
             console.info('Server already stopped')
             return
         }
+        if (get(pyChildProcess).kill) {
+            await get(pyChildProcess).kill()
+            localStorage.removeItem('pyserver-pid')
+        }
 
-        get(pyChildProcess).kill()
-        console.log(get(pyChildProcess))
         pyServerReady.set(false)
+
         return Promise.resolve(true)
     } catch (error) {
         if (error instanceof Error) {
