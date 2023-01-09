@@ -1,4 +1,4 @@
-import { pyVersion, developerMode, felionpy, get } from '$lib/pyserver/stores'
+import { pyVersion, developerMode, get } from '$lib/pyserver/stores'
 import { Command } from '@tauri-apps/api/shell'
 
 export async function getPyVersion(e?: ButtonClickEvent) {

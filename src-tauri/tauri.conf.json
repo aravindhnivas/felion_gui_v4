@@ -19,11 +19,12 @@
         ]
       },
       "shell": {
+        "all": true,
         "sidecar": true,
         "scope": [
           {
             "name": "felionpy",
-            "cmd": "$RESOURCE/resources/felionpy/felionpy.exe",
+            "cmd": "$RESOURCE/resources/felionpy/felionpy",
             "args": true
           },
           {

@@ -2,18 +2,21 @@
     import {
         pyVersion,
         pythonscript,
+        pythonpath,
         pyServerPORT,
         developerMode,
         pyServerReady,
         currentTab,
         serverDebug,
+        felionpy,
     } from '$lib/pyserver/stores'
-    import { BrowseTextfield, Switch } from '$src/components'
+    import { BrowseTextfield, Switch, Textfield } from '$src/components'
     import { getPyVersion } from '../checkPython'
     import { fetchServerROOT } from '../serverConnections'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
+
     interface ServerInfo {
         value: string
         type: 'info' | 'danger' | 'warning' | 'success'
@@ -41,18 +44,17 @@
             dispatch('serverStatusChanged', { closed: false })
         }
     }
-
+    const dispatch = createEventDispatcher()
     onMount(async () => {
         try {
             $pythonscript = await path.resolve('../src-python/')
             if (!$pyVersion) {
-                console.warn('python is invalid. computing again')
                 await getPyVersion()
                 console.warn($pyVersion)
             }
 
             if (import.meta.env.PROD) {
-                console.log('starting server')
+                // console.log('starting server')
                 await startServer()
                 await updateServerInfo()
             }
@@ -62,7 +64,6 @@
             serverInfo = [...serverInfo, { value: `pyVersion: ${$pyVersion}`, type: 'info' }]
         }
     })
-    const dispatch = createEventDispatcher()
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Configuration'}>
@@ -87,7 +88,33 @@
             {/if}
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
         </div>
-        <button class="button is-link" on:click={() => (showServerControls = !showServerControls)}>
+
+        <div class="align">
+            <BrowseTextfield
+                class="three_col_browse"
+                label="python-src"
+                bind:value={$pythonpath}
+                style="width: 100%;"
+                dir={false}
+                lock={!$developerMode}
+            />
+            <BrowseTextfield
+                class="three_col_browse"
+                label="python-script-src"
+                bind:value={$pythonscript}
+                style="width: 100%;"
+                lock={!$developerMode}
+            />
+        </div>
+        <BrowseTextfield
+            class="three_col_browse"
+            label="felionpy"
+            bind:value={$felionpy}
+            dir={false}
+            lock={$developerMode}
+        />
+
+        <button class="button is-link mt-6" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls
             {#if !$pyServerReady}
                 <Badge class="has-background-danger" />

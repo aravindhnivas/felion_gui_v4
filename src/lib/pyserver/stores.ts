@@ -7,8 +7,8 @@ export const pythonscript = persistentWritable('pythonscript', '')
 export const felionpy = persistentWritable('felionpy', 'binaries/felionpy')
 
 export const developerMode = writable(import.meta.env.DEV)
-export const pyProgram = derived([developerMode], ([$developerMode]) => {
-    return $developerMode ? 'python' : 'felionpy'
+export const pyProgram = derived([developerMode, pythonpath, felionpy], ([$developerMode, $pythonpath, $felionpy]) => {
+    return $developerMode ? $pythonpath : $felionpy
 })
 
 export const pyServerReady = writable(false)
@@ -20,5 +20,8 @@ export const mainpyfile = derived([developerMode, pythonscript], async ([$develo
 
 export const currentTab = persistentWritable('settingsActiveTab', 'Configuration')
 export const serverDebug = persistentWritable('serverDebug', false)
+export const pythonPath = persistentWritable('pythonPath', '')
+export const pythonScript = persistentWritable('pythonScript', '')
+
 export const pyChildProcess = writable<Child>(null)
 export { get }
