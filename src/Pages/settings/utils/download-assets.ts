@@ -67,6 +67,8 @@ export async function unZIP(filename) {
 }
 
 export const check_assets_update = async () => {
+    const URL = import.meta.env.VITE_URL_FELIONPY_VERSION
+    console.warn(URL, typeof URL)
     if (!get(felionlibVersion)) {
         outputbox.add({ value: 'Current version not determined yet.', type: 'danger' })
         return
@@ -75,7 +77,7 @@ export const check_assets_update = async () => {
 
     const [_err1, response] = await oO(
         http.fetch<{ version: string }>(
-            'https://raw.githubusercontent.com/aravindhnivas/felionpy/main/version.json',
+            URL,
             {
                 method: 'GET',
                 responseType: http.ResponseType.JSON,
@@ -106,7 +108,7 @@ export const download_assets = async () => {
     assets_downloading = true
 
     const asset_name = `felionpy-${await platform()}.zip`
-    const base_url = 'https://github.com/aravindhnivas/felionpy/releases/download'
+    const base_url = import.meta.env.VITE_URL_FELIONPY_BASE
     const URL = `${base_url}/${assets_version_available}/${asset_name}`
 
     if (assets_download_needed) {
