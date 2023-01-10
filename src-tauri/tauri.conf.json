@@ -29,8 +29,26 @@
           },
           {
             "name": "python",
-            "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
+            "cmd": "C:/Python311/python.exe",
             "args": true
+          },
+          {
+            "name": "netstat-win32",
+            "cmd": "netstat",
+            "args": [
+              "-ano"
+            ]
+          },
+          {
+            "name": "taskkill-win32",
+            "cmd": "taskkill",
+            "args": [
+              "/PID",
+              {
+                "validator": "\\S+"
+              },
+              "/F"
+            ]
           }
         ]
       }

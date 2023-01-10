@@ -36,6 +36,8 @@
         } else {
             value = result[0]
         }
+
+        // console.log(value)
         dispatch('fileupdate', result)
     }
 </script>

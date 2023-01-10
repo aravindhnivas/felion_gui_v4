@@ -41,4 +41,9 @@ declare global {
         error: unknown
     }
     interface Window extends Exposed {}
+
+    interface OutputBoxtype {
+        value: string
+        type: 'info' | 'danger' | 'warning' | 'success'
+    }
 }

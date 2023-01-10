@@ -21,6 +21,7 @@ export { default as SeparateWindow } from './misc/SeparateWindow.svelte'
 export { default as Notify } from './alert/Notify.svelte'
 export { default as QuickBrowser } from './quickDrawers/QuickBrowser.svelte'
 export { CheckList, VirtualCheckList, ListsMultiline } from './lists'
+export { default as OutputBox} from './OutputBox.svelte'
 
 export { default as Textfield } from '@smui/textfield'
 export { default as Badge } from '@smui-extra/badge'

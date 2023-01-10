@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
         pyVersion,
+        felionlibVersion,
         pythonscript,
         pythonpath,
         pyServerPORT,
@@ -10,21 +11,17 @@
         serverDebug,
         felionpy,
     } from '$lib/pyserver/stores'
-    import { BrowseTextfield, Switch, Textfield } from '$src/components'
+    import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../checkPython'
     import { fetchServerROOT } from '../serverConnections'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-
-    interface ServerInfo {
-        value: string
-        type: 'info' | 'danger' | 'warning' | 'success'
-    }
+    import { platform } from '@tauri-apps/api/os'
 
     let showServerControls: boolean
-    let serverInfo: ServerInfo[] = []
-    let serverCurrentStatus: ServerInfo = { value: '', type: 'info' }
+    let serverInfo: OutputBoxtype[] = []
+    let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
     const updateServerInfo = async (e?: ButtonClickEvent) => {
         serverCurrentStatus = { value: 'server starting...', type: 'info' }
@@ -44,19 +41,55 @@
             dispatch('serverStatusChanged', { closed: false })
         }
     }
+
+    let currentplatform: string
+    const checkNetstat = async () => {
+        const [_err, output] = await oO(new shell.Command(`netstat-${currentplatform}`, ['-ano']).execute())
+
+        if (_err) return window.handleError(_err)
+        if (output.stderr) {
+            serverInfo = [...serverInfo, { value: output.stderr.trim(), type: 'danger' }]
+            return
+        }
+
+        const result = output.stdout
+            .trim()
+            .split('\n ')
+            .filter((ln) => ln.includes(`:${$pyServerPORT}`))
+            .map((ln) => ln.trim())
+        result.forEach((value) => {
+            serverInfo = [...serverInfo, { value, type: 'info' }]
+        })
+    }
+    let currentPortPID: string = localStorage.getItem('pyserver-pid') || ''
+    const killPID = async () => {
+        if (!currentPortPID) return window.createToast('Enter PID in currentPortPID', 'danger')
+        const [_err, output] = await oO(
+            new shell.Command(`taskkill-${currentplatform}`, ['/PID', currentPortPID, '/F']).execute()
+        )
+
+        if (_err) return window.handleError(_err)
+        if (output.stderr) {
+            serverInfo = [...serverInfo, { value: output.stderr.trim(), type: 'danger' }]
+            return
+        }
+        serverInfo = [...serverInfo, { value: output.stdout.trim(), type: 'success' }]
+    }
     const dispatch = createEventDispatcher()
     onMount(async () => {
         try {
-            $pythonscript = await path.resolve('../src-python/')
-            if (!$pyVersion) {
-                await getPyVersion()
-                console.warn($pyVersion)
-            }
+            currentplatform = await platform()
+            // $pythonscript = await path.resolve('../src-python/')
+            // if (!$pyVersion) {
+            //     await getPyVersion()
+            //     // console.warn($pyVersion)
+            // }
 
             if (import.meta.env.PROD) {
                 // console.log('starting server')
                 await startServer()
                 await updateServerInfo()
+                await getPyVersion()
             }
         } catch (error) {
             if (error instanceof Error) console.error(error)
@@ -70,7 +103,7 @@
     <h1>Configuration</h1>
     <div class="align">
         <div class="tag is-warning">
-            {$pyVersion || 'Python undefined'}
+            {$pyVersion ? `Python ${$pyVersion} (felionlib ${$felionlibVersion})` : 'Python undefined'}
         </div>
         <div class="tag is-{serverCurrentStatus.type}">
             {serverCurrentStatus.value}
@@ -145,6 +178,8 @@
                     class:is-loading={serverCurrentStatus.value.includes('starting')}
                     on:click={async () => {
                         await startServer()
+                        currentPortPID = localStorage.getItem('pyserver-pid')
+                        serverInfo = [...serverInfo, { value: `PID: ${currentPortPID}`, type: 'info' }]
                         await updateServerInfo()
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
@@ -154,7 +189,6 @@
                         <Badge class="has-background-danger" />
                     {/if}
                 </button>
-
                 {#if $pyServerReady && serverCurrentStatus.value.includes('running')}
                     <button
                         class="button is-danger"
@@ -167,35 +201,13 @@
                     </button>
                 {/if}
             </div>
-
             <div class="align">
                 <button id="fetchServerROOT" class="button is-link" on:click={updateServerInfo}>fetchServerROOT</button>
-                <button
-                    class="button is-danger"
-                    on:click={() => {
-                        serverInfo = []
-                    }}>Clear</button
-                >
+                <button class="button is-link" on:click={checkNetstat}>checkNetstat</button>
+                <Textfield bind:value={currentPortPID} label="currentPortPID" />
+                <button class="button is-danger" on:click={killPID}>killPID</button>
             </div>
         </div>
-
-        <div id="serverInfo__div" class="align box">
-            {#each serverInfo as info (info)}
-                <span class="has-text-{info.type}" style="width: 100%;">>> {info.value}</span>
-            {/each}
-        </div>
+        <OutputBox bind:output={serverInfo} heading="Server outputs" />
     </div>
 </div>
-
-<style>
-    #serverInfo__div {
-        display: flex;
-        align-content: flex-start;
-        overflow: auto;
-        user-select: text;
-        white-space: pre-wrap;
-        align-items: baseline;
-        height: calc(42vh - 5rem);
-        max-height: calc(42vh - 5rem);
-    }
-</style>

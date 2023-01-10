@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentTab, pyVersion } from '$lib/pyserver/stores'
+    import { currentTab, pyVersion, felionlibVersion } from '$lib/pyserver/stores'
     import { getVersion, getTauriVersion } from '@tauri-apps/api/app'
 </script>
 
@@ -14,7 +14,8 @@
             {#await getTauriVersion() then value}
                 <li>Tauri: {value}</li>
             {/await}
-            <li>{$pyVersion}</li>
+            <li>Python {$pyVersion}</li>
+            <li>felionlib {$felionlibVersion}</li>
             <hr />
         </ul>
     </div>

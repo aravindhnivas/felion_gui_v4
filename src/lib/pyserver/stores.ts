@@ -13,6 +13,7 @@ export const pyProgram = derived([developerMode, pythonpath, felionpy], ([$devel
 
 export const pyServerReady = writable(false)
 export const pyVersion = writable('')
+export const felionlibVersion = writable('')
 export const pyServerPORT = persistentWritable('pyServerPORT', 5050)
 export const mainpyfile = derived([developerMode, pythonscript], async ([$developerMode, $pythonscript]) => {
     return $developerMode ? await path.join($pythonscript, 'main.py') : ''
