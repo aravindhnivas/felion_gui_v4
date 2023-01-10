@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentTab, felionlibVersion } from '$lib/pyserver/stores'
+    import { currentTab } from '$lib/pyserver/stores'
     import { currentVersion } from '$src/js/functions'
     import Notify from '$lib/notifier/Notify.svelte'
     import { updateInterval, updateError } from '$src/sveltewritables'
@@ -13,10 +13,8 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
-    // import { platform } from '@tauri-apps/api/os'
     import { outputbox, downloadURL, downloadoverrideURL } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
-    // import { http } from '@tauri-apps/api'
 
     const check_for_update = async (log = false) => {
         try {
@@ -136,7 +134,6 @@
         </div>
         <Notify bind:label={$updateError} type="danger" />
     </div>
-
     <hr />
     <div class="align">
         {#if import.meta.env.DEV}
