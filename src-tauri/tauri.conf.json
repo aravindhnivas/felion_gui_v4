@@ -49,6 +49,21 @@
               },
               "/F"
             ]
+          },
+          {
+            "name": "unzip-win32",
+            "cmd": "powershell",
+            "args": [
+              "Expand-Archive",
+              "-Path",
+              {
+                "validator": "\\S+"
+              },
+              "-DestinationPath",
+              {
+                "validator": "\\S+"
+              }
+            ]
           }
         ]
       },
