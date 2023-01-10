@@ -12,8 +12,9 @@
         felionpy,
     } from '$lib/pyserver/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
-    import { getPyVersion } from '../checkPython'
-    import { fetchServerROOT } from '../serverConnections'
+    import { getPyVersion } from '../utils/checkPython'
+    import { fetchServerROOT } from '../utils/serverConnections'
+    import { checkNetstat, killPID } from '../utils/network'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
@@ -43,38 +44,8 @@
     }
 
     let currentplatform: string
-    const checkNetstat = async () => {
-        const [_err, output] = await oO(new shell.Command(`netstat-${currentplatform}`, ['-ano']).execute())
-
-        if (_err) return window.handleError(_err)
-        if (output.stderr) {
-            serverInfo = [...serverInfo, { value: output.stderr.trim(), type: 'danger' }]
-            return
-        }
-
-        const result = output.stdout
-            .trim()
-            .split('\n ')
-            .filter((ln) => ln.includes(`:${$pyServerPORT}`))
-            .map((ln) => ln.trim())
-        result.forEach((value) => {
-            serverInfo = [...serverInfo, { value, type: 'info' }]
-        })
-    }
     let currentPortPID: string = localStorage.getItem('pyserver-pid') || ''
-    const killPID = async () => {
-        if (!currentPortPID) return window.createToast('Enter PID in currentPortPID', 'danger')
-        const [_err, output] = await oO(
-            new shell.Command(`taskkill-${currentplatform}`, ['/PID', currentPortPID, '/F']).execute()
-        )
 
-        if (_err) return window.handleError(_err)
-        if (output.stderr) {
-            serverInfo = [...serverInfo, { value: output.stderr.trim(), type: 'danger' }]
-            return
-        }
-        serverInfo = [...serverInfo, { value: output.stdout.trim(), type: 'success' }]
-    }
     const dispatch = createEventDispatcher()
     onMount(async () => {
         try {
@@ -203,9 +174,23 @@
             </div>
             <div class="align">
                 <button id="fetchServerROOT" class="button is-link" on:click={updateServerInfo}>fetchServerROOT</button>
-                <button class="button is-link" on:click={checkNetstat}>checkNetstat</button>
+                <button
+                    class="button is-link"
+                    on:click={async () => {
+                        const output = await checkNetstat($pyServerPORT, currentplatform)
+                        if (!output) return
+                        serverInfo = [...serverInfo, ...output]
+                    }}>checkNetstat</button
+                >
                 <Textfield bind:value={currentPortPID} label="currentPortPID" />
-                <button class="button is-danger" on:click={killPID}>killPID</button>
+                <button
+                    class="button is-danger"
+                    on:click={async () => {
+                        const output = await killPID(currentPortPID, currentplatform)
+                        if (!output) return
+                        serverInfo = [...serverInfo, ...output]
+                    }}>killPID</button
+                >
             </div>
         </div>
         <OutputBox bind:output={serverInfo} heading="Server outputs" />
