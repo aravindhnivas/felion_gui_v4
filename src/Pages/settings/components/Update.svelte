@@ -8,10 +8,10 @@
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
     import { confirm } from '@tauri-apps/api/dialog'
-    import OutputBox from '$src/lib/OutputBox.svelte'
+    // import OutputBox from '$src/lib/OutputBox.svelte'
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
-    import Switch from '$src/components/Switch.svelte'
+    import { Switch, OutputBox } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
 
@@ -23,12 +23,12 @@
                 }
             }
 
-            if (log) update_output('Checking for updates...')
+            if (log) update_output({ value: 'Checking for updates...', type: 'info' })
             download_progress = 0
             lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
-            if (log) update_output(update)
+            if (log) update_output({ value: JSON.stringify(update), type: 'info' })
 
             if (!devMODE && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
@@ -37,7 +37,10 @@
                 })
                 if (install) {
                     await stopServer()
-                    update_output(`Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`)
+                    update_output({
+                        value: `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`,
+                        type: 'success',
+                    })
                     await installUpdate()
                     await relaunch()
                 }
@@ -87,12 +90,12 @@
         }
     })
 
-    let outputs: string[] = []
+    let output: OutputBoxtype[] = []
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
-    export const update_output = (val: string | Object) => {
-        if (!val) return
-        outputs = [JSON.stringify(val), ...outputs]
+    export const update_output = (val: OutputBoxtype) => {
+        // if (!val) return
+        output = [val, ...output]
     }
 
     let showOutput = devMODE
@@ -136,18 +139,12 @@
         </div>
         <Notify bind:label={$updateError} type="danger" />
     </div>
-
     {#if download_progress}
         <LinearProgress progress={download_progress} />
     {/if}
 
     {#if showOutput}
-        <OutputBox
-            items={outputs}
-            on:clear={() => {
-                outputs = []
-            }}
-        />
+        <OutputBox bind:output heading="update info" />
     {/if}
 </div>
 

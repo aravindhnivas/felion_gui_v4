@@ -26,18 +26,18 @@
 
     const updateServerInfo = async (e?: ButtonClickEvent) => {
         serverCurrentStatus = { value: 'server starting...', type: 'info' }
-        serverInfo = [...serverInfo, serverCurrentStatus]
+        serverInfo = [serverCurrentStatus, ...serverInfo]
 
         const target = e?.target as HTMLButtonElement
         const rootpage = await fetchServerROOT({ target })
 
         if (rootpage instanceof Error) {
-            serverInfo = [...serverInfo, { value: rootpage.message, type: 'danger' }]
+            serverInfo = [{ value: rootpage.message, type: 'danger' }, ...serverInfo]
             serverCurrentStatus = { value: 'server closed', type: 'danger' }
             dispatch('serverStatusChanged', { closed: true })
         } else {
             $pyServerReady = true
-            serverInfo = [...serverInfo, { value: rootpage, type: 'success' }]
+            serverInfo = [{ value: rootpage, type: 'success' }, ...serverInfo]
             serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
             dispatch('serverStatusChanged', { closed: false })
         }
@@ -65,7 +65,7 @@
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
-            serverInfo = [...serverInfo, { value: `pyVersion: ${$pyVersion}`, type: 'info' }]
+            serverInfo = [{ value: `pyVersion: ${$pyVersion}`, type: 'info' }, ...serverInfo]
         }
     })
 </script>
@@ -150,7 +150,7 @@
                     on:click={async () => {
                         await startServer()
                         currentPortPID = localStorage.getItem('pyserver-pid')
-                        serverInfo = [...serverInfo, { value: `PID: ${currentPortPID}`, type: 'info' }]
+                        serverInfo = [{ value: `PID: ${currentPortPID}`, type: 'info' }, ...serverInfo]
                         await updateServerInfo()
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
@@ -179,7 +179,7 @@
                     on:click={async () => {
                         const output = await checkNetstat($pyServerPORT, currentplatform)
                         if (!output) return
-                        serverInfo = [...serverInfo, ...output]
+                        serverInfo = [...output, ...serverInfo]
                     }}>checkNetstat</button
                 >
                 <Textfield bind:value={currentPortPID} label="currentPortPID" />
@@ -188,7 +188,7 @@
                     on:click={async () => {
                         const output = await killPID(currentPortPID, currentplatform)
                         if (!output) return
-                        serverInfo = [...serverInfo, ...output]
+                        serverInfo = [...output, ...serverInfo]
                     }}>killPID</button
                 >
             </div>
