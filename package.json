@@ -4,7 +4,7 @@
   "version": "4.0.8",
   "type": "module",
   "scripts": {
-    "dev": "npm run tauri dev",
+    "dev": "npm run tauri dev --release",
     "build": "npm run tauri build ",
     "dev:vite": "vite",
     "build:vite": "vite build",
@@ -33,6 +33,7 @@
     "@zerodevx/svelte-toast": "^0.8.2",
     "@zmotivat0r/o0": "^1.0.2",
     "animate.css": "^4.1.1",
+    "axios": "^1.2.2",
     "buffer": "^6.0.3",
     "bulma": "^0.9.4",
     "bulma-extensions": "^6.2.7",

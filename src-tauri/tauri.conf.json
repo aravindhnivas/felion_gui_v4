@@ -29,7 +29,7 @@
           },
           {
             "name": "python",
-            "cmd": "C:/Python311/python.exe",
+            "cmd": "C:/Users/aravindhnivas/AppData/Local/Programs/Python/Python311/python.exe",
             "args": true
           },
           {
