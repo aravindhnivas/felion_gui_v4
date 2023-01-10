@@ -141,8 +141,8 @@
             <Switch bind:selected={$downloadoverrideURL} label="override URL" />
         {/if}
         <span class="tag is-warning">assets download</span>
-        <button class="button is-link" on:click={check_assets_update}>Check assets update</button>
-        <button class="button is-link" on:click={download_assets}>Download assets</button>
+        <button class="button is-link" on:click={() => check_assets_update()}>Check assets update</button>
+        <button class="button is-link" on:click={() => download_assets()}>Download assets</button>
     </div>
 
     {#if download_progress}

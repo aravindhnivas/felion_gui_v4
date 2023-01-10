@@ -16,9 +16,10 @@
     import { fetchServerROOT } from '../utils/serverConnections'
     import { checkNetstat, killPID } from '../utils/network'
     import Badge from '@smui-extra/badge'
-    import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+    import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
     import { platform } from '@tauri-apps/api/os'
+    // import { persistentWritable } from '$src/js/persistentStore'
 
     let showServerControls: boolean
     let serverInfo: OutputBoxtype[] = []
@@ -44,20 +45,12 @@
     }
 
     let currentplatform: string
-    let currentPortPID: string = localStorage.getItem('pyserver-pid') || ''
-
     const dispatch = createEventDispatcher()
+
     onMount(async () => {
         try {
             currentplatform = await platform()
-            // $pythonscript = await path.resolve('../src-python/')
-            // if (!$pyVersion) {
-            //     await getPyVersion()
-            //     // console.warn($pyVersion)
-            // }
-
             if (import.meta.env.PROD) {
-                // console.log('starting server')
                 await startServer()
                 await updateServerInfo()
                 await getPyVersion()
@@ -149,8 +142,7 @@
                     class:is-loading={serverCurrentStatus.value.includes('starting')}
                     on:click={async () => {
                         await startServer()
-                        currentPortPID = localStorage.getItem('pyserver-pid')
-                        serverInfo = [{ value: `PID: ${currentPortPID}`, type: 'info' }, ...serverInfo]
+                        serverInfo = [{ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' }, ...serverInfo]
                         await updateServerInfo()
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
@@ -182,11 +174,11 @@
                         serverInfo = [...output, ...serverInfo]
                     }}>checkNetstat</button
                 >
-                <Textfield bind:value={currentPortPID} label="currentPortPID" />
+                <Textfield value={$currentPortPID.join(', ')} label="currentPortPID" />
                 <button
                     class="button is-danger"
                     on:click={async () => {
-                        const output = await killPID(currentPortPID, currentplatform)
+                        const output = await killPID(currentplatform)
                         if (!output) return
                         serverInfo = [...output, ...serverInfo]
                     }}>killPID</button

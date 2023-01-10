@@ -24,7 +24,7 @@
         "scope": [
           {
             "name": "felionpy",
-            "cmd": "$RESOURCE/resources/felionpy/felionpy",
+            "cmd": "$APPLOCALDATA/felionpy/felionpy",
             "args": true
           },
           {

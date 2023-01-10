@@ -19,6 +19,7 @@
     import { events_listeners } from '$src/lib/event_listeneres'
     import { check_assets_update, download_assets } from './Pages/settings/utils/download-assets'
     import { downloadoverrideURL } from './Pages/settings/utils/stores'
+    import { platform } from '@tauri-apps/api/os'
 
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
@@ -45,11 +46,29 @@
 
         console.log(felionpydir)
         if (!(await fs.exists(felionpydir))) {
-            console.warn('felionpy asset required')
-
+            console.warn('felionpy asset REQUIRED!!')
             $downloadoverrideURL = false
             await check_assets_update(true)
             await download_assets()
+        } else {
+            console.warn('felionpy asset READY')
+        }
+
+        if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
+            console.warn('removing temp files from localdir')
+
+            const [_err, result] = await oO(
+                fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
+                    dir: fs.BaseDirectory.AppLocalData,
+                })
+            )
+
+            if (_err) {
+                console.warn('Could not remove temp files')
+                console.error(_err)
+            } else {
+                console.warn('Temp files removed from localdir')
+            }
         }
         mounted = true
 

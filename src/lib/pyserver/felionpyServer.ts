@@ -8,8 +8,10 @@ import {
     pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
-
+import { persistentWritable } from '$src/js/persistentStore'
 import { path, shell } from '@tauri-apps/api'
+
+export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
     if (get(pyServerReady)) return console.info('Server already running')
@@ -31,8 +33,8 @@ export async function startServer() {
         const pyChild = await py.spawn()
         pyChildProcess.set(pyChild)
         pyServerReady.set(true)
-
-        localStorage.setItem('pyserver-pid', `${pyChild.pid}`)
+        currentPortPID.update(ports => ([...ports, `${pyChild.pid}`]))
+        // localStorage.setItem('pyserver-pid', `${pyChild.pid}`)
 
         py.on('close', () => {
             pyServerReady.set(false)
@@ -62,7 +64,8 @@ export async function stopServer() {
         }
         if (get(pyChildProcess).kill) {
             await get(pyChildProcess).kill()
-            localStorage.removeItem('pyserver-pid')
+            // localStorage.removeItem('pyserver-pid')
+            currentPortPID.update(ports => (ports.filter(p => p!==`${get(pyChildProcess).pid}`)))
         }
 
         pyServerReady.set(false)
