@@ -62,7 +62,8 @@
               "-DestinationPath",
               {
                 "validator": "\\S+"
-              }
+              },
+              "-Force"
             ]
           }
         ]

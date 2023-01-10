@@ -135,6 +135,7 @@
             `${await path.join(filepath, filename)}`,
             '-DestinationPath',
             `${filepath}`,
+            '-Force',
         ])
 
         let err: string
