@@ -13,7 +13,8 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
-    // import { downloadZIP } from '../utils/download-zip'
+    import { platform } from '@tauri-apps/api/os'
+
     import { http } from '@tauri-apps/api'
     const check_for_update = async (log = false) => {
         try {
@@ -102,15 +103,20 @@
     let assets_downloading = false
     let assets_download_needed = false
     let assets_version_available = ''
-    let assets_name = ''
 
     async function downloadZIP(url, filename) {
         try {
+            output = [{ value: 'downloading assets...', type: 'warning' }, ...output]
+            output = [{ value: url, type: 'warning' }, ...output]
             const response = await http.fetch(url, {
                 method: 'GET',
                 responseType: http.ResponseType.Binary,
             })
-
+            console.log(response)
+            if (!response.ok) {
+                output = [{ value: `Status ${response.status} : Invalid URL`, type: 'danger' }, ...output]
+                return
+            }
             output = [{ value: `assets downloaded`, type: 'success' }, ...output]
             await fs.writeBinaryFile(filename, response.data as Uint8Array, { dir: fs.BaseDirectory.AppLocalData })
             output = [{ value: `assets saved`, type: 'success' }, ...output]
@@ -121,6 +127,10 @@
     }
 
     const check_assets_update = async () => {
+        if (!$felionlibVersion) {
+            output = [{ value: 'Current version not determined yet.', type: 'danger' }, ...output]
+            return
+        }
         output = [{ value: 'checking for assets update...', type: 'info' }, ...output]
 
         const [_err1, response] = await oO(
@@ -149,14 +159,23 @@
 
     let downloadURL = 'https://github.com/aravindhnivas/felionpy/releases/download/v0.0.11/felionpy-win64.zip'
     const download_assets = async () => {
+        if (!assets_version_available) {
+            output = [{ value: 'Check for assets update first.', type: 'warning' }, ...output]
+            return
+        }
+
         assets_downloading = true
-        output = [{ value: 'downloading assets...', type: 'warning' }, ...output]
-        const asset_name = `felionpy-win64.zip`
-        // const URL = `https://github.com/aravindhnivas/felionpy/releases/download/${assets_version_available}/${asset_name}`
-        // const URL = `https://github.com/aravindhnivas/felionpy/releases/download/v0.0.11/felionpy-win64.zip`
-        const localDir = await path.appLocalDataDir()
-        const savefile = await path.join(localDir, asset_name)
-        await downloadZIP(downloadURL, savefile)
+
+        const asset_name = `felionpy-${await platform()}.zip`
+        const base_url = 'https://github.com/aravindhnivas/felionpy/releases/download'
+        const URL = `${base_url}/${assets_version_available}/${asset_name}`
+
+        if (assets_download_needed) {
+            await downloadZIP(URL, asset_name)
+            return
+        }
+        if (!(await confirm('Download anyway', { title: 'Download not required' }))) return
+        await downloadZIP(URL, asset_name)
     }
 </script>
 
