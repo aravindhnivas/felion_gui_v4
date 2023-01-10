@@ -51,6 +51,12 @@
             ]
           }
         ]
+      },
+      "http": {
+        "scope": [
+          "https://github.com/aravindhnivas/felionpy/*",
+          "https://raw.githubusercontent.com/aravindhnivas/felionpy/*"
+        ]
       }
     },
     "bundle": {

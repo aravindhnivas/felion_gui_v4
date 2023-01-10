@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentTab } from '$lib/pyserver/stores'
+    import { currentTab, felionlibVersion } from '$lib/pyserver/stores'
     import { currentVersion } from '$src/js/functions'
     import Notify from '$lib/notifier/Notify.svelte'
     import { updateInterval, updateError } from '$src/sveltewritables'
@@ -8,13 +8,13 @@
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
     import { confirm } from '@tauri-apps/api/dialog'
-    // import OutputBox from '$src/lib/OutputBox.svelte'
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
-    import { Switch, OutputBox } from '$src/components'
+    import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
-
+    // import { downloadZIP } from '../utils/download-zip'
+    import { http } from '@tauri-apps/api'
     const check_for_update = async (log = false) => {
         try {
             if (devMODE) {
@@ -36,6 +36,7 @@
                     title: `Update available ${newVersion}`,
                 })
                 if (install) {
+                    appupdate_downloading = true
                     await stopServer()
                     update_output({
                         value: `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`,
@@ -58,7 +59,7 @@
     }
 
     let download_progress = 0
-
+    let appupdate_downloading = false
     let version_info = ''
 
     const listen_download_progress = listen('tauri://update-download-progress', async function (res) {
@@ -93,12 +94,70 @@
     let output: OutputBoxtype[] = []
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
+
     export const update_output = (val: OutputBoxtype) => {
-        // if (!val) return
         output = [val, ...output]
     }
-
     let showOutput = devMODE
+    let assets_downloading = false
+    let assets_download_needed = false
+    let assets_version_available = ''
+    let assets_name = ''
+
+    async function downloadZIP(url, filename) {
+        try {
+            const response = await http.fetch(url, {
+                method: 'GET',
+                responseType: http.ResponseType.Binary,
+            })
+
+            output = [{ value: `assets downloaded`, type: 'success' }, ...output]
+            await fs.writeBinaryFile(filename, response.data as Uint8Array, { dir: fs.BaseDirectory.AppLocalData })
+            output = [{ value: `assets saved`, type: 'success' }, ...output]
+        } catch (error) {
+            output = [{ value: `error occure while downloading assets`, type: 'danger' }, ...output]
+            window.handleError(error)
+        }
+    }
+
+    const check_assets_update = async () => {
+        output = [{ value: 'checking for assets update...', type: 'info' }, ...output]
+
+        const [_err1, response] = await oO(
+            http.fetch<{ version: string }>(
+                'https://raw.githubusercontent.com/aravindhnivas/felionpy/main/version.json',
+                {
+                    method: 'GET',
+                    responseType: http.ResponseType.JSON,
+                }
+            )
+        )
+        if (_err1) return window.handleError(_err1)
+        if (!response.ok) return window.createToast('Could not download the assets', 'danger')
+
+        const { version } = response.data
+        output = [{ value: `Available version: ${version}`, type: 'info' }, ...output]
+        output = [{ value: `Current version: ${$felionlibVersion}`, type: 'info' }, ...output]
+        assets_version_available = `v${version}`
+        assets_download_needed = $felionlibVersion < version
+        if (assets_download_needed) {
+            output = [{ value: `Download required`, type: 'warning' }, ...output]
+        } else {
+            output = [{ value: `Download not required`, type: 'warning' }, ...output]
+        }
+    }
+
+    let downloadURL = 'https://github.com/aravindhnivas/felionpy/releases/download/v0.0.11/felionpy-win64.zip'
+    const download_assets = async () => {
+        assets_downloading = true
+        output = [{ value: 'downloading assets...', type: 'warning' }, ...output]
+        const asset_name = `felionpy-win64.zip`
+        // const URL = `https://github.com/aravindhnivas/felionpy/releases/download/${assets_version_available}/${asset_name}`
+        // const URL = `https://github.com/aravindhnivas/felionpy/releases/download/v0.0.11/felionpy-win64.zip`
+        const localDir = await path.appLocalDataDir()
+        const savefile = await path.join(localDir, asset_name)
+        await downloadZIP(downloadURL, savefile)
+    }
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
@@ -139,6 +198,17 @@
         </div>
         <Notify bind:label={$updateError} type="danger" />
     </div>
+
+    <hr />
+    <div class="align">
+        {#if import.meta.env.DEV}
+            <Textfield bind:value={downloadURL} label="download-URL" style="width: 100%" />
+        {/if}
+        <span class="tag is-warning">assets download</span>
+        <button class="button is-link" on:click={check_assets_update}>Check assets update</button>
+        <button class="button is-link" on:click={download_assets}>Download assets</button>
+    </div>
+
     {#if download_progress}
         <LinearProgress progress={download_progress} />
     {/if}
