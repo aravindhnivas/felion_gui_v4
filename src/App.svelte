@@ -17,6 +17,8 @@
     import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
+    import { check_assets_update, download_assets } from './Pages/settings/utils/download-assets'
+    import { downloadoverrideURL } from './Pages/settings/utils/stores'
 
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
@@ -33,9 +35,23 @@
 
     const toastOpts = { reversed: true, intro: { y: 100 } }
 
+    let mounted = false
     onMount(async () => {
         const unlisteners = await events_listeners()
         console.log('App mounted')
+
+        const localdir = await path.appLocalDataDir()
+        const felionpydir = await path.join(localdir, 'felionpy')
+
+        console.log(felionpydir)
+        if (!(await fs.exists(felionpydir))) {
+            console.warn('felionpy asset required')
+
+            $downloadoverrideURL = false
+            await check_assets_update(true)
+            await download_assets()
+        }
+        mounted = true
 
         return () => {
             unlisteners.forEach((unlisten) => unlisten())
@@ -60,6 +76,7 @@
     <Navbar {navItems} />
     <div id="pageContainer" style="overflow: hidden;">
         <Home />
+        <!-- {#if mounted} -->
         {#each pageIDs as id}
             <PageLayout component={PageComponents[id]} {id} />
         {/each}
@@ -69,8 +86,9 @@
         <Settings />
 
         <!-- {#if import.meta.env.MODE === 'development'}
-            <Test />
-        {/if} -->
+                <Test />
+                {/if} -->
+        <!-- {/if} -->
     </div>
     <Footer />
 </div>
