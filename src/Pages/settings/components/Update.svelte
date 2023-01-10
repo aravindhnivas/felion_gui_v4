@@ -29,7 +29,7 @@
             lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
-            if (log) outputbox.add({ value: JSON.stringify(update), type: 'info' })
+            if (log) outputbox.add({ value: JSON.stringify(update, null, 2), type: 'info' })
 
             if (!devMODE && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
