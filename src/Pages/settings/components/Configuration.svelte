@@ -19,6 +19,7 @@
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
     import { platform } from '@tauri-apps/api/os'
+    import { isEmpty } from 'lodash-es'
     // import { persistentWritable } from '$src/js/persistentStore'
 
     let showServerControls: boolean
@@ -47,10 +48,20 @@
     let currentplatform: string
     const dispatch = createEventDispatcher()
 
+    const clearPORTs = async () => {
+        const output = await killPID(currentplatform)
+        if (!output) return
+        serverInfo = [...output, ...serverInfo]
+    }
+
     onMount(async () => {
         try {
             currentplatform = await platform()
+
             if (import.meta.env.PROD) {
+                if ($currentPortPID.length > 0) {
+                    await clearPORTs()
+                }
                 await startServer()
                 await updateServerInfo()
                 await getPyVersion()
@@ -175,14 +186,7 @@
                     }}>checkNetstat</button
                 >
                 <Textfield value={$currentPortPID.join(', ')} label="currentPortPID" />
-                <button
-                    class="button is-danger"
-                    on:click={async () => {
-                        const output = await killPID(currentplatform)
-                        if (!output) return
-                        serverInfo = [...output, ...serverInfo]
-                    }}>killPID</button
-                >
+                <button class="button is-danger" on:click={async () => await clearPORTs()}>killPID</button>
             </div>
         </div>
         <OutputBox bind:output={serverInfo} heading="Server outputs" />
