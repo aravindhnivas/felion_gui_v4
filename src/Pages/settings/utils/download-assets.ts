@@ -17,7 +17,7 @@ const tauriDownload = async (url: string, responseType: http.ResponseType = http
 
         return res
     } catch (e) {
-        console.error(e)
+        outputbox.add({ value: JSON.stringify(e, null, 2), type: 'danger' })
     } finally {
         console.timeEnd('tauri fetch download')
     }
@@ -31,7 +31,7 @@ const axiosDownload = async (url: string, responseType: ResponseType = 'arraybuf
 
         return res
     } catch (e) {
-        console.error(e)
+        outputbox.add({ value: JSON.stringify(e, null, 2), type: 'danger' })
     } finally {
         console.timeEnd('axios download')
     }
@@ -60,9 +60,8 @@ export async function downloadZIP(filename) {
         outputbox.add({ value: URL_to_download, type: 'warning' })
 
         const response = await tauriDownload(URL_to_download)
-        const res = await axiosDownload(URL_to_download)
+        // const response = await axiosDownload(URL_to_download)
         return
-
         if (response.status !== 200) {
             outputbox.add({ value: `Status ${response.status} : Invalid URL`, type: 'danger' })
             return
@@ -70,6 +69,8 @@ export async function downloadZIP(filename) {
 
         outputbox.add({ value: `assets downloaded`, type: 'success' })
 
+        // return
+        outputbox.add({ value: `saving downloaded assets...`, type: 'success' })
         await fs.writeBinaryFile(filename, response.data, { dir: fs.BaseDirectory.AppLocalData })
         outputbox.add({ value: `assets saved`, type: 'success' })
 
@@ -77,7 +78,7 @@ export async function downloadZIP(filename) {
         await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
     } catch (err) {
         outputbox.add({ value: `error occured while downloading assets`, type: 'danger' })
-        outputbox.add({ value: JSON.stringify(err), type: 'danger' })
+        outputbox.add({ value: JSON.stringify(err, null, 2), type: 'danger' })
     } finally {
         assets_downloading = false
     }
@@ -108,16 +109,16 @@ export function unZIP(filename) {
         cmd.on('error', (error) => {
             err = error
             outputbox.add({ value: 'Error whiile UNZIPing assets', type: 'danger' })
-            outputbox.add({ value: JSON.stringify(error), type: 'danger' })
+            outputbox.add({ value: JSON.stringify(error, null, 2), type: 'danger' })
         })
 
         cmd.stderr.on('data', (stderr) => {
             err = stderr
-            outputbox.add({ value: JSON.stringify(stderr), type: 'danger' })
+            outputbox.add({ value: JSON.stringify(stderr, null, 2), type: 'danger' })
         })
 
         cmd.stdout.on('data', (stdout) => {
-            outputbox.add({ value: JSON.stringify(stdout), type: 'info' })
+            outputbox.add({ value: JSON.stringify(stdout, null, 2), type: 'info' })
         })
     })
 }
