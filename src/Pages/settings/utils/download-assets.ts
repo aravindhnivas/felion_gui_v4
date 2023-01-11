@@ -36,8 +36,13 @@ export async function downloadZIP(filename) {
         const localdir = await path.appLocalDataDir()
         const fileName = await path.join(localdir, filename)
 
-        const download_output = await invoke('download_url', { url: URL_to_download, fileName })
-        console.log(download_output)
+        const [download_err, download_output] = await oO(invoke('download_url', { url: URL_to_download, fileName }))
+        console.log({ download_err, download_output })
+
+        if (download_err) {
+            outputbox.add({ value: download_err, type: 'danger' })
+            return
+        }
 
         const duration = performance.now() - startTime
         outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })

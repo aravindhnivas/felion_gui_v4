@@ -14,10 +14,10 @@ fn get_tcp_port() -> u16 {
 mod download;
 
 #[tauri::command]
-fn download_url(url: &str, file_name: &str) {
+fn download_url(url: &str, file_name: &str) -> Result<String, String> {
     match download::download_url_main(url, file_name) {
-        Ok(_) => println!("Download completed successfully"),
-        Err(e) => eprintln!("An error occurred: {:?}", e),
+        Ok(_) => Ok("Download completed successfully".into()),
+        Err(e) => Err(format!("An error occurred: {:?}", e)),
     }
 }
 

@@ -5,7 +5,7 @@ pub async fn download_url_main(
     url: &str,
     file_name: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Received URL {} and filename {}", url, file_name);
+    println!("Received URL {} \n filename {}", url, file_name);
 
     let client = Client::new();
     let response = client.get(url).send().await?;
