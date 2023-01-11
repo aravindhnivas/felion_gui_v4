@@ -14,7 +14,9 @@
 
     <hr />
     {#each output as info (info)}
-        <span class="has-text-{info.type}" style="width: 100%;">>> {info.value}</span>
+        {#if info.value}
+            <span class="has-text-{info.type}" style="width: 100%;">>> {info.value}</span>
+        {/if}
     {/each}
 </div>
 
