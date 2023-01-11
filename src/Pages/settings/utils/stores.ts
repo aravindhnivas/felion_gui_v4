@@ -14,6 +14,7 @@ const makeStore = (value: OutputBoxtype[]) => {
 export const outputbox = makeStore([])
 export const downloadoverrideURL = persistentWritable('downloadoverrideURL', false)
 export const override_felionpy_version_check = persistentWritable('downloadoverrideURL', false)
+export const unzip_downloaded_assets = persistentWritable('unzip_downloaded_assets', false)
 export const downloadURL = persistentWritable(
     'download_URL_test',
     'https://github.com/aravindhnivas/felionpy/archive/refs/tags/v0.0.11.zip'

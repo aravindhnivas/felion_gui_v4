@@ -1,5 +1,11 @@
 import { felionlibVersion } from '$lib/pyserver/stores'
-import { outputbox, downloadURL, downloadoverrideURL, override_felionpy_version_check } from './stores'
+import {
+    outputbox,
+    downloadURL,
+    downloadoverrideURL,
+    override_felionpy_version_check,
+    unzip_downloaded_assets,
+} from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
@@ -53,10 +59,11 @@ export async function downloadZIP(filename) {
         outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })
 
         outputbox.add({ value: `assets downloaded`, type: 'success' })
-
-        // await unZIP(filename)
-        // await window.sleep(1000)
-        // await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
+        if (get(unzip_downloaded_assets)) {
+            await unZIP(filename)
+            await window.sleep(1000)
+            await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
+        }
     } catch (err) {
         outputbox.add({ value: `error occured while downloading assets`, type: 'danger' })
         outputbox.add({ value: JSON.stringify(err, null, 2), type: 'danger' })

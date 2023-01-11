@@ -13,7 +13,13 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
-    import { outputbox, downloadURL, downloadoverrideURL, override_felionpy_version_check } from '../utils/stores'
+    import {
+        outputbox,
+        downloadURL,
+        downloadoverrideURL,
+        override_felionpy_version_check,
+        unzip_downloaded_assets,
+    } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
 
     const check_for_update = async (log = false) => {
@@ -143,6 +149,7 @@
         <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
         <Switch bind:selected={$downloadoverrideURL} label="override URL" />
         <Switch bind:selected={$override_felionpy_version_check} label="override_felionpy_version_check" />
+        <Switch bind:selected={$unzip_downloaded_assets} label="unzip_downloaded_assets" />
         <!-- {/if} -->
         <button
             class="button is-link"
