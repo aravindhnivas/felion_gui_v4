@@ -89,11 +89,11 @@
         {/if}
 
         <div class="align">
-            {#if import.meta.env.DEV}
-                <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
-                    Developer mode: {$developerMode}
-                </button>
-            {/if}
+            <!-- {#if import.meta.env.DEV} -->
+            <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
+                Developer mode: {$developerMode}
+            </button>
+            <!-- {/if} -->
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
         </div>
 
