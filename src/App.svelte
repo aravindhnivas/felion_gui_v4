@@ -14,7 +14,7 @@
     import Kinetics from './Pages/Kinetics.svelte'
     import Misc from './Pages/Misc.svelte'
     import Settings from './Pages/Settings.svelte'
-    import Test from './Pages/Test.svelte'
+    // import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
     import { check_assets_update, download_assets } from './Pages/settings/utils/download-assets'
@@ -37,39 +37,47 @@
     const toastOpts = { reversed: true, intro: { y: 100 } }
 
     let mounted = false
-    onMount(async () => {
-        const unlisteners = await events_listeners()
-        console.log('App mounted')
 
-        const localdir = await path.appLocalDataDir()
-        const felionpydir = await path.join(localdir, 'felionpy')
+    let beforeProcessCompleted = false
+    beforeUpdate(async () => {
+        try {
+            if (beforeProcessCompleted) return
+            console.warn('before update')
+            if (await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData })) {
+                return
+            }
 
-        console.log(felionpydir)
-        if (!(await fs.exists(felionpydir))) {
             console.warn('felionpy asset REQUIRED!!')
             $downloadoverrideURL = false
             await check_assets_update(true)
             await download_assets()
-        } else {
-            console.warn('felionpy asset READY')
-        }
 
-        if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
-            console.warn('removing temp files from localdir')
+            if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
+                console.warn('removing temp files from localdir')
 
-            const [_err, result] = await oO(
-                fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
-                    dir: fs.BaseDirectory.AppLocalData,
-                })
-            )
+                const [_err] = await oO(
+                    fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
+                        dir: fs.BaseDirectory.AppLocalData,
+                    })
+                )
 
-            if (_err) {
-                console.warn('Could not remove temp files')
-                console.error(_err)
-            } else {
-                console.warn('Temp files removed from localdir')
+                if (_err) {
+                    console.warn('Could not remove temp files')
+                    console.error(_err)
+                } else {
+                    console.warn('Temp files removed from localdir')
+                }
             }
+            beforeProcessCompleted = true
+        } catch (error) {
+            console.error(error)
         }
+    })
+
+    onMount(async () => {
+        const unlisteners = await events_listeners()
+        console.log('App mounted')
+
         mounted = true
 
         return () => {

@@ -69,6 +69,8 @@
         ]
       },
       "http": {
+        "all": true,
+        "request": true,
         "scope": [
           "https://github.com/aravindhnivas/felionpy/*",
           "https://raw.githubusercontent.com/aravindhnivas/felionpy/*"
@@ -111,7 +113,8 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": null,
+      "devCsp": null
     },
     "updater": {
       "active": true,

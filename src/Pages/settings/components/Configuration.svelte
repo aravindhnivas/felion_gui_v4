@@ -19,7 +19,7 @@
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
     import { platform } from '@tauri-apps/api/os'
-    import { isEmpty } from 'lodash-es'
+    // import { isEmpty } from 'lodash-es'
     // import { persistentWritable } from '$src/js/persistentStore'
 
     let showServerControls: boolean

@@ -3,8 +3,8 @@ import { outputbox, downloadURL, downloadoverrideURL } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { http } from '@tauri-apps/api'
 import axios, { type ResponseType } from 'axios'
-import { isEmpty } from 'lodash-es'
-
+import { isEmpty, round } from 'lodash-es'
+import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 let assets_downloading = false
 let assets_download_needed = false
 let assets_version_available = ''
@@ -12,21 +12,25 @@ let assets_version_available = ''
 const tauriDownload = async (url: string, responseType: http.ResponseType = http.ResponseType.Binary) => {
     try {
         console.time('tauri fetch download')
-        const res = await http.fetch(url, { method: 'GET', responseType })
-        console.log(res)
-
+        const res = await http.fetch<Uint8Array>(url, {
+            method: 'GET',
+            responseType,
+        })
+        // console.log(res)
+        console.timeEnd('tauri fetch download')
         return res
     } catch (e) {
         outputbox.add({ value: JSON.stringify(e, null, 2), type: 'danger' })
-    } finally {
-        console.timeEnd('tauri fetch download')
     }
 }
 
 const axiosDownload = async (url: string, responseType: ResponseType = 'arraybuffer') => {
     try {
         console.time('axios download')
-        const res = await axios(url, { method: 'get', responseType: responseType })
+        const res = await axios<Uint8Array>(url, {
+            method: 'get',
+            responseType,
+        })
         console.log(res)
 
         return res
@@ -58,10 +62,15 @@ export async function downloadZIP(filename) {
         const URL_to_download = get(downloadoverrideURL) ? get(downloadURL) : browser_download_url
 
         outputbox.add({ value: URL_to_download, type: 'warning' })
+        const startTime = performance.now()
 
         const response = await tauriDownload(URL_to_download)
-        // const response = await axiosDownload(URL_to_download)
-        return
+        // const response2 = await axiosDownload(URL_to_download)
+
+        const duration = performance.now() - startTime
+        outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })
+
+        // return
         if (response.status !== 200) {
             outputbox.add({ value: `Status ${response.status} : Invalid URL`, type: 'danger' })
             return
