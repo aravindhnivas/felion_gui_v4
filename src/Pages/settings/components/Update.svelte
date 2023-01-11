@@ -12,7 +12,7 @@
     import LinearProgress from '@smui/linear-progress'
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
-    import { footerMsg } from '$src/layout/main/Footer.svelte'
+    import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import {
         outputbox,
         downloadURL,
