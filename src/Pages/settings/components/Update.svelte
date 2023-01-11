@@ -136,13 +136,21 @@
     </div>
     <hr />
     <div class="align">
-        {#if import.meta.env.DEV}
-            <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
-            <Switch bind:selected={$downloadoverrideURL} label="override URL" />
-        {/if}
+        <!-- {#if import.meta.env.DEV} -->
+        <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
+        <Switch bind:selected={$downloadoverrideURL} label="override URL" />
+        <!-- {/if} -->
         <span class="tag is-warning">assets download</span>
-        <button class="button is-link" on:click={() => check_assets_update()}>Check assets update</button>
-        <button class="button is-link" on:click={() => download_assets()}>Download assets</button>
+        <button class="button is-link" on:click={async ({currentTarget}) => {
+            currentTarget.classList.toggle('is-loading')
+            const [_err, ] = await oO(check_assets_update())
+            currentTarget.classList.toggle('is-loading')
+        }}>Check assets update</button>
+        <button class="button is-link" on:click={async ({currentTarget}) => {
+            currentTarget.classList.toggle('is-loading')
+            const [_err, ] = await oO(download_assets())
+            currentTarget.classList.toggle('is-loading')
+        }}>Download assets</button>
     </div>
 
     {#if download_progress}

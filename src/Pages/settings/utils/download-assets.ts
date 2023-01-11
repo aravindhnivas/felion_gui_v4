@@ -1,45 +1,14 @@
 import { felionlibVersion } from '$lib/pyserver/stores'
 import { outputbox, downloadURL, downloadoverrideURL } from './stores'
 import { platform } from '@tauri-apps/api/os'
-import { http } from '@tauri-apps/api'
-import axios, { type ResponseType } from 'axios'
+import { invoke } from '@tauri-apps/api'
+import axios from 'axios'
 import { isEmpty, round } from 'lodash-es'
-import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+// import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 let assets_downloading = false
 let assets_download_needed = false
 let assets_version_available = ''
 
-const tauriDownload = async (url: string, responseType: http.ResponseType = http.ResponseType.Binary) => {
-    try {
-        console.time('tauri fetch download')
-        const res = await http.fetch<Uint8Array>(url, {
-            method: 'GET',
-            responseType,
-        })
-        // console.log(res)
-        console.timeEnd('tauri fetch download')
-        return res
-    } catch (e) {
-        outputbox.add({ value: JSON.stringify(e, null, 2), type: 'danger' })
-    }
-}
-
-const axiosDownload = async (url: string, responseType: ResponseType = 'arraybuffer') => {
-    try {
-        console.time('axios download')
-        const res = await axios<Uint8Array>(url, {
-            method: 'get',
-            responseType,
-        })
-        console.log(res)
-
-        return res
-    } catch (e) {
-        outputbox.add({ value: JSON.stringify(e, null, 2), type: 'danger' })
-    } finally {
-        console.timeEnd('axios download')
-    }
-}
 export async function downloadZIP(filename) {
     try {
         if (assets_downloading) return outputbox.add({ value: 'already downloading assets...', type: 'warning' })
@@ -51,7 +20,7 @@ export async function downloadZIP(filename) {
             })
             return
         }
-
+        await path.BaseDirectory.AppLocalData
         const { assets } = current_release_data
         const asset_ind = assets.findIndex((e) => e.name === filename)
 
@@ -64,26 +33,20 @@ export async function downloadZIP(filename) {
         outputbox.add({ value: URL_to_download, type: 'warning' })
         const startTime = performance.now()
 
-        const response = await tauriDownload(URL_to_download)
-        // const response2 = await axiosDownload(URL_to_download)
+        const localdir = await path.appLocalDataDir()
+        const fileName = await path.join(localdir, filename)
+
+        const download_output = await invoke('download_url', { url: URL_to_download, fileName })
+        console.log(download_output)
 
         const duration = performance.now() - startTime
         outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })
 
-        // return
-        if (response.status !== 200) {
-            outputbox.add({ value: `Status ${response.status} : Invalid URL`, type: 'danger' })
-            return
-        }
-
         outputbox.add({ value: `assets downloaded`, type: 'success' })
 
-        // return
-        outputbox.add({ value: `saving downloaded assets...`, type: 'success' })
-        await fs.writeBinaryFile(filename, response.data, { dir: fs.BaseDirectory.AppLocalData })
-        outputbox.add({ value: `assets saved`, type: 'success' })
-
         await unZIP(filename)
+        await window.sleep(1000)
+
         await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
     } catch (err) {
         outputbox.add({ value: `error occured while downloading assets`, type: 'danger' })
@@ -102,6 +65,7 @@ export function unZIP(filename) {
             `${await path.join(filepath, filename)}`,
             '-DestinationPath',
             `${filepath}`,
+            // await path.join(filepath, 'temp-zip'),
             '-Force',
         ])
 
@@ -109,6 +73,7 @@ export function unZIP(filename) {
         const child = await cmd.spawn()
 
         outputbox.add({ value: `unzip PID: ${child.pid}`, type: 'info' })
+
         cmd.on('close', () => {
             outputbox.add({ value: 'UNZIP closed', type: 'info' })
             outputbox.add({ value: err ? 'failed to UNZIP' : 'UNZIP success', type: err ? 'danger' : 'success' })
