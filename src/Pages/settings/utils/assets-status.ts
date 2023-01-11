@@ -7,10 +7,10 @@ import {
 } from './stores'
 import { check_assets_update, download_assets } from './download-assets'
 import { platform } from '@tauri-apps/api/os'
+
 export const check_felionpy_assets_status = async () => {
     try {
         python_asset_ready.set(false)
-
         if (await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData })) {
             python_asset_ready.set(true)
             return
