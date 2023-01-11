@@ -17,7 +17,7 @@ mod download;
 async fn download_url(url: &str, file_name: &str) -> Result<String, String> {
     match download::download_url_main(url, file_name).await {
         Ok(_) => Ok("Download completed successfully".into()),
-        Err(e) => Err(format!("An error occurred: {:?}", e).into()),
+        Err(e) => Err(format!("{:?}", e).into()),
     }
 }
 
