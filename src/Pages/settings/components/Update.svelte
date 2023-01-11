@@ -21,7 +21,6 @@
         unzip_downloaded_assets,
     } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
-    import { check_felionpy_assets_status } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
         try {
