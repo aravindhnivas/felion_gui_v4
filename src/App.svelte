@@ -45,9 +45,16 @@
         console.warn('before update')
         if (!(await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData }))) {
             console.warn('felionpy asset REQUIRED!!')
-            $downloadoverrideURL = false
-            await check_assets_update(true)
-            await download_assets()
+
+            if (
+                await dialog.confirm('Python assets are missing. Press OK to download.', {
+                    type: 'warning',
+                })
+            ) {
+                $downloadoverrideURL = false
+                await check_assets_update(true)
+                await download_assets()
+            }
         }
 
         if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
