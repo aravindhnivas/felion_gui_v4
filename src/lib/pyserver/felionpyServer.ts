@@ -8,16 +8,22 @@ import {
     pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
+
+import { python_asset_ready } from '$src/Pages/settings/utils/stores'
+
 import { persistentWritable } from '$src/js/persistentStore'
 import { path, shell } from '@tauri-apps/api'
 
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
+    if (!developerMode && !get(python_asset_ready))
+        return dialog.message('python assets are missing. Download it in Settings -> Update', {
+            title: 'Missing assets',
+            type: 'error',
+        })
     if (get(pyServerReady)) return console.info('Server already running')
-    // const serverDebug = JSON.parse(localStorage.getItem('serverDebug')) ?? false
-    // const availablePORT = (await invoke('get_tcp_port')) as number
-    // pyServerPORT.set(availablePORT)
+
     console.info('starting felionpy server at port: ', get(pyServerPORT))
 
     pyServerReady.set(false)
@@ -33,7 +39,7 @@ export async function startServer() {
         const pyChild = await py.spawn()
         pyChildProcess.set(pyChild)
         pyServerReady.set(true)
-        currentPortPID.update(ports => ([...ports, `${pyChild.pid}`]))
+        currentPortPID.update((ports) => [...ports, `${pyChild.pid}`])
         // localStorage.setItem('pyserver-pid', `${pyChild.pid}`)
 
         py.on('close', () => {
@@ -65,7 +71,7 @@ export async function stopServer() {
         if (get(pyChildProcess).kill) {
             await get(pyChildProcess).kill()
             // localStorage.removeItem('pyserver-pid')
-            currentPortPID.update(ports => (ports.filter(p => p!==`${get(pyChildProcess).pid}`)))
+            currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`))
         }
 
         pyServerReady.set(false)
