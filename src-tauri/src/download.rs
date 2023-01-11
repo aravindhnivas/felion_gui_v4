@@ -7,7 +7,7 @@ error_chain! {
     }
 }
 
-#[tokio::main]
+// #[tokio::main]
 pub async fn download_url_main(url: &str, file_name: &str) -> Result<()> {
     let response = reqwest::get(url).await?;
 
