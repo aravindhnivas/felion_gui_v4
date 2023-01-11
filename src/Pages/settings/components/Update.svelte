@@ -13,7 +13,7 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/Footer.svelte'
-    import { outputbox, downloadURL, downloadoverrideURL } from '../utils/stores'
+    import { outputbox, downloadURL, downloadoverrideURL, override_felionpy_version_check } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
 
     const check_for_update = async (log = false) => {
@@ -134,23 +134,32 @@
         </div>
         <Notify bind:label={$updateError} type="danger" />
     </div>
+
     <hr />
+
     <div class="align">
+        <span class="tag is-warning">assets download</span>
         <!-- {#if import.meta.env.DEV} -->
         <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
         <Switch bind:selected={$downloadoverrideURL} label="override URL" />
+        <Switch bind:selected={$override_felionpy_version_check} label="override_felionpy_version_check" />
         <!-- {/if} -->
-        <span class="tag is-warning">assets download</span>
-        <button class="button is-link" on:click={async ({currentTarget}) => {
-            currentTarget.classList.toggle('is-loading')
-            const [_err, ] = await oO(check_assets_update())
-            currentTarget.classList.toggle('is-loading')
-        }}>Check assets update</button>
-        <button class="button is-link" on:click={async ({currentTarget}) => {
-            currentTarget.classList.toggle('is-loading')
-            const [_err, ] = await oO(download_assets())
-            currentTarget.classList.toggle('is-loading')
-        }}>Download assets</button>
+        <button
+            class="button is-link"
+            on:click={async ({ currentTarget }) => {
+                currentTarget.classList.toggle('is-loading')
+                const [_err] = await oO(check_assets_update())
+                currentTarget.classList.toggle('is-loading')
+            }}>Check assets update</button
+        >
+        <button
+            class="button is-link"
+            on:click={async ({ currentTarget }) => {
+                currentTarget.classList.toggle('is-loading')
+                const [_err] = await oO(download_assets())
+                currentTarget.classList.toggle('is-loading')
+            }}>Download assets</button
+        >
     </div>
 
     {#if download_progress}

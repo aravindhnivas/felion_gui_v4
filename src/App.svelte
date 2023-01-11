@@ -18,7 +18,7 @@
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
     import { check_assets_update, download_assets } from './Pages/settings/utils/download-assets'
-    import { downloadoverrideURL } from './Pages/settings/utils/stores'
+    import { downloadoverrideURL, override_felionpy_version_check } from './Pages/settings/utils/stores'
     import { platform } from '@tauri-apps/api/os'
 
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
@@ -52,7 +52,8 @@
                 })
             ) {
                 $downloadoverrideURL = false
-                await check_assets_update(true)
+                $override_felionpy_version_check = true
+                await check_assets_update()
                 await download_assets()
             }
         }

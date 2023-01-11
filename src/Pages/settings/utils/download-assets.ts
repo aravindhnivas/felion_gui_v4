@@ -1,5 +1,5 @@
 import { felionlibVersion } from '$lib/pyserver/stores'
-import { outputbox, downloadURL, downloadoverrideURL } from './stores'
+import { outputbox, downloadURL, downloadoverrideURL, override_felionpy_version_check } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
@@ -40,7 +40,7 @@ export async function downloadZIP(filename) {
         console.log({ download_err, download_output })
 
         if (download_err) {
-            outputbox.add({ value: download_err, type: 'danger' })
+            outputbox.add({ value: download_err as string, type: 'danger' })
             return
         }
 
@@ -49,10 +49,9 @@ export async function downloadZIP(filename) {
 
         outputbox.add({ value: `assets downloaded`, type: 'success' })
 
-        await unZIP(filename)
-        await window.sleep(1000)
-
-        await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
+        // await unZIP(filename)
+        // await window.sleep(1000)
+        // await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
     } catch (err) {
         outputbox.add({ value: `error occured while downloading assets`, type: 'danger' })
         outputbox.add({ value: JSON.stringify(err, null, 2), type: 'danger' })
@@ -104,12 +103,12 @@ export function unZIP(filename) {
 
 let current_release_data = {}
 
-export const check_assets_update = async (override = false) => {
+export const check_assets_update = async () => {
     // const URL = import.meta.env.VITE_URL_FELIONPY_VERSION
     // console.warn(URL, typeof URL)
     if (!get(felionlibVersion)) {
         outputbox.add({ value: 'Current version not determined yet.', type: 'danger' })
-        if (!override) return
+        if (!get(override_felionpy_version_check)) return
     }
 
     const URL = 'https://api.github.com/repos/aravindhnivas/felionpy/releases/latest'
