@@ -57,14 +57,15 @@
         try {
             currentplatform = await platform()
 
+            await check_felionpy_assets_status()
+
             if (import.meta.env.DEV) return
 
             if ($currentPortPID.length > 0) {
                 await clearPORTs()
             }
-            await check_felionpy_assets_status()
-            if (!$python_asset_ready) return
 
+            if (!$python_asset_ready) return
             await startServer()
             await updateServerInfo()
             await getPyVersion()
