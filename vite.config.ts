@@ -16,6 +16,7 @@ export default defineConfig({
                 { '@zmotivat0r/o0': ['oO'] },
                 { '@tauri-apps/api': ['fs', 'path', 'dialog', 'shell'] },
                 { 'plotly.js-basic-dist': ['relayout', 'deleteTraces', 'react', 'addTraces'] },
+                { '@tauri-apps/api/os': ['platform'] },
             ],
             dts: './src/auto-imports.d.ts',
         }),

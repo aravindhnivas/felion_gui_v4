@@ -17,14 +17,8 @@
     // import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
-    import { check_assets_update, download_assets } from './Pages/settings/utils/download-assets'
-    import {
-        downloadoverrideURL,
-        override_felionpy_version_check,
-        unzip_downloaded_assets,
-    } from './Pages/settings/utils/stores'
-    import { platform } from '@tauri-apps/api/os'
-
+    import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
+    import { outputbox } from './Pages/settings/utils/stores'
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -45,40 +39,8 @@
     onMount(async () => {
         const unlisteners = await events_listeners()
         console.log('App mounted')
+        check_assets_to_delete().then(outputbox.info).catch(outputbox.error)
 
-        console.warn('before update')
-        if (!(await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData }))) {
-            console.warn('felionpy asset REQUIRED!!')
-
-            if (
-                await dialog.confirm('Python assets are missing. Press OK to download.', {
-                    type: 'warning',
-                })
-            ) {
-                $downloadoverrideURL = false
-                $override_felionpy_version_check = true
-                $unzip_downloaded_assets = true
-                await check_assets_update()
-                await download_assets()
-            }
-        }
-
-        if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
-            console.warn('removing temp files from localdir')
-
-            const [_err] = await oO(
-                fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
-                    dir: fs.BaseDirectory.AppLocalData,
-                })
-            )
-
-            if (_err) {
-                console.warn('Could not remove temp files')
-                console.error(_err)
-            } else {
-                console.warn('Temp files removed from localdir')
-            }
-        }
         mounted = true
 
         return () => {

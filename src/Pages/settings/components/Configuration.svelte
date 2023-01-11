@@ -15,12 +15,12 @@
     import { getPyVersion } from '../utils/checkPython'
     import { fetchServerROOT } from '../utils/serverConnections'
     import { checkNetstat, killPID } from '../utils/network'
+    import { python_asset_ready } from '../utils/stores'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
     import { platform } from '@tauri-apps/api/os'
-    // import { isEmpty } from 'lodash-es'
-    // import { persistentWritable } from '$src/js/persistentStore'
+    import { check_felionpy_assets_status } from '../utils/assets-status'
 
     let showServerControls: boolean
     let serverInfo: OutputBoxtype[] = []
@@ -57,14 +57,17 @@
         try {
             currentplatform = await platform()
 
-            if (import.meta.env.PROD) {
-                if ($currentPortPID.length > 0) {
-                    await clearPORTs()
-                }
-                await startServer()
-                await updateServerInfo()
-                await getPyVersion()
+            if (import.meta.env.DEV) return
+
+            if ($currentPortPID.length > 0) {
+                await clearPORTs()
             }
+            await check_felionpy_assets_status()
+            if (!$python_asset_ready) return
+
+            await startServer()
+            await updateServerInfo()
+            await getPyVersion()
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {

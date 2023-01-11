@@ -18,31 +18,28 @@ let assets_version_available = ''
 
 export async function downloadZIP(filename) {
     try {
-        if (assets_downloading) return outputbox.add({ value: 'already downloading assets...', type: 'warning' })
+        if (assets_downloading) return outputbox.warn('already downloading assets...')
         let browser_download_url = ''
 
         assets_downloading = true
         if (!get(downloadoverrideURL)) {
             if (isEmpty(current_release_data)) {
-                outputbox.add({
-                    value: 'To download assets, first check assets update to obtain release data...',
-                    type: 'danger',
-                })
+                outputbox.error('To download assets, first check assets update to obtain release data...')
                 return
             }
 
-            const { assets } = current_release_data
+            const { assets } = current_release_data as { assets: [{ name: string; browser_download_url: string }] }
             const asset_ind = assets.findIndex((e) => e.name === filename)
 
             // const { browser_download_url } = assets[asset_ind]
             browser_download_url = assets[asset_ind].browser_download_url
             // console.log({ browser_download_url })
 
-            outputbox.add({ value: 'downloading assets...', type: 'warning' })
+            outputbox.warn('downloading assets...')
         }
         const URL_to_download = get(downloadoverrideURL) ? get(downloadURL) : browser_download_url
 
-        outputbox.add({ value: URL_to_download, type: 'warning' })
+        outputbox.warn(URL_to_download)
         const startTime = performance.now()
 
         const localdir = await path.appLocalDataDir()
@@ -51,24 +48,24 @@ export async function downloadZIP(filename) {
         const [download_err, download_output] = await oO(invoke('download_url', { url: URL_to_download, fileName }))
 
         if (download_err) {
-            outputbox.add({ value: download_err as string, type: 'danger' })
+            outputbox.error(download_err as string)
             return
         }
 
-        outputbox.add({ value: download_output as string, type: 'success' })
+        outputbox.success(download_output as string)
 
         const duration = performance.now() - startTime
-        outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })
+        outputbox.warn(`Time taken to download: ${round(duration, 0)} ms`)
 
-        outputbox.add({ value: `assets downloaded`, type: 'success' })
+        outputbox.success(`assets downloaded`)
         if (get(unzip_downloaded_assets)) {
             await unZIP(filename)
             await window.sleep(1000)
             await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
         }
     } catch (err) {
-        outputbox.add({ value: `error occured while downloading assets`, type: 'danger' })
-        outputbox.add({ value: JSON.stringify(err, null, 2), type: 'danger' })
+        outputbox.error(`error occured while downloading assets`)
+        outputbox.error(err)
     } finally {
         assets_downloading = false
     }
@@ -90,27 +87,33 @@ export function unZIP(filename) {
         let err: string
         const child = await cmd.spawn()
 
-        outputbox.add({ value: `unzip PID: ${child.pid}`, type: 'info' })
+        outputbox.info(`unzip PID: ${child.pid}`)
 
         cmd.on('close', () => {
-            outputbox.add({ value: 'UNZIP closed', type: 'info' })
-            outputbox.add({ value: err ? 'failed to UNZIP' : 'UNZIP success', type: err ? 'danger' : 'success' })
-            err ? reject('failed to UNZIP') : resolve('UNZIP success')
+            outputbox.info('UNZIP closed')
+
+            if (err) {
+                outputbox.error('failed to UNZIP')
+                reject('failed to UNZIP')
+            } else {
+                outputbox.success('UNZIP success')
+                resolve('UNZIP success')
+            }
         })
 
         cmd.on('error', (error) => {
             err = error
-            outputbox.add({ value: 'Error whiile UNZIPing assets', type: 'danger' })
-            outputbox.add({ value: JSON.stringify(error, null, 2), type: 'danger' })
+            outputbox.error('Error whiile UNZIPing assets')
+            outputbox.error(error)
         })
 
         cmd.stderr.on('data', (stderr) => {
             err = stderr
-            outputbox.add({ value: JSON.stringify(stderr, null, 2), type: 'danger' })
+            outputbox.error(stderr)
         })
 
         cmd.stdout.on('data', (stdout) => {
-            outputbox.add({ value: JSON.stringify(stdout, null, 2), type: 'info' })
+            outputbox.info(stdout)
         })
     })
 }
@@ -121,12 +124,12 @@ export const check_assets_update = async () => {
     // const URL = import.meta.env.VITE_URL_FELIONPY_VERSION
     // console.warn(URL, typeof URL)
     if (!get(felionlibVersion)) {
-        outputbox.add({ value: 'Current version not determined yet.', type: 'danger' })
+        outputbox.error('Current version not determined yet.')
         if (!get(override_felionpy_version_check)) return
     }
 
     const URL = 'https://api.github.com/repos/aravindhnivas/felionpy/releases/latest'
-    outputbox.add({ value: 'checking for assets update...', type: 'info' })
+    outputbox.info('checking for assets update...')
 
     console.time('axios fetch')
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
@@ -138,20 +141,20 @@ export const check_assets_update = async () => {
     current_release_data = response.data
     console.log(current_release_data)
     const { tag_name } = response.data
-    outputbox.add({ value: `Available version: ${tag_name}`, type: 'info' })
-    outputbox.add({ value: `Current version: v${get(felionlibVersion)}`, type: 'info' })
+    outputbox.info(`Available version: ${tag_name}`)
+    outputbox.info(`Current version: v${get(felionlibVersion)}`)
     assets_version_available = tag_name
     assets_download_needed = `v${get(felionlibVersion)}` < tag_name
     if (assets_download_needed) {
-        outputbox.add({ value: `Download required`, type: 'warning' })
+        outputbox.warn(`Download required`)
     } else {
-        outputbox.add({ value: `Download not required`, type: 'warning' })
+        outputbox.warn(`Download not required`)
     }
 }
 
 export const download_assets = async () => {
     if (!get(downloadoverrideURL) && !assets_version_available) {
-        outputbox.add({ value: 'Check for assets update first.', type: 'warning' })
+        outputbox.warn('Check for assets update first.')
         return
     }
     const asset_name = `felionpy-${await platform()}.zip`

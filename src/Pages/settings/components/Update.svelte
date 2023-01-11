@@ -21,6 +21,7 @@
         unzip_downloaded_assets,
     } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
+    import { check_felionpy_assets_status } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
         try {
@@ -30,12 +31,12 @@
                 }
             }
 
-            if (log) outputbox.add({ value: 'Checking for updates...', type: 'info' })
+            if (log) outputbox.info('Checking for updates...')
             download_progress = 0
             lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
-            if (log) outputbox.add({ value: JSON.stringify(update, null, 2), type: 'info' })
+            if (log) outputbox.info(update)
 
             if (!devMODE && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
@@ -45,10 +46,9 @@
                 if (install) {
                     appupdate_downloading = true
                     await stopServer()
-                    outputbox.add({
-                        value: `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`,
-                        type: 'success',
-                    })
+                    outputbox.success(
+                        `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`
+                    )
                     await installUpdate()
                     await relaunch()
                 }
@@ -107,8 +107,6 @@
 
     onDestroy(async () => {
         const unlisten1 = await unlisten_download_asset_event
-
-        // console.warn('closing assets-download-progress listen', unlisten1)
         unlisten1()
 
         const unlisten2 = await listen_download_progress
