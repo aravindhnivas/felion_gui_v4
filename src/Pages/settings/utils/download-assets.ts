@@ -48,14 +48,13 @@ export async function downloadZIP(filename) {
         const fileName = await path.join(localdir, filename)
 
         const [download_err, download_output] = await oO(invoke('download_url', { url: URL_to_download, fileName }))
-        // console.log({ download_err, download_output })
 
         if (download_err) {
             outputbox.add({ value: download_err as string, type: 'danger' })
             return
-        } else {
-            outputbox.add({ value: download_output as string, type: 'success' })
         }
+
+        outputbox.add({ value: download_output as string, type: 'success' })
 
         const duration = performance.now() - startTime
         outputbox.add({ value: `Time taken to download: ${round(duration, 0)} ms`, type: 'warning' })
