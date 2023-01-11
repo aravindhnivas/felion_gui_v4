@@ -21,6 +21,7 @@
         unzip_downloaded_assets,
     } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
+    import { toggle_loading } from '../utils/misc'
 
     const check_for_update = async (log = false) => {
         try {
@@ -184,18 +185,18 @@
         <button
             class="button is-link"
             on:click={async ({ currentTarget }) => {
-                currentTarget.classList.toggle('is-loading')
+                toggle_loading(currentTarget)
                 const [_err] = await oO(check_assets_update())
-                currentTarget.classList.toggle('is-loading')
+                toggle_loading(currentTarget)
             }}>Check assets update</button
         >
         <button
             class="button is-link"
             on:click={async ({ currentTarget }) => {
                 assets_download_progress = 0
-                currentTarget.classList.toggle('is-loading')
+                toggle_loading(currentTarget)
                 const [_err] = await oO(download_assets())
-                currentTarget.classList.toggle('is-loading')
+                toggle_loading(currentTarget)
             }}>Download assets</button
         >
     </div>

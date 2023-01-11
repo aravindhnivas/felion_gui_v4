@@ -24,6 +24,10 @@ export const check_felionpy_assets_status = async () => {
         unzip_downloaded_assets.set(true)
         await check_assets_update()
         await download_assets()
+
+        override_felionpy_version_check.set(false)
+        unzip_downloaded_assets.set(true)
+
         python_asset_ready.set(true)
     } catch (error) {
         outputbox.error(error)

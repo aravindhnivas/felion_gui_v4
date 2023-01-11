@@ -29,11 +29,6 @@
     }
     .navbar-end {
         display: flex;
-        .icon-footer {
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
         .navbar-item:not(:only-child) {
             border-left: solid 1px;
         }

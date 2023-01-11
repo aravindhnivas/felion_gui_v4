@@ -45,7 +45,6 @@ export async function downloadZIP(filename) {
 
         const localdir = await path.appLocalDataDir()
         const fileName = await path.join(localdir, filename)
-
         const [download_err, download_output] = await oO(invoke('download_url', { url: URL_to_download, fileName }))
 
         if (download_err) {
@@ -73,8 +72,12 @@ export async function downloadZIP(filename) {
 
 export function unZIP(filename) {
     return new Promise(async (resolve, reject) => {
-        if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded' }))) return
+        if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' }))) {
+            return resolve('')
+        }
+
         await stopServer()
+
         const filepath = await path.appLocalDataDir()
         const cmd = new shell.Command(`unzip-${await platform()}`, [
             'Expand-Archive',
@@ -167,7 +170,7 @@ export const download_assets = async () => {
         await downloadZIP(asset_name)
         return
     }
-    if (!get(downloadoverrideURL) && !(await dialog.confirm('Download anyway', { title: 'Download not required' })))
+    if (!get(downloadoverrideURL) && !(await dialog.confirm('Download not required', { title: 'Download anyway' })))
         return
     await downloadZIP(asset_name)
 }

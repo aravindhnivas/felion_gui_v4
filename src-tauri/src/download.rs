@@ -37,11 +37,14 @@ pub async fn download_url_main(url: &str, file_name: &str, window: tauri::Window
         bytes_downloaded += chunk.len() as u64;
         let progress = (bytes_downloaded * 100) / total_size;
 
-        window.emit("assets-download-progress", progress);
-        // println!(
-        //     "Downloaded {}/{} bytes ({}%)",
-        //     bytes_downloaded, total_size, progress
-        // );
+        // window.emit("assets-download-progress", progress);
+        match window.emit("assets-download-progress", progress) {
+            Ok(_) => (),
+            Err(e) => {
+                // handle the error here
+                eprintln!("Error emitting event: {:?}", e);
+            }
+        }
         file.write_all(&chunk)?;
     }
 
