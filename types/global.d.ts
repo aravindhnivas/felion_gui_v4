@@ -1,5 +1,4 @@
 import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
-// export {};
 
 const felix_opo_data_from_python = <const>['SA', 'pow', 'base', 'average', 'average_per_photon', 'average_rel']
 declare global {
@@ -39,6 +38,7 @@ declare global {
         tempdirPath: string
         getID: () => string
         error: unknown
+        // LOGGER: ReturnType<typeof import('../src/Pages/settings/utils/stores').create_logger_store>
     }
     interface Window extends Exposed {}
 

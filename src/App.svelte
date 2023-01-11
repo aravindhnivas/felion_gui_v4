@@ -19,6 +19,10 @@
     import { events_listeners } from '$src/lib/event_listeneres'
     import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
     import { outputbox } from './Pages/settings/utils/stores'
+    import { LOGGER } from '$console'
+
+    console.warn({ LOGGER })
+    LOGGER.info('App starting')
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -33,7 +37,6 @@
     // }
 
     const toastOpts = { reversed: true, intro: { y: 100 } }
-
     let mounted = false
 
     onMount(async () => {
@@ -42,6 +45,7 @@
         check_assets_to_delete().then(outputbox.info).catch(outputbox.error)
 
         mounted = true
+        LOGGER.info('App mounted')
 
         return () => {
             unlisteners.forEach((unlisten) => unlisten())

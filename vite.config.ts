@@ -57,6 +57,7 @@ export default defineConfig({
         alias: {
             $src: join(PACKAGE_ROOT, 'src'),
             $lib: join(PACKAGE_ROOT, 'src/lib'),
+            $console: join(PACKAGE_ROOT, 'src/Pages/settings/components/Console.svelte'),
         },
     },
 })
