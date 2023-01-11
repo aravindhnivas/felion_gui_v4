@@ -12,22 +12,27 @@ let assets_version_available = ''
 export async function downloadZIP(filename) {
     try {
         if (assets_downloading) return outputbox.add({ value: 'already downloading assets...', type: 'warning' })
+        let browser_download_url = ''
+
         assets_downloading = true
-        if (isEmpty(current_release_data)) {
-            outputbox.add({
-                value: 'To download assets, first check assets update to obtain release data...',
-                type: 'danger',
-            })
-            return
+        if (!get(downloadoverrideURL)) {
+            if (isEmpty(current_release_data)) {
+                outputbox.add({
+                    value: 'To download assets, first check assets update to obtain release data...',
+                    type: 'danger',
+                })
+                return
+            }
+
+            const { assets } = current_release_data
+            const asset_ind = assets.findIndex((e) => e.name === filename)
+
+            // const { browser_download_url } = assets[asset_ind]
+            browser_download_url = assets[asset_ind].browser_download_url
+            // console.log({ browser_download_url })
+
+            outputbox.add({ value: 'downloading assets...', type: 'warning' })
         }
-        await path.BaseDirectory.AppLocalData
-        const { assets } = current_release_data
-        const asset_ind = assets.findIndex((e) => e.name === filename)
-
-        const { browser_download_url } = assets[asset_ind]
-        console.log({ browser_download_url })
-
-        outputbox.add({ value: 'downloading assets...', type: 'warning' })
         const URL_to_download = get(downloadoverrideURL) ? get(downloadURL) : browser_download_url
 
         outputbox.add({ value: URL_to_download, type: 'warning' })
@@ -136,7 +141,7 @@ export const check_assets_update = async () => {
 }
 
 export const download_assets = async () => {
-    if (!assets_version_available) {
+    if (!get(downloadoverrideURL) && !assets_version_available) {
         outputbox.add({ value: 'Check for assets update first.', type: 'warning' })
         return
     }
