@@ -1,9 +1,12 @@
 <script lang="ts">
     export let output: OutputBoxtype[] = []
     export let heading: string = ''
+    export let style: string = ''
+    let className: string = ''
+    export { className as class }
 </script>
 
-<div id="serverInfo__div" class="align box">
+<div class="console-box align box {className}" {style}>
     <span class="tag">{heading}</span>
     <button
         class="button is-danger ml-auto"
@@ -21,14 +24,14 @@
 </div>
 
 <style>
-    #serverInfo__div {
+    .console-box {
         display: flex;
         align-content: flex-start;
         overflow: auto;
         user-select: text;
         white-space: pre-wrap;
         align-items: baseline;
-        height: calc(42vh - 5rem);
-        max-height: calc(42vh - 5rem);
+        /* height: calc(42vh - 5rem);
+        max-height: calc(42vh - 5rem); */
     }
 </style>

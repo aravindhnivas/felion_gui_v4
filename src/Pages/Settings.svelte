@@ -1,10 +1,10 @@
 <script lang="ts">
     import { currentTab } from '$lib/pyserver/stores'
     import Changelog from '$src/components/misc/Changelog.svelte'
-    import { Configuration, About, Update, Credits } from './settings/components/'
+    import { Configuration, About, Update, Credits, Console } from './settings/components/'
     import { Badge } from '$src/components'
 
-    const tabs = ['Configuration', 'Update', 'About', 'Credits']
+    const tabs = ['Configuration', 'Update', 'About', 'Credits', 'Console']
     const id = 'Settings'
 
     let display = 'none'
@@ -51,7 +51,7 @@
         </div>
 
         <div class="mainContainer box">
-            <div class="container right">
+            <div class="container right__div">
                 <Configuration
                     on:serverStatusChanged={({ detail: { closed } }) => {
                         console.log('server closed', closed)
@@ -71,12 +71,16 @@
                 />
                 <About />
                 <Credits />
+                <Console />
             </div>
         </div>
     </div>
 </section>
 
 <style lang="scss">
+    .right__div {
+        height: 100%;
+    }
     section {
         margin: 0;
         padding: 0;
