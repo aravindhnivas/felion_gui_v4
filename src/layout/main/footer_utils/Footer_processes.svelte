@@ -20,7 +20,8 @@
     <div
         transition:fade
         role="presentation"
-        class="navbar-item process__notify_container"
+        class="navbar-item"
+        style="cursor: pointer;"
         on:click={() => surface.setOpen(true)}
     >
         Running {$running_processes.length}

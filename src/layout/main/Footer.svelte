@@ -16,6 +16,7 @@
             <FooterLabel />
             <FooterDownloadStatus />
             <FooterProcess />
+
             <div class="navbar-item">
                 <p>{import.meta.env.VITE_YEAR} &copy; {import.meta.env.VITE_AUTHOUR}</p>
             </div>
@@ -24,9 +25,6 @@
 </div>
 
 <style lang="scss">
-    .process__notify_container {
-        cursor: pointer;
-    }
     .navbar-end {
         display: flex;
         .navbar-item:not(:only-child) {

@@ -4,38 +4,32 @@
     import { activePage } from '$src/sveltewritables'
 </script>
 
-<div class="container mx-2">
-    {#if !$pyServerReady}
-        <div
-            role="presentation"
-            class="tag is-danger"
-            style="cursor: pointer;"
-            on:click={() => {
-                $activePage = 'Settings'
-            }}
-        >
-            python server not ready
-        </div>
-    {/if}
+{#if !($pyServerReady && $python_asset_ready)}
+    <div class="navbar-item" style="gap: 0.5em;">
+        {#if !$pyServerReady}
+            <div
+                role="presentation"
+                class="tag is-danger"
+                style="cursor: pointer;"
+                on:click={() => {
+                    $activePage = 'Settings'
+                }}
+            >
+                python server not ready
+            </div>
+        {/if}
 
-    {#if !$python_asset_ready}
-        <div
-            role="presentation"
-            class="tag is-danger"
-            style="cursor: pointer;"
-            on:click={() => {
-                $activePage = 'Settings'
-            }}
-        >
-            python assets are missing
-        </div>
-    {/if}
-</div>
-
-<style>
-    .container {
-        display: flex;
-        gap: 0.5em;
-        align-items: center;
-    }
-</style>
+        {#if !$python_asset_ready}
+            <div
+                role="presentation"
+                class="tag is-danger"
+                style="cursor: pointer;"
+                on:click={() => {
+                    $activePage = 'Settings'
+                }}
+            >
+                python assets are missing
+            </div>
+        {/if}
+    </div>
+{/if}
