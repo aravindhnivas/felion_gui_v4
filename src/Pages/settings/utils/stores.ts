@@ -23,6 +23,7 @@ export const create_logger_store = (value: OutputBoxtype[]) => {
 export const outputbox = create_logger_store([])
 
 export const downloadoverrideURL = persistentWritable('downloadoverrideURL', false)
+export const python_asset_ready_to_install = persistentWritable('python_asset_ready_to_install', false)
 export const override_felionpy_version_check = persistentWritable('override_felionpy_version_check', false)
 export const unzip_downloaded_assets = persistentWritable('unzip_downloaded_assets', false)
 export const python_asset_ready = writable(false)

@@ -17,12 +17,14 @@ import { path, shell } from '@tauri-apps/api'
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
-    if (!developerMode && !get(python_asset_ready))
-        return dialog.message('python assets are missing. Download it in Settings -> Update', {
+    if (!get(developerMode) && !get(python_asset_ready)) {
+        dialog.message('python assets are missing. Download it in Settings -> Update', {
             title: 'Missing assets',
             type: 'error',
         })
-    if (get(pyServerReady)) return console.info('Server already running')
+        return Promise.reject('python assets are missing')
+    }
+    if (get(pyServerReady)) return Promise.reject('Server already running')
 
     console.info('starting felionpy server at port: ', get(pyServerPORT))
 
@@ -40,7 +42,6 @@ export async function startServer() {
         pyChildProcess.set(pyChild)
         pyServerReady.set(true)
         currentPortPID.update((ports) => [...ports, `${pyChild.pid}`])
-        // localStorage.setItem('pyserver-pid', `${pyChild.pid}`)
 
         py.on('close', () => {
             pyServerReady.set(false)
@@ -57,6 +58,7 @@ export async function startServer() {
         py.stdout.on('data', (stdout) => {
             console.info("Server's stdout: ", stdout)
         })
+        Promise.resolve('')
     } catch (error) {
         window.handleError(error)
     }

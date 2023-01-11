@@ -5,13 +5,14 @@ import {
     downloadoverrideURL,
     override_felionpy_version_check,
     unzip_downloaded_assets,
+    python_asset_ready_to_install,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
 import { isEmpty, round } from 'lodash-es'
 
-// import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+import { stopServer } from '$src/lib/pyserver/felionpyServer'
 let assets_downloading = false
 let assets_download_needed = false
 let assets_version_available = ''
@@ -56,12 +57,11 @@ export async function downloadZIP(filename) {
 
         const duration = performance.now() - startTime
         outputbox.warn(`Time taken to download: ${round(duration, 0)} ms`)
-
         outputbox.success(`assets downloaded`)
+
+        python_asset_ready_to_install.set(true)
         if (get(unzip_downloaded_assets)) {
             await unZIP(filename)
-            await window.sleep(1000)
-            await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
         }
     } catch (err) {
         outputbox.error(`error occured while downloading assets`)
@@ -73,6 +73,8 @@ export async function downloadZIP(filename) {
 
 export function unZIP(filename) {
     return new Promise(async (resolve, reject) => {
+        if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded' }))) return
+        await stopServer()
         const filepath = await path.appLocalDataDir()
         const cmd = new shell.Command(`unzip-${await platform()}`, [
             'Expand-Archive',
@@ -88,9 +90,7 @@ export function unZIP(filename) {
 
         outputbox.info(`unzip PID: ${child.pid}`)
 
-        cmd.on('close', () => {
-            outputbox.info('UNZIP closed')
-
+        cmd.on('close', async () => {
             if (err) {
                 outputbox.error('failed to UNZIP')
                 reject('failed to UNZIP')
@@ -98,6 +98,10 @@ export function unZIP(filename) {
                 outputbox.success('UNZIP success')
                 resolve('UNZIP success')
             }
+            outputbox.info('UNZIP closed')
+            await window.sleep(1000)
+            await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
+            python_asset_ready_to_install.set(false)
         })
 
         cmd.on('error', (error) => {
@@ -148,11 +152,17 @@ export const check_assets_update = async () => {
 }
 
 export const download_assets = async () => {
+    const asset_name = `felionpy-${await platform()}.zip`
+    if (!get(downloadoverrideURL) && get(python_asset_ready_to_install)) {
+        await unZIP(asset_name)
+        return
+    }
+
     if (!get(downloadoverrideURL) && !assets_version_available) {
         outputbox.warn('Check for assets update first.')
         return
     }
-    const asset_name = `felionpy-${await platform()}.zip`
+
     if (assets_download_needed) {
         await downloadZIP(asset_name)
         return
