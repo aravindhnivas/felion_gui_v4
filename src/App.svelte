@@ -38,46 +38,34 @@
 
     let mounted = false
 
-    let beforeProcessCompleted = false
-    beforeUpdate(async () => {
-        try {
-            if (beforeProcessCompleted) return
-            console.warn('before update')
-            if (await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData })) {
-                return
-            }
-
-            console.warn('felionpy asset REQUIRED!!')
-            $downloadoverrideURL = false
-            await check_assets_update(true)
-            await download_assets()
-
-            if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
-                console.warn('removing temp files from localdir')
-
-                const [_err] = await oO(
-                    fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
-                        dir: fs.BaseDirectory.AppLocalData,
-                    })
-                )
-
-                if (_err) {
-                    console.warn('Could not remove temp files')
-                    console.error(_err)
-                } else {
-                    console.warn('Temp files removed from localdir')
-                }
-            }
-            beforeProcessCompleted = true
-        } catch (error) {
-            console.error(error)
-        }
-    })
-
     onMount(async () => {
         const unlisteners = await events_listeners()
         console.log('App mounted')
 
+        console.warn('before update')
+        if (!(await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData }))) {
+            console.warn('felionpy asset REQUIRED!!')
+            $downloadoverrideURL = false
+            await check_assets_update(true)
+            await download_assets()
+        }
+
+        if (await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })) {
+            console.warn('removing temp files from localdir')
+
+            const [_err] = await oO(
+                fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
+                    dir: fs.BaseDirectory.AppLocalData,
+                })
+            )
+
+            if (_err) {
+                console.warn('Could not remove temp files')
+                console.error(_err)
+            } else {
+                console.warn('Temp files removed from localdir')
+            }
+        }
         mounted = true
 
         return () => {

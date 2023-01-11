@@ -53,7 +53,6 @@
         if (!output) return
         serverInfo = [...output, ...serverInfo]
     }
-
     onMount(async () => {
         try {
             currentplatform = await platform()
@@ -72,6 +71,7 @@
             serverInfo = [{ value: `pyVersion: ${$pyVersion}`, type: 'info' }, ...serverInfo]
         }
     })
+    // let joinedPorts = $currentPortPID.join(', ')
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Configuration'}>
@@ -185,7 +185,15 @@
                         serverInfo = [...output, ...serverInfo]
                     }}>checkNetstat</button
                 >
-                <Textfield value={$currentPortPID.join(', ')} label="currentPortPID" />
+                <Textfield
+                    value={$currentPortPID.join(', ')}
+                    label="currentPortPID"
+                    on:keyup={(e) => {
+                        if (e.key === 'Enter') {
+                            $currentPortPID = e.target.value.split(', ')
+                        }
+                    }}
+                />
                 <button class="button is-danger" on:click={async () => await clearPORTs()}>killPID</button>
             </div>
         </div>
