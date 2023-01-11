@@ -123,7 +123,7 @@
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
-    let showOutput = import.meta.env.DEV
+    let showOutput = true
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
