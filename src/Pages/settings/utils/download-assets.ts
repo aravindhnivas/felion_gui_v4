@@ -80,7 +80,6 @@ export function unZIP(filename) {
             `${await path.join(filepath, filename)}`,
             '-DestinationPath',
             `${filepath}`,
-            // await path.join(filepath, 'temp-zip'),
             '-Force',
         ])
 
@@ -121,8 +120,6 @@ export function unZIP(filename) {
 let current_release_data = {}
 
 export const check_assets_update = async () => {
-    // const URL = import.meta.env.VITE_URL_FELIONPY_VERSION
-    // console.warn(URL, typeof URL)
     if (!get(felionlibVersion)) {
         outputbox.error('Current version not determined yet.')
         if (!get(override_felionpy_version_check)) return
@@ -131,11 +128,9 @@ export const check_assets_update = async () => {
     const URL = 'https://api.github.com/repos/aravindhnivas/felionpy/releases/latest'
     outputbox.info('checking for assets update...')
 
-    console.time('axios fetch')
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
-    console.timeEnd('axios fetch')
-
     if (_err1) return window.handleError(_err1)
+
     if (response.status !== 200) return window.createToast('Could not download the assets', 'danger')
 
     current_release_data = response.data
