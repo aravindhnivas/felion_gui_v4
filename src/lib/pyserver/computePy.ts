@@ -3,6 +3,7 @@ import computefromSubprocess from './computefromSubprocess'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
 import { startServer } from './felionpyServer'
 import { confirm } from '@tauri-apps/api/dialog'
+import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 interface Type {
     pyfile: string
     args: Object
@@ -25,6 +26,14 @@ export default async function ({ e, target, pyfile, args, general }: Type) {
     let processDivGeneralNum = 0
 
     try {
+        if (!get(python_asset_ready)) {
+            dialog.message('python assets are missing. Download it in Settings -> Update', {
+                title: 'Missing assets',
+                type: 'error',
+            })
+            return Promise.reject('python assets are missing')
+        }
+
         console.log(`Running python in ${general ? 'subprocess' : 'server'} mode`)
         console.warn(`Running python in ${get(developerMode) ? 'developer' : 'production'} mode \n ${get(pyProgram)}`)
 
