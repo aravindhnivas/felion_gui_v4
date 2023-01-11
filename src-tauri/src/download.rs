@@ -11,7 +11,7 @@ error_chain! {
 }
 
 // #[tokio::main]
-pub async fn download_url_main(url: &str, file_name: &str) -> Result<()> {
+pub async fn download_url_main(url: &str, file_name: &str, window: tauri::Window) -> Result<()> {
     let response = reqwest::get(url).await?;
 
     if !response.status().is_success() {
@@ -36,10 +36,12 @@ pub async fn download_url_main(url: &str, file_name: &str) -> Result<()> {
     while let Some(Ok(chunk)) = stream.next().await {
         bytes_downloaded += chunk.len() as u64;
         let progress = (bytes_downloaded * 100) / total_size;
-        println!(
-            "Downloaded {}/{} bytes ({}%)",
-            bytes_downloaded, total_size, progress
-        );
+
+        window.emit("assets-download-progress", progress);
+        // println!(
+        //     "Downloaded {}/{} bytes ({}%)",
+        //     bytes_downloaded, total_size, progress
+        // );
         file.write_all(&chunk)?;
     }
 

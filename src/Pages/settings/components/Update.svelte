@@ -66,6 +66,7 @@
     }
 
     let download_progress = 0
+    let assets_download_progress = 0
     let appupdate_downloading = false
     let version_info = ''
 
@@ -85,10 +86,23 @@
     const devMODE = import.meta.env.DEV
 
     onMount(async () => {
-        if (import.meta.env.DEV) return
+        const unlisten_download_asset_event = await listen<string>('assets-download-progress', (event) => {
+            assets_download_progress = Number(event.payload) / 100
+        })
+
+        if (import.meta.env.DEV) {
+            console.warn('DEV mode', unlisten_download_asset_event)
+            return () => {
+                console.warn('closing assets-download-progress listen', unlisten_download_asset_event)
+                unlisten_download_asset_event()
+            }
+        }
+
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+
         return async () => {
+            unlisten_download_asset_event()
             const unlisten = await listen_download_progress
             unlisten()
             console.warn('Update page unmounted')
@@ -141,10 +155,17 @@
         <Notify bind:label={$updateError} type="danger" />
     </div>
 
+    {#if download_progress}
+        <div class="progress__div">
+            <span class="tag is-warning">update-progress</span>
+            <LinearProgress progress={download_progress} />
+        </div>
+    {/if}
+
     <hr />
 
     <div class="align">
-        <span class="tag is-warning">assets download</span>
+        <h3 class="">Assets download</h3>
         <!-- {#if import.meta.env.DEV} -->
         <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
         <Switch bind:selected={$downloadoverrideURL} label="override URL" />
@@ -162,6 +183,7 @@
         <button
             class="button is-link"
             on:click={async ({ currentTarget }) => {
+                assets_download_progress = 0
                 currentTarget.classList.toggle('is-loading')
                 const [_err] = await oO(download_assets())
                 currentTarget.classList.toggle('is-loading')
@@ -169,8 +191,11 @@
         >
     </div>
 
-    {#if download_progress}
-        <LinearProgress progress={download_progress} />
+    {#if assets_download_progress}
+        <div class="progress__div">
+            <span class="tag is-warning">update-progress</span>
+            <LinearProgress progress={assets_download_progress} />
+        </div>
     {/if}
 
     {#if showOutput}
@@ -179,6 +204,13 @@
 </div>
 
 <style lang="scss">
+    .progress__div {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        width: 100%;
+        align-items: center;
+        gap: 0.5em;
+    }
     .updateCheck_status_div {
         display: flex;
         gap: 0.2em;
