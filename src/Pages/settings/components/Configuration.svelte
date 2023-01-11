@@ -128,7 +128,7 @@
                 <Badge class="has-background-danger" />
             {/if}
         </button>
-        <div id="serverControllers" class="align server-control" class:hide={!showServerControls && $pyServerReady}>
+        <div id="serverControllers" class="align server-control">
             <div class="align">
                 <span
                     role="presentation"
