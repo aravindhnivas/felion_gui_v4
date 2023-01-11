@@ -85,31 +85,27 @@
 
     const devMODE = import.meta.env.DEV
 
-    onMount(async () => {
-        const unlisten_download_asset_event = await listen<string>('assets-download-progress', (event) => {
-            assets_download_progress = Number(event.payload) / 100
-        })
+    const unlisten_download_asset_event = listen<string>('assets-download-progress', (event) => {
+        assets_download_progress = Number(event.payload) / 100
+    })
 
-        if (import.meta.env.DEV) {
-            console.warn('DEV mode', unlisten_download_asset_event)
-            return () => {
-                console.warn('closing assets-download-progress listen', unlisten_download_asset_event)
-                unlisten_download_asset_event()
-            }
+    onDestroy(async () => {
+        const unlisten1 = await unlisten_download_asset_event
+
+        // console.warn('closing assets-download-progress listen', unlisten1)
+        unlisten1()
+
+        const unlisten2 = await listen_download_progress
+        unlisten2()
+        if (updateIntervalCycle) {
+            clearInterval(updateIntervalCycle)
         }
-
+        console.warn('Update destroyed')
+    })
+    onMount(async () => {
+        if (import.meta.env.DEV) return
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-
-        return async () => {
-            unlisten_download_asset_event()
-            const unlisten = await listen_download_progress
-            unlisten()
-            console.warn('Update page unmounted')
-            if (updateIntervalCycle) {
-                clearInterval(updateIntervalCycle)
-            }
-        }
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
