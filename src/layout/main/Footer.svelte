@@ -1,5 +1,5 @@
-<script context="module">
-    export const footerMsg = writable('')
+<script context="module" lang="ts">
+    export const footerMsg = writable<{ status: 'idle' | 'running' | 'done'; msg: string }>({ status: 'idle', msg: '' })
 </script>
 
 <script lang="ts">
@@ -34,12 +34,20 @@
                     python server not ready
                 </div>
             {/if}
-            {#if $footerMsg}
+            {#if $footerMsg.status === 'running'}
                 <div class="icon-footer">
-                    <span>Update downloading</span>
+                    <span>{$footerMsg.msg}</span>
                     <lord-icon trigger="loop" src="/assets/icons/lottie/loader.json" />
                 </div>
             {/if}
+
+            {#if $footerMsg.status === 'done'}
+                <div class="icon-footer">
+                    <span>Download completed</span>
+                    <lord-icon trigger="hover" src="/assets/icons/lottie/confetti.json" />
+                </div>
+            {/if}
+
             {#if $running_processes.length > 0}
                 <MenuSurface
                     style="background: var(--background-color);"

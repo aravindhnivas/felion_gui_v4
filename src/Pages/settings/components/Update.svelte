@@ -70,12 +70,25 @@
     let appupdate_downloading = false
     let version_info = ''
 
+    const update_footer_download_label = (percent: number) => {
+        if (Number(percent) < 100) {
+            $footerMsg.status = 'running'
+        } else if (Number(percent) === 0) {
+            $footerMsg.status = 'idle'
+        } else {
+            $footerMsg.status = 'done'
+        }
+    }
+
     const listen_download_progress = listen('tauri://update-download-progress', async function (res) {
         if (res.payload) {
             const { chunkLength, contentLength } = res.payload as { chunkLength: string; contentLength: string }
 
             download_progress += +chunkLength / +contentLength
-            $footerMsg = `Update downloaded ${Number(download_progress * 100).toFixed(2)} %`
+            const percent = Number(download_progress * 100).toFixed(2)
+            $footerMsg.msg = `Downloading Update (${percent} %)`
+
+            update_footer_download_label(Number(percent))
         }
     })
 
@@ -86,7 +99,10 @@
     const devMODE = import.meta.env.DEV
 
     const unlisten_download_asset_event = listen<string>('assets-download-progress', (event) => {
-        assets_download_progress = Number(event.payload) / 100
+        const percent = event.payload
+        assets_download_progress = Number(percent) / 100
+        $footerMsg.msg = `Downloading python assets (${percent} %)`
+        update_footer_download_label(Number(percent))
     })
 
     onDestroy(async () => {

@@ -10,6 +10,7 @@ import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
 import { isEmpty, round } from 'lodash-es'
+
 // import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 let assets_downloading = false
 let assets_download_needed = false
