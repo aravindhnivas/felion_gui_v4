@@ -58,7 +58,7 @@ export async function startServer() {
         py.stdout.on('data', (stdout) => {
             console.info("Server's stdout: ", stdout)
         })
-        Promise.resolve('')
+        return Promise.resolve('')
     } catch (error) {
         window.handleError(error)
     }
@@ -72,7 +72,6 @@ export async function stopServer() {
         }
         if (get(pyChildProcess).kill) {
             await get(pyChildProcess).kill()
-            // localStorage.removeItem('pyserver-pid')
             currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`))
         }
 

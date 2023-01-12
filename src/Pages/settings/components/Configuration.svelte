@@ -27,6 +27,7 @@
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
     const updateServerInfo = async (e?: ButtonClickEvent) => {
+        await window.sleep(1000) // give time for the server to get ready
         serverCurrentStatus = { value: 'server starting...', type: 'info' }
         serverInfo = [serverCurrentStatus, ...serverInfo]
 
@@ -93,11 +94,9 @@
         {/if}
 
         <div class="align">
-            <!-- {#if import.meta.env.DEV} -->
             <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
                 Developer mode: {$developerMode}
             </button>
-            <!-- {/if} -->
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
         </div>
 
@@ -165,6 +164,7 @@
                     on:click={async () => {
                         const [err] = await oO(startServer())
                         if (err) return
+
                         serverInfo = [{ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' }, ...serverInfo]
                         await updateServerInfo()
                         if ($pyServerReady) await getPyVersion()
