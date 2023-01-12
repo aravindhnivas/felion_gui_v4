@@ -22,7 +22,7 @@ export const create_logger_store = (value: OutputBoxtype[]) => {
 
 export const outputbox = create_logger_store([])
 
-export const downloadoverrideURL = persistentWritable('downloadoverrideURL', false)
+export const downloadoverrideURL = writable(import.meta.env.DEV)
 export const python_asset_ready_to_install = writable(false)
 export const python_asset_ready = writable(false)
 export const downloadURL = persistentWritable(
