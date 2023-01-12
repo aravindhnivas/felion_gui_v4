@@ -3,7 +3,7 @@ import {
     outputbox,
     downloadURL,
     downloadoverrideURL,
-    override_felionpy_version_check,
+    // override_felionpy_version_check,
     unzip_downloaded_assets,
     python_asset_ready_to_install,
 } from './stores'
@@ -11,14 +11,17 @@ import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
 import { isEmpty, round } from 'lodash-es'
-
 import { stopServer } from '$src/lib/pyserver/felionpyServer'
+
 let assets_downloading = false
-let assets_download_needed = false
 let assets_version_available = ''
 
 export async function downloadZIP(filename) {
     try {
+        if (!window.navigator.onLine) {
+            outputbox.warn('No internet connection')
+            return
+        }
         if (assets_downloading) return outputbox.warn('already downloading assets...')
         let browser_download_url = ''
 
@@ -32,10 +35,7 @@ export async function downloadZIP(filename) {
             const { assets } = current_release_data as { assets: [{ name: string; browser_download_url: string }] }
             const asset_ind = assets.findIndex((e) => e.name === filename)
 
-            // const { browser_download_url } = assets[asset_ind]
             browser_download_url = assets[asset_ind].browser_download_url
-            // console.log({ browser_download_url })
-
             outputbox.warn('downloading assets...')
         }
         const URL_to_download = get(downloadoverrideURL) ? get(downloadURL) : browser_download_url
@@ -126,51 +126,71 @@ export function unZIP(filename) {
 
 let current_release_data = {}
 
-export const check_assets_update = async () => {
-    if (!get(felionlibVersion)) {
-        outputbox.error('Current version not determined yet.')
-        if (!get(override_felionpy_version_check)) return
+export const check_assets_update = async (toast = false) => {
+    if (!window.navigator.onLine) {
+        if (toast) outputbox.warn('No internet connection')
+        return Promise.resolve(false)
     }
 
-    const URL = 'https://api.github.com/repos/aravindhnivas/felionpy/releases/latest'
+    const URL = import.meta.env.VITE_FELIONPY_URL
     outputbox.info('checking for assets update...')
 
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
-    if (_err1) return window.handleError(_err1)
+    if (_err1) {
+        outputbox.error(_err1)
+        return Promise.resolve(false)
+    }
 
-    if (response.status !== 200) return window.createToast('Could not download the assets', 'danger')
+    if (response.status !== 200) {
+        outputbox.error('Could not download the assets')
+        return Promise.resolve(false)
+    }
 
     current_release_data = response.data
-    console.log(current_release_data)
     const { tag_name } = response.data
+    outputbox.warn(response.data)
     outputbox.info(`Available version: ${tag_name}`)
-    outputbox.info(`Current version: v${get(felionlibVersion)}`)
+    if (get(felionlibVersion)) {
+        outputbox.info(`Current version: v${get(felionlibVersion)}`)
+    } else {
+        outputbox.error('Current version not determined yet.')
+    }
+
     assets_version_available = tag_name
-    assets_download_needed = `v${get(felionlibVersion)}` < tag_name
+
+    const assets_download_needed = `v${get(felionlibVersion)}` < tag_name
     if (assets_download_needed) {
         outputbox.warn(`Download required`)
     } else {
         outputbox.warn(`Download not required`)
     }
+
+    return Promise.resolve(assets_download_needed)
 }
 
 export const download_assets = async () => {
     const asset_name = `felionpy-${await platform()}.zip`
-    if (!get(downloadoverrideURL) && get(python_asset_ready_to_install)) {
-        await unZIP(asset_name)
-        return
+
+    if (!get(downloadoverrideURL)) {
+        if (get(python_asset_ready_to_install)) {
+            await unZIP(asset_name)
+            return
+        }
+
+        let assets_download_needed: boolean
+        if (!assets_version_available) {
+            // outputbox.warn('Check for assets update first.')
+            assets_download_needed = await check_assets_update()
+            // return
+        }
+
+        if (assets_download_needed) {
+            await downloadZIP(asset_name)
+            return
+        }
+
+        if (!(await dialog.confirm('Download not required', { title: 'Download anyway' }))) return
     }
 
-    if (!get(downloadoverrideURL) && !assets_version_available) {
-        outputbox.warn('Check for assets update first.')
-        return
-    }
-
-    if (assets_download_needed) {
-        await downloadZIP(asset_name)
-        return
-    }
-    if (!get(downloadoverrideURL) && !(await dialog.confirm('Download not required', { title: 'Download anyway' })))
-        return
     await downloadZIP(asset_name)
 }

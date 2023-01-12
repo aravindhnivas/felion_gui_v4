@@ -1,6 +1,6 @@
 import {
     downloadoverrideURL,
-    override_felionpy_version_check,
+    // override_felionpy_version_check,
     unzip_downloaded_assets,
     python_asset_ready,
     outputbox,
@@ -20,12 +20,12 @@ export const check_felionpy_assets_status = async () => {
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
 
         downloadoverrideURL.set(false)
-        override_felionpy_version_check.set(true)
+        // override_felionpy_version_check.set(true)
         unzip_downloaded_assets.set(true)
         await check_assets_update()
         await download_assets()
 
-        override_felionpy_version_check.set(false)
+        // override_felionpy_version_check.set(false)
         unzip_downloaded_assets.set(true)
 
         python_asset_ready.set(true)

@@ -17,7 +17,7 @@
         outputbox,
         downloadURL,
         downloadoverrideURL,
-        override_felionpy_version_check,
+        // override_felionpy_version_check,
         unzip_downloaded_assets,
     } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
@@ -93,6 +93,7 @@
     })
 
     let updateIntervalCycle: NodeJS.Timer | null = null
+    let assetsUpdateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
@@ -111,8 +112,13 @@
 
         const unlisten2 = await listen_download_progress
         unlisten2()
+
         if (updateIntervalCycle) {
             clearInterval(updateIntervalCycle)
+        }
+
+        if (assetsUpdateIntervalCycle) {
+            clearInterval(assetsUpdateIntervalCycle)
         }
         console.warn('Update destroyed')
     })
@@ -120,6 +126,7 @@
         if (import.meta.env.DEV) return
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+        assetsUpdateIntervalCycle = setInterval(check_assets_update, $updateInterval * 60 * 1000)
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
@@ -128,89 +135,99 @@
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
     <h1>Update</h1>
-    <div class="subtitle" style="width: 100%;">
-        Current version: {$currentVersion}
-        <span class="tag is-success">{version_info}</span>
-    </div>
-
     <div class="align">
+        <div class="subtitle" style="width: 100%;">
+            Current version: {$currentVersion}
+            <span class="tag is-success">{version_info}</span>
+        </div>
+
+        <div class="align">
+            <div class="align">
+                <button
+                    class="button is-link"
+                    class:is-warning={updateReadyToInstall}
+                    id="updateCheckBtn"
+                    on:click={async () => {
+                        await check_for_update(true)
+                    }}
+                >
+                    {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
+                </button>
+
+                <button
+                    class="button is-warning"
+                    on:click={() => {
+                        $activateChangelog = true
+                    }}>What's New</button
+                >
+            </div>
+            {#if devMODE}
+                <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
+            {/if}
+
+            <Switch bind:selected={showOutput} label="show update logs" />
+
+            <div class="updateCheck_status_div">
+                <span>Last checked</span>
+                <span class="tag is-warning" id="update-check-status">{lastUpdateCheck}</span>
+            </div>
+            <Notify bind:label={$updateError} type="danger" />
+        </div>
+
+        {#if download_progress}
+            <div class="progress__div">
+                <span class="tag is-warning">update-progress</span>
+                <LinearProgress progress={download_progress} />
+            </div>
+        {/if}
+
+        <hr />
+
+        <h3>Assets download</h3>
+
+        <!-- {#if import.meta.env.PROD} -->
+        {#if import.meta.env.DEV}
+            <div class="align">
+                <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
+                <Switch bind:selected={$downloadoverrideURL} label="override URL" />
+                <!-- <Switch bind:selected={$override_felionpy_version_check} label="override_felionpy_version_check" /> -->
+                <Switch bind:selected={$unzip_downloaded_assets} label="unzip_downloaded_assets" />
+            </div>
+        {/if}
+
         <div class="align">
             <button
+                id="btn-check-asset-update"
                 class="button is-link"
-                class:is-warning={updateReadyToInstall}
-                id="updateCheckBtn"
-                on:click={async () => {
-                    await check_for_update(true)
-                }}
+                on:click={async ({ currentTarget }) => {
+                    toggle_loading(currentTarget)
+                    const [_err] = await oO(check_assets_update(true))
+                    toggle_loading(currentTarget)
+                }}>Check assets update</button
             >
-                {updateReadyToInstall ? 'Quit and Install' : 'Check update'}
-            </button>
-
             <button
-                class="button is-warning"
-                on:click={() => {
-                    $activateChangelog = true
-                }}>What's New</button
+                id="btn-download-asset"
+                class="button is-link"
+                on:click={async ({ currentTarget }) => {
+                    assets_download_progress = 0
+                    toggle_loading(currentTarget)
+                    const [_err] = await oO(download_assets())
+                    toggle_loading(currentTarget)
+                }}>Download assets</button
             >
         </div>
-        {#if devMODE}
-            <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
+
+        {#if assets_download_progress}
+            <div class="progress__div">
+                <span class="tag is-warning">update-progress</span>
+                <LinearProgress progress={assets_download_progress} />
+            </div>
         {/if}
-        <Switch bind:selected={showOutput} label="show update logs" />
 
-        <div class="updateCheck_status_div">
-            <span>Last checked</span>
-            <span class="tag is-warning" id="update-check-status">{lastUpdateCheck}</span>
-        </div>
-        <Notify bind:label={$updateError} type="danger" />
+        {#if showOutput}
+            <OutputBox bind:output={$outputbox} heading="update info" />
+        {/if}
     </div>
-
-    {#if download_progress}
-        <div class="progress__div">
-            <span class="tag is-warning">update-progress</span>
-            <LinearProgress progress={download_progress} />
-        </div>
-    {/if}
-
-    <hr />
-
-    <div class="align">
-        <h3 class="">Assets download</h3>
-        <!-- {#if import.meta.env.DEV} -->
-        <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
-        <Switch bind:selected={$downloadoverrideURL} label="override URL" />
-        <Switch bind:selected={$override_felionpy_version_check} label="override_felionpy_version_check" />
-        <Switch bind:selected={$unzip_downloaded_assets} label="unzip_downloaded_assets" />
-        <!-- {/if} -->
-        <button
-            class="button is-link"
-            on:click={async ({ currentTarget }) => {
-                toggle_loading(currentTarget)
-                const [_err] = await oO(check_assets_update())
-                toggle_loading(currentTarget)
-            }}>Check assets update</button
-        >
-        <button
-            class="button is-link"
-            on:click={async ({ currentTarget }) => {
-                assets_download_progress = 0
-                toggle_loading(currentTarget)
-                const [_err] = await oO(download_assets())
-                toggle_loading(currentTarget)
-            }}>Download assets</button
-        >
-    </div>
-
-    {#if assets_download_progress}
-        <div class="progress__div">
-            <span class="tag is-warning">update-progress</span>
-            <LinearProgress progress={assets_download_progress} />
-        </div>
-    {/if}
-
-    {#if showOutput}
-        <OutputBox bind:output={$outputbox} heading="update info" />
-    {/if}
 </div>
 
 <style lang="scss">

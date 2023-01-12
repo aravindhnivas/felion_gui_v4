@@ -101,23 +101,26 @@
             <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
         </div>
 
-        <div class="align">
-            <BrowseTextfield
-                class="three_col_browse"
-                label="python-src"
-                bind:value={$pythonpath}
-                style="width: 100%;"
-                dir={false}
-                lock={!$developerMode}
-            />
-            <BrowseTextfield
-                class="three_col_browse"
-                label="python-script-src"
-                bind:value={$pythonscript}
-                style="width: 100%;"
-                lock={!$developerMode}
-            />
-        </div>
+        {#if $developerMode}
+            <div class="align">
+                <BrowseTextfield
+                    class="three_col_browse"
+                    label="python-src"
+                    bind:value={$pythonpath}
+                    style="width: 100%;"
+                    dir={false}
+                    lock={!$developerMode}
+                />
+                <BrowseTextfield
+                    class="three_col_browse"
+                    label="python-script-src"
+                    bind:value={$pythonscript}
+                    style="width: 100%;"
+                    lock={!$developerMode}
+                />
+            </div>
+        {/if}
+
         <BrowseTextfield
             class="three_col_browse"
             label="felionpy"
@@ -142,6 +145,7 @@
                         $pyServerPORT = await invoke('get_tcp_port')
                     }}>refresh</span
                 >
+
                 <BrowseTextfield
                     type="number"
                     bind:value={$pyServerPORT}
@@ -151,7 +155,10 @@
                     style="display: flex;"
                 />
 
-                <Switch bind:selected={$serverDebug} label="debug mode" />
+                {#if $developerMode}
+                    <Switch bind:selected={$serverDebug} label="debug mode" />
+                {/if}
+
                 <button
                     class="button is-link"
                     class:is-loading={serverCurrentStatus.value.includes('starting')}

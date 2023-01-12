@@ -91,15 +91,6 @@
 
 <div class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'Credits'}>
     <h1>Credits</h1>
-    <div class="credits__div">
-        <ListsMultiline lists={credits} />
-    </div>
-</div>
 
-<style>
-    .credits__div {
-        display: grid;
-        max-height: 75vh;
-        overflow: auto;
-    }
-</style>
+    <ListsMultiline lists={credits} />
+</div>

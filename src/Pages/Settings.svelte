@@ -51,34 +51,32 @@
         </div>
 
         <div class="mainContainer box">
-            <div class="container right__div">
-                <Configuration
-                    on:serverStatusChanged={({ detail: { closed } }) => {
-                        console.log('server closed', closed)
-                        configBadge.style.backgroundColor = closed ? 'var(--color-danger)' : ''
-                        warningStatuses[0] = closed
-                        updateSettingStatus()
-                    }}
-                />
-                <Update
-                    on:updateStatusChange={(e) => {
-                        warningStatuses[1] = false
-                        if (e.detail.status !== 'update-downloaded') return
-                        updateBadge.style.backgroundColor = 'var(--color-danger)'
-                        warningStatuses[1] = true
-                        updateSettingStatus()
-                    }}
-                />
-                <About />
-                <Credits />
-                <Console />
-            </div>
+            <Configuration
+                on:serverStatusChanged={({ detail: { closed } }) => {
+                    console.log('server closed', closed)
+                    configBadge.style.backgroundColor = closed ? 'var(--color-danger)' : ''
+                    warningStatuses[0] = closed
+                    updateSettingStatus()
+                }}
+            />
+            <Update
+                on:updateStatusChange={(e) => {
+                    warningStatuses[1] = false
+                    if (e.detail.status !== 'update-downloaded') return
+                    updateBadge.style.backgroundColor = 'var(--color-danger)'
+                    warningStatuses[1] = true
+                    updateSettingStatus()
+                }}
+            />
+            <About />
+            <Credits />
+            <Console />
         </div>
     </div>
 </section>
 
 <style lang="scss">
-    .right__div {
+    .mainContainer {
         height: 100%;
     }
     section {
