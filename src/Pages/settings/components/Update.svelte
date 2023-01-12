@@ -185,12 +185,10 @@
 
         <h3>Assets download</h3>
 
-        <!-- {#if import.meta.env.PROD} -->
         {#if import.meta.env.DEV}
             <div class="align">
                 <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
                 <Switch bind:selected={$downloadoverrideURL} label="override URL" />
-                <!-- <Switch bind:selected={$override_felionpy_version_check} label="override_felionpy_version_check" /> -->
                 <Switch bind:selected={$unzip_downloaded_assets} label="unzip_downloaded_assets" />
             </div>
         {/if}
