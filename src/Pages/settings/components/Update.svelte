@@ -13,13 +13,7 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import {
-        outputbox,
-        downloadURL,
-        downloadoverrideURL,
-        // override_felionpy_version_check,
-        unzip_downloaded_assets,
-    } from '../utils/stores'
+    import { outputbox, downloadURL, downloadoverrideURL } from '../utils/stores'
     import { download_assets, check_assets_update } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
 
@@ -189,7 +183,6 @@
             <div class="align">
                 <Textfield bind:value={$downloadURL} label="download-URL" style="width: 100%" />
                 <Switch bind:selected={$downloadoverrideURL} label="override URL" />
-                <Switch bind:selected={$unzip_downloaded_assets} label="unzip_downloaded_assets" />
             </div>
         {/if}
 

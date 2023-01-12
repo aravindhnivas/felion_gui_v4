@@ -1,10 +1,4 @@
-import {
-    downloadoverrideURL,
-    // override_felionpy_version_check,
-    unzip_downloaded_assets,
-    python_asset_ready,
-    outputbox,
-} from './stores'
+import { downloadoverrideURL, python_asset_ready, outputbox } from './stores'
 import { check_assets_update, download_assets } from './download-assets'
 import { platform } from '@tauri-apps/api/os'
 
@@ -20,13 +14,8 @@ export const check_felionpy_assets_status = async () => {
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
 
         downloadoverrideURL.set(false)
-        // override_felionpy_version_check.set(true)
-        unzip_downloaded_assets.set(true)
         await check_assets_update()
         await download_assets()
-
-        // override_felionpy_version_check.set(false)
-        unzip_downloaded_assets.set(true)
 
         python_asset_ready.set(true)
     } catch (error) {

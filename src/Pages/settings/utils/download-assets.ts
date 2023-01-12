@@ -1,12 +1,5 @@
 import { felionlibVersion } from '$lib/pyserver/stores'
-import {
-    outputbox,
-    downloadURL,
-    downloadoverrideURL,
-    // override_felionpy_version_check,
-    unzip_downloaded_assets,
-    python_asset_ready_to_install,
-} from './stores'
+import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import axios from 'axios'
@@ -59,9 +52,7 @@ export async function downloadZIP(filename) {
         outputbox.success(`assets downloaded`)
 
         python_asset_ready_to_install.set(true)
-        if (get(unzip_downloaded_assets)) {
-            await unZIP(filename)
-        }
+        await unZIP(filename)
     } catch (err) {
         outputbox.error(`error occured while downloading assets`)
         outputbox.error(err)
