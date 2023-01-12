@@ -11,7 +11,7 @@
 
     const readChangelog = async () => {
         source = ''
-        const changelogFile = await path.resolve('./resources/CHANGELOG.md')
+        const changelogFile = await path.resolveResource("resources/CHANGELOG.md")
 
         const [_err, fileRead] = await oO(fs.readTextFile(changelogFile))
         if (_err) return window.handleError(_err)
