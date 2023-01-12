@@ -40,6 +40,16 @@
             ]
           },
           {
+            "name": "netstat-darwin",
+            "cmd": "lsof",
+            "args": [
+              "-i",
+              {
+                "validator": "\\S+"
+              }
+            ]
+          },
+          {
             "name": "taskkill-win32",
             "cmd": "taskkill",
             "args": [
@@ -48,6 +58,16 @@
                 "validator": "\\S+"
               },
               "/F"
+            ]
+          },
+          {
+            "name": "taskkill-darwin",
+            "cmd": "kill",
+            "args": [
+              "-9",
+              {
+                "validator": "\\S+"
+              }
             ]
           },
           {
@@ -64,6 +84,19 @@
                 "validator": "\\S+"
               },
               "-Force"
+            ]
+          },
+          {
+            "name": "unzip-darwin",
+            "cmd": "unzip",
+            "args": [
+              {
+                "validator": "\\S+"
+              },
+              "-d",
+              {
+                "validator": "\\S+"
+              }
             ]
           }
         ]

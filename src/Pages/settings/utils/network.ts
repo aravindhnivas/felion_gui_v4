@@ -1,10 +1,21 @@
 import { currentPortPID } from '$src/lib/pyserver/felionpyServer'
+
 export const checkNetstat = async (port: number, currentplatform: string) => {
     let out: OutputBoxtype[] = [{ value: 'checking netstat...', type: 'info' }]
 
-    const [_err, output] = await oO(new shell.Command(`netstat-${currentplatform}`, ['-ano']).execute())
+    const args = {
+        win32: ['-ano'],
+        darwin: ['-i', `:${port}`],
+    }
+
+    const [_err, output] = await oO(new shell.Command(`netstat-${currentplatform}`, args[currentplatform]).execute())
     if (_err) return window.handleError(_err)
 
+    if (currentplatform === 'darwin') {
+        const value = output.stdout.trim()
+        out = [...out, { value, type: 'info' }]
+        return out
+    }
     if (output.stderr) {
         out = [{ value: output.stderr.trim(), type: 'danger' }, ...out]
         return out
@@ -33,8 +44,12 @@ export const killPID = async (currentplatform: string) => {
     let out: OutputBoxtype[] = []
 
     const kill = async (port: string) => {
+        const args = {
+            win32: ['/PID', port, '/F'],
+            darwin: ['-9', port],
+        }
         const [_err, output] = await oO(
-            new shell.Command(`taskkill-${currentplatform}`, ['/PID', port, '/F']).execute()
+            new shell.Command(`taskkill-${currentplatform}`, args[currentplatform]).execute()
         )
 
         if (_err) return window.handleError(_err)

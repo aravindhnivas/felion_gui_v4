@@ -68,16 +68,16 @@ export function unZIP(filename) {
         }
 
         await stopServer()
-
+        const currentplatform = await platform()
         const filepath = await path.appLocalDataDir()
-        const cmd = new shell.Command(`unzip-${await platform()}`, [
-            'Expand-Archive',
-            '-Path',
-            `${await path.join(filepath, filename)}`,
-            '-DestinationPath',
-            `${filepath}`,
-            '-Force',
-        ])
+        const zipfile = await path.join(filepath, filename)
+
+        const args = {
+            win32: ['Expand-Archive', '-Path', zipfile, '-DestinationPath', `${filepath}`, '-Force'],
+            darwin: [zipfile, '-d', filepath],
+        }
+
+        const cmd = new shell.Command(`unzip-${currentplatform}`, args[currentplatform])
 
         let err: string
         const child = await cmd.spawn()
