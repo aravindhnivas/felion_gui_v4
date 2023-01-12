@@ -148,7 +148,6 @@ export const check_assets_update = async (toast = false) => {
     }
 
     assets_version_available = tag_name
-
     const assets_download_needed = `v${get(felionlibVersion)}` < tag_name
     if (assets_download_needed) {
         outputbox.warn(`Download required`)
