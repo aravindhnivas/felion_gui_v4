@@ -139,7 +139,7 @@ export const check_assets_update = async (toast = false) => {
 
     current_release_data = response.data
     const { tag_name } = response.data
-    outputbox.warn(response.data)
+    // outputbox.warn(response.data)
     outputbox.info(`Available version: ${tag_name}`)
     if (get(felionlibVersion)) {
         outputbox.info(`Current version: v${get(felionlibVersion)}`)
