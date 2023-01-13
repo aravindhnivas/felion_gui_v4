@@ -12,6 +12,7 @@ import { isEmpty, round } from 'lodash-es'
 import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
 import axios from 'axios'
+import { LOGGER } from '$console'
 
 let assets_downloading = false
 let assets_version_available = ''
@@ -81,8 +82,9 @@ export function unZIP(installation_request = true) {
         footerMsg.set({ msg: 'installing assets...', status: 'running' })
 
         if (installation_request) {
-            if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' })))
-                return resolve('')
+            if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' }))) {
+                return resolve('installation on next reboot')
+            }
         }
 
         if (get(pyServerReady)) {
@@ -155,8 +157,14 @@ export function unZIP(installation_request = true) {
 }
 
 let current_release_data = {}
-
+let no_more_asset_check = false
 export const check_assets_update = async (toast = false) => {
+    if (get(python_asset_ready_to_install)) {
+        if (!no_more_asset_check) return outputbox.warn('assets updates are ready to install')
+        no_more_asset_check = true
+        return
+    }
+
     if (!window.navigator.onLine) {
         if (toast) outputbox.warn('No internet connection')
         return
@@ -168,7 +176,7 @@ export const check_assets_update = async (toast = false) => {
     if (_err1) return outputbox.error(_err1)
 
     if (response.status !== 200) return outputbox.error('Could not download the assets')
-
+    LOGGER.warn(response.data)
     current_release_data = response.data
     assets_version_available = response.data.tag_name
 

@@ -209,6 +209,7 @@
 
             {#if $python_asset_ready_to_install}
                 <button
+                    id="install-asset-btn"
                     class="button is-warning"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
