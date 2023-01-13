@@ -11,6 +11,7 @@
         serverDebug,
         felionpy,
     } from '$lib/pyserver/stores'
+    import { serverInfo } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { fetchServerROOT } from '../utils/serverConnections'
@@ -19,51 +20,50 @@
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    import { platform } from '@tauri-apps/api/os'
+    // import { platform } from '@tauri-apps/api/os'
     import { check_felionpy_assets_status } from '../utils/assets-status'
+    import { toggle_loading } from '../utils/misc'
+    import axios from 'axios'
 
     let showServerControls: boolean
-    let serverInfo: OutputBoxtype[] = []
+    // let serverInfo: OutputBoxtype[] = []
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
     const updateServerInfo = async (e?: ButtonClickEvent) => {
-        await window.sleep(1000) // give time for the server to get ready
+        // await window.sleep(1000) // give time for the server to get ready
         serverCurrentStatus = { value: 'server starting...', type: 'info' }
-        serverInfo = [serverCurrentStatus, ...serverInfo]
+        serverInfo.info('server starting...')
 
-        const target = e?.target as HTMLButtonElement
-        const rootpage = await fetchServerROOT({ target })
+        // const target = e?.target as HTMLButtonElement
+        // const output = await fetchServerROOT({ target })
+        const [err, output] = await oO(checkNetstat())
 
-        if (rootpage instanceof Error) {
-            serverInfo = [{ value: rootpage.message, type: 'danger' }, ...serverInfo]
+        if (err) {
+            serverInfo.error(err)
             serverCurrentStatus = { value: 'server closed', type: 'danger' }
             dispatch('serverStatusChanged', { closed: true })
-        } else {
-            $pyServerReady = true
-            serverInfo = [{ value: rootpage, type: 'success' }, ...serverInfo]
-            serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
-            dispatch('serverStatusChanged', { closed: false })
+            return
         }
+
+        const [_err, rootpage] = await oO(axios.get<{ string }>(`http://localhost:${$pyServerPORT}/`))
+        if (_err) return
+
+        $pyServerReady = true
+        serverInfo.success(rootpage.data)
+        serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
+        dispatch('serverStatusChanged', { closed: false })
     }
 
-    let currentplatform: string
     const dispatch = createEventDispatcher()
 
-    const clearPORTs = async () => {
-        const output = await killPID(currentplatform)
-        if (!output) return
-        serverInfo = [...output, ...serverInfo]
-    }
     onMount(async () => {
         try {
-            currentplatform = await platform()
-
             await check_felionpy_assets_status()
 
             if (import.meta.env.DEV) return
 
             if ($currentPortPID.length > 0) {
-                await clearPORTs()
+                await killPID()
             }
 
             if (!$python_asset_ready) return
@@ -73,7 +73,7 @@
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
-            serverInfo = [{ value: `pyVersion: ${$pyVersion}`, type: 'info' }, ...serverInfo]
+            serverInfo.add({ value: `pyVersion: ${$pyVersion}`, type: 'info' })
         }
     })
     // let joinedPorts = $currentPortPID.join(', ')
@@ -165,7 +165,7 @@
                         const [err] = await oO(startServer())
                         if (err) return
 
-                        serverInfo = [{ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' }, ...serverInfo]
+                        serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
                         await updateServerInfo()
                         if ($pyServerReady) await getPyVersion()
                     }}
@@ -192,10 +192,11 @@
                 <button id="fetchServerROOT" class="button is-link" on:click={updateServerInfo}>fetchServerROOT</button>
                 <button
                     class="button is-link"
-                    on:click={async () => {
-                        const output = await checkNetstat($pyServerPORT, currentplatform)
-                        if (!output) return
-                        serverInfo = [...output, ...serverInfo]
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
+                        const [err, output] = await oO(checkNetstat())
+                        if (err) serverInfo.error(err)
+                        toggle_loading(currentTarget)
                     }}>checkNetstat</button
                 >
                 <Textfield
@@ -207,9 +208,9 @@
                         }
                     }}
                 />
-                <button class="button is-danger" on:click={async () => await clearPORTs()}>killPID</button>
+                <button class="button is-danger" on:click={async () => await killPID()}>killPID</button>
             </div>
         </div>
-        <OutputBox bind:output={serverInfo} heading="Server outputs" />
+        <OutputBox bind:output={$serverInfo} heading="Server outputs" />
     </div>
 </div>
