@@ -7,12 +7,15 @@ import {
     serverDebug,
     pyChildProcess,
     get,
+    felionlibVersion,
 } from '$lib/pyserver/stores'
 import { LOGGER } from '$console'
-import { python_asset_ready } from '$src/Pages/settings/utils/stores'
+import { asset_download_required, python_asset_ready } from '$src/Pages/settings/utils/stores'
 
 import { persistentWritable } from '$src/js/persistentStore'
 import { path, shell } from '@tauri-apps/api'
+import { check_assets_update } from '$src/Pages/settings/utils/download-assets'
+import { auto_download_and_install_assets } from '$src/Pages/settings/utils/assets-status'
 
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
@@ -24,7 +27,17 @@ export async function startServer() {
         })
         return Promise.reject('python assets are missing')
     }
+
     if (get(pyServerReady)) return Promise.reject('server already running')
+
+    if (get(felionlibVersion)) {
+        await check_assets_update()
+        if (get(asset_download_required)) {
+            if (await dialog.confirm('Download now ?', { title: 'New felionpy version available' })) {
+                return auto_download_and_install_assets()
+            }
+        }
+    }
 
     console.info('starting felionpy server at port: ', get(pyServerPORT))
 
@@ -66,6 +79,7 @@ export async function startServer() {
     })
 
     await window.sleep(500)
+
     return Promise.resolve('server started')
 }
 
