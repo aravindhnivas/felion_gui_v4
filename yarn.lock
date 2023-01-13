@@ -2779,7 +2779,7 @@ pkg-types@^1.0.1:
     mlly "^1.0.0"
     pathe "^1.0.0"
 
-plotly.js-basic-dist@^2.17.0:
+plotly.js-basic-dist@^2.17.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-2.17.1.tgz#9de7bec9040ef477851b66a0aa2507042fe9c687"
   integrity sha512-qU3LrujgkwlMJOfT3lQAd5aW+Yn6CNnrfuXZ+mCPaV5o3CwuIJyFEyzmYKlQ8OSrIt4TZ7qCrV8m2ye9t+yKKw==
@@ -3044,7 +3044,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-check@^3.0.1:
+svelte-check@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-3.0.2.tgz#a5f4582c3bfd28a5ee991803810e5ae4ae891af5"
   integrity sha512-DkhKhV0Jt0gh7q9DBB26+J2Vfb9y4/4JWxnbkXBZha7542LOhwvj3edJFjyJ+xjdaXyInZ+YRRYc3V6wytP2ew==
@@ -3148,7 +3148,7 @@ svelte2tsx@^0.5.12:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"
 
-svelte@^3.55.0:
+svelte@^3.55.1:
   version "3.55.1"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.55.1.tgz#6f93b153e5248039906ce5fe196efdb9e05dfce8"
   integrity sha512-S+87/P0Ve67HxKkEV23iCdAh/SX1xiSfjF1HOglno/YTbSTW7RniICMCofWGdJJbdjw3S+0PfFb1JtGfTXE0oQ==
@@ -3190,7 +3190,7 @@ tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
-tsx@^3.12.1:
+tsx@^3.12.2:
   version "3.12.2"
   resolved "https://registry.yarnpkg.com/tsx/-/tsx-3.12.2.tgz#1c8a4fa08a97739e6eedf0ad464bd8218e1a64f0"
   integrity sha512-ykAEkoBg30RXxeOMVeZwar+JH632dZn9EUJVyJwhfag62k6UO/dIyJEV58YuLF6e5BTdV/qmbQrpkWqjq9cUnQ==
