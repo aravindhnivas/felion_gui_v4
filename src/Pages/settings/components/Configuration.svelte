@@ -200,8 +200,14 @@
                 {/if}
             </div>
             <div class="align">
-                <button id="fetchServerROOT" class="button is-link" on:click={async () => await fetchServerROOT()}
-                    >fetchServerROOT</button
+                <button
+                    id="fetchServerROOT"
+                    class="button is-link"
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
+                        await fetchServerROOT()
+                        toggle_loading(currentTarget)
+                    }}>fetchServerROOT</button
                 >
                 <button
                     class="button is-link"
