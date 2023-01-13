@@ -83,7 +83,8 @@ export function unZIP(installation_request = true) {
 
         if (installation_request) {
             if (!(await dialog.confirm('Install it now ?', { title: 'Python assets update ready.' }))) {
-                return resolve('installation on next reboot')
+                footerMsg.set({ msg: '', status: 'idle' })
+                return resolve('installation skipped')
             }
         }
 
@@ -137,6 +138,7 @@ export function unZIP(installation_request = true) {
             } else {
                 await startServer()
             }
+            setTimeout(() => footerMsg.set({ msg: '', status: 'idle' }), 1 * 60 * 1000)
         })
 
         cmd.on('error', (error) => {
