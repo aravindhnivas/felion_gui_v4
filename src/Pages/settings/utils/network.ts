@@ -13,9 +13,11 @@ export const checkNetstat = async () => {
     const args = {
         win32: ['Get-Process', '-Id', `(Get-NetTCPConnection -LocalPort ${get(pyServerPORT)}).OwningProcess`],
         darwin: ['-i', `:${get(pyServerPORT)}`],
+        linux: ['-i', `:${get(pyServerPORT)}`],
     }
-
-    const [err, output] = await oO(new shell.Command(`netstat-${await platform()}`, args[await platform()]).execute())
+    const currentplatform = await platform()
+    const command = currentplatform === 'win32' ? `netstat-${await platform()}` : 'netstat-darwin'
+    const [err, output] = await oO(new shell.Command(command, args[await platform()]).execute())
     if (err) return fail(err)
 
     if (output.stderr) return fail(output.stderr)
@@ -32,10 +34,11 @@ export const killPID = async () => {
         const args = {
             win32: ['/PID', port, '/F'],
             darwin: ['-9', port],
+            linux: ['-9', port],
         }
-        const [_err, output] = await oO(
-            new shell.Command(`taskkill-${await platform()}`, args[await platform()]).execute()
-        )
+        const currentplatform = await platform()
+        const command = currentplatform === 'win32' ? `taskkill-${await platform()}` : 'taskkill-darwin'
+        const [_err, output] = await oO(new shell.Command(command, args[await platform()]).execute())
 
         if (_err) return window.handleError(_err)
         currentPortPID.update((ports) => ports.filter((p) => p !== port))

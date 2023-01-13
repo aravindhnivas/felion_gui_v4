@@ -106,9 +106,11 @@ export function unZIP(installation_request = true) {
         const args = {
             win32: ['Expand-Archive', '-Path', asset_zipfile, '-DestinationPath', `${localdir}`, '-Force'],
             darwin: [asset_zipfile, '-d', localdir],
+            linux: [asset_zipfile, '-d', localdir],
         }
-
-        const cmd = new shell.Command(`unzip-${await platform()}`, args[await platform()])
+        const currentplatform = await platform()
+        const command = currentplatform === 'win32' ? `unzip-${await platform()}` : 'unzip-darwin'
+        const cmd = new shell.Command(command, args[await platform()])
 
         let err: string
         const child = await cmd.spawn()
