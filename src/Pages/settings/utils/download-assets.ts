@@ -167,7 +167,6 @@ export const check_assets_update = async (toast = false) => {
         outputbox.error('Current version not determined yet.')
         outputbox.warn(`Download required`)
         asset_download_required.set(true)
-        // await downloadZIP()
         return
     }
     outputbox.info(`Current version: v${get(felionlibVersion)}`)
@@ -177,6 +176,13 @@ export const check_assets_update = async (toast = false) => {
         asset_download_required.set(true)
         return
     }
+
+    if (get(felionlibVersion) <= import.meta.env.VITE_FELIONPY_MIN_VERSION) {
+        outputbox.warn(`Download required`)
+        asset_download_required.set(true)
+        return
+    }
+
     outputbox.warn(`Download not required`)
     asset_download_required.set(false)
 }
