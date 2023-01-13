@@ -13,9 +13,16 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install } from '../utils/stores'
+    import {
+        outputbox,
+        downloadURL,
+        downloadoverrideURL,
+        python_asset_ready_to_install,
+        asset_download_required,
+    } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
+    import { auto_download_and_install_assets } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
         try {
@@ -120,7 +127,13 @@
         if (import.meta.env.DEV) return
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-        assetsUpdateIntervalCycle = setInterval(check_assets_update, 60 * 60 * 1000)
+        assetsUpdateIntervalCycle = setInterval(async () => {
+            if ($python_asset_ready_to_install) return
+            await check_assets_update()
+            if ($asset_download_required) {
+                await auto_download_and_install_assets({ installation_request: true })
+            }
+        }, 60 * 60 * 1000)
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)

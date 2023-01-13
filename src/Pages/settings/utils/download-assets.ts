@@ -82,7 +82,7 @@ export function unZIP(installation_request = true) {
         footerMsg.set({ msg: 'installing assets...', status: 'running' })
 
         if (installation_request) {
-            if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' }))) {
+            if (!(await dialog.confirm('Install it now ?', { title: 'Python assets update ready.' }))) {
                 return resolve('installation on next reboot')
             }
         }

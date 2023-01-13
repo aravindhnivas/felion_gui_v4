@@ -79,9 +79,7 @@
 
             await check_assets_update()
             if ($asset_download_required) {
-                if (await dialog.confirm('python assets download required', { title: 'Download required' })) {
-                    await auto_download_and_install_assets({ installation_request: true })
-                }
+                await auto_download_and_install_assets({ installation_request: true })
             }
         } catch (error) {
             if (error instanceof Error) console.error(error)
