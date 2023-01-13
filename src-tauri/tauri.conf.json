@@ -98,6 +98,11 @@
                 "validator": "\\S+"
               }
             ]
+          },
+          {
+            "name": "rm",
+            "cmd": "rm",
+            "args": true
           }
         ]
       },
