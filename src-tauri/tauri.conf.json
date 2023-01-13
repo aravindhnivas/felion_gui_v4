@@ -7,7 +7,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "felion_gui_v4",
+    "productName": "feliongui",
     "version": "4.0.9"
   },
   "tauri": {
