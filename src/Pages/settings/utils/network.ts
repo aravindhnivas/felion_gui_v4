@@ -2,6 +2,11 @@ import { currentPortPID } from '$src/lib/pyserver/felionpyServer'
 import { pyServerPORT } from '$src/lib/pyserver/stores'
 import { serverInfo } from './stores'
 
+const fail = (error) => {
+    serverInfo.error('failed to check network status')
+    serverInfo.error(error)
+    return false
+}
 export const checkNetstat = async () => {
     const args = {
         win32: ['Get-Process', '-Id', `(Get-NetTCPConnection -LocalPort ${get(pyServerPORT)}).OwningProcess`],
@@ -9,11 +14,12 @@ export const checkNetstat = async () => {
     }
 
     const [err, output] = await oO(new shell.Command(`netstat-${await platform()}`, args[await platform()]).execute())
-    if (err) throw err
+    if (err) return fail(err)
 
-    if (output.stderr) throw output.stderr
-
-    serverInfo.warn(output.stdout.trim())
+    if (output.stderr) return fail(output.stderr)
+    serverInfo.warn(output.stdout)
+    serverInfo.warn('network status check done!')
+    return true
 }
 
 export const killPID = async () => {
@@ -32,9 +38,9 @@ export const killPID = async () => {
         if (_err) return window.handleError(_err)
         currentPortPID.update((ports) => ports.filter((p) => p !== port))
         if (output.stderr) {
-            return serverInfo.error(output.stdout.trim())
+            return serverInfo.error(output.stdout)
         }
-        serverInfo.success(output.stdout.trim())
+        serverInfo.success(output.stdout)
     }
     for (const port of fullports) {
         await kill(port)

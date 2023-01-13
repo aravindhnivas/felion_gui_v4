@@ -4,9 +4,12 @@ import { writable } from 'svelte/store'
 export const create_logger_store = (value: OutputBoxtype[]) => {
     const { set, subscribe, update } = writable(value)
     const setVal = (log: string | Object) => {
-        return typeof log === 'string' ? log : JSON.stringify(log, null, 2)
+        return typeof log === 'string' ? log.trim() : JSON.stringify(log, null, 2)
     }
-    const add = (val: OutputBoxtype) => update((output) => [val, ...output])
+    const add = (val: OutputBoxtype) => {
+        if (!val.value) val.value = 'No output returned'
+        update((output) => [val, ...output])
+    }
 
     return {
         set,

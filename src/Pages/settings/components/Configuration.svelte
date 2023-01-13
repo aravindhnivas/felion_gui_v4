@@ -14,44 +14,48 @@
     import { serverInfo } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
-    import { fetchServerROOT } from '../utils/serverConnections'
     import { checkNetstat, killPID } from '../utils/network'
     import { python_asset_ready } from '../utils/stores'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    // import { platform } from '@tauri-apps/api/os'
     import { check_felionpy_assets_status } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
 
     let showServerControls: boolean
-    // let serverInfo: OutputBoxtype[] = []
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
-    const updateServerInfo = async (e?: ButtonClickEvent) => {
-        // await window.sleep(1000) // give time for the server to get ready
-        serverCurrentStatus = { value: 'server starting...', type: 'info' }
-        serverInfo.info('server starting...')
-
-        // const target = e?.target as HTMLButtonElement
-        // const output = await fetchServerROOT({ target })
-        const [err, output] = await oO(checkNetstat())
-
-        if (err) {
-            serverInfo.error(err)
+    const dispatch_server_status = ({ closed }) => {
+        if (closed) {
             serverCurrentStatus = { value: 'server closed', type: 'danger' }
             dispatch('serverStatusChanged', { closed: true })
-            return
+        } else {
+            serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
+            dispatch('serverStatusChanged', { closed: false })
         }
+    }
 
+    const fetchServerROOT = async () => {
         const [_err, rootpage] = await oO(axios.get<{ string }>(`http://localhost:${$pyServerPORT}/`))
-        if (_err) return
+        if (_err) return serverInfo.error(`failed to fetch rootpage /`)
 
         $pyServerReady = true
         serverInfo.success(rootpage.data)
-        serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
-        dispatch('serverStatusChanged', { closed: false })
+        dispatch_server_status({ closed: false })
+    }
+    const updateServerInfo = async (delay = true) => {
+        serverCurrentStatus = { value: 'checking server status...', type: 'info' }
+        serverInfo.info(serverCurrentStatus.value)
+
+        if (delay) await window.sleep(1000) // give time for the server to get ready
+        const status = await checkNetstat()
+
+        if (!status) {
+            dispatch_server_status({ closed: true })
+            return
+        }
+        await fetchServerROOT()
     }
 
     const dispatch = createEventDispatcher()
@@ -162,9 +166,7 @@
                     class="button is-link"
                     class:is-loading={serverCurrentStatus.value.includes('starting')}
                     on:click={async () => {
-                        const [err] = await oO(startServer())
-                        if (err) return
-
+                        await startServer()
                         serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
                         await updateServerInfo()
                         if ($pyServerReady) await getPyVersion()
@@ -181,7 +183,7 @@
                         class="button is-danger"
                         on:click={async () => {
                             await stopServer()
-                            await updateServerInfo()
+                            await updateServerInfo(false)
                         }}
                     >
                         STOPserver
@@ -189,13 +191,14 @@
                 {/if}
             </div>
             <div class="align">
-                <button id="fetchServerROOT" class="button is-link" on:click={updateServerInfo}>fetchServerROOT</button>
+                <button id="fetchServerROOT" class="button is-link" on:click={async () => await fetchServerROOT()}
+                    >fetchServerROOT</button
+                >
                 <button
                     class="button is-link"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
-                        const [err, output] = await oO(checkNetstat())
-                        if (err) serverInfo.error(err)
+                        await checkNetstat()
                         toggle_loading(currentTarget)
                     }}>checkNetstat</button
                 >
