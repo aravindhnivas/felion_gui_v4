@@ -13,8 +13,8 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import { outputbox, downloadURL, downloadoverrideURL } from '../utils/stores'
-    import { download_assets, check_assets_update } from '../utils/download-assets'
+    import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install } from '../utils/stores'
+    import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
 
     const check_for_update = async (log = false) => {
@@ -204,8 +204,19 @@
                     toggle_loading(currentTarget)
                     const [_err] = await oO(download_assets())
                     toggle_loading(currentTarget)
-                }}>Download assets</button
+                }}>Download assets {$python_asset_ready_to_install ? 'again' : ''}</button
             >
+
+            {#if $python_asset_ready_to_install}
+                <button
+                    class="button is-warning"
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
+                        const [_err] = await oO(unZIP(false))
+                        toggle_loading(currentTarget)
+                    }}>Install assets</button
+                >
+            {/if}
         </div>
 
         {#if assets_download_progress}

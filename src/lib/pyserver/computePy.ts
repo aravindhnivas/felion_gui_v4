@@ -1,8 +1,8 @@
 import computefromServer from './computefromServer'
 import computefromSubprocess from './computefromSubprocess'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
-import { startServer } from './felionpyServer'
-import { confirm } from '@tauri-apps/api/dialog'
+// import { startServer } from './felionpyServer'
+// import { confirm } from '@tauri-apps/api/dialog'
 import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 interface Type {
     pyfile: string
@@ -12,16 +12,9 @@ interface Type {
     e?: Event
 }
 
-const restartServer = async () => {
-    const restartPyServer = await confirm('Restart Python server?')
-    if (!restartPyServer) return Promise.resolve(null)
-    await startServer()
-    window.createToast('Python server is ready')
-    return Promise.resolve(true)
-}
-export default async function ({ e, target, pyfile, args, general }: Type) {
+export default async function <T>({ e, target, pyfile, args, general }: Type) {
     target ||= e?.target as HTMLButtonElement
-    let dataFromPython: DataFromPython | string | undefined
+    let dataFromPython: T
     let processDivGeneral
     let processDivGeneralNum = 0
 
@@ -31,7 +24,7 @@ export default async function ({ e, target, pyfile, args, general }: Type) {
                 title: 'Missing assets',
                 type: 'error',
             })
-            return Promise.reject('python assets are missing')
+            return window.handleError('python assets are missing')
         }
 
         console.log(`Running python in ${general ? 'subprocess' : 'server'} mode`)
@@ -56,11 +49,7 @@ export default async function ({ e, target, pyfile, args, general }: Type) {
             })
         } else {
             if (!get(pyServerReady)) {
-                await window.sleep(2000)
-                if (!get(pyServerReady)) {
-                    const ready = await restartServer()
-                    if (!ready) return Promise.resolve(null)
-                }
+                return window.handleError('felionpy server not running')
             }
             dataFromPython = await computefromServer({
                 target,

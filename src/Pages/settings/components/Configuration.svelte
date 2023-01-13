@@ -11,7 +11,7 @@
         serverDebug,
         felionpy,
     } from '$lib/pyserver/stores'
-    import { serverInfo } from '../utils/stores'
+    import { asset_download_required, serverInfo } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
@@ -19,7 +19,11 @@
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    import { check_felionpy_assets_status } from '../utils/assets-status'
+    import {
+        auto_download_and_install_assets,
+        check_felionpy_assets_status,
+        check_whether_asset_update_required,
+    } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
 
@@ -44,6 +48,7 @@
         serverInfo.success(rootpage.data)
         dispatch_server_status({ closed: false })
     }
+
     const updateServerInfo = async () => {
         serverCurrentStatus = { value: 'checking server status...', type: 'info' }
         serverInfo.info(serverCurrentStatus.value)
@@ -54,6 +59,7 @@
             dispatch_server_status({ closed: true })
             return
         }
+
         await fetchServerROOT()
     }
 
@@ -73,6 +79,12 @@
             await startServer()
             await updateServerInfo()
             await getPyVersion()
+            check_whether_asset_update_required()
+
+            if ($asset_download_required) {
+                if (!(await dialog.confirm('python assets download required', { title: 'Download required' }))) return
+                await auto_download_and_install_assets()
+            }
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
@@ -210,6 +222,7 @@
                         }
                     }}
                 />
+
                 <button class="button is-danger" on:click={async () => await killPID()}>killPID</button>
             </div>
         </div>

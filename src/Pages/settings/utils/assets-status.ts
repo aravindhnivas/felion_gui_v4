@@ -1,6 +1,6 @@
-import { downloadoverrideURL, python_asset_ready, outputbox } from './stores'
-import { check_assets_update, download_assets } from './download-assets'
-import { platform } from '@tauri-apps/api/os'
+import { downloadoverrideURL, python_asset_ready, outputbox, asset_download_required } from './stores'
+import { check_assets_update, download_assets, unZIP } from './download-assets'
+import { felionlibVersion } from '$src/lib/pyserver/stores'
 
 export const check_felionpy_assets_status = async () => {
     try {
@@ -13,32 +13,21 @@ export const check_felionpy_assets_status = async () => {
 
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
 
-        downloadoverrideURL.set(false)
-        await check_assets_update()
-        await download_assets()
-
-        python_asset_ready.set(true)
+        await auto_download_and_install_assets()
     } catch (error) {
         outputbox.error(error)
     }
 }
 
-export const check_assets_to_delete = async () => {
-    if (!(await fs.exists(`felionpy-${await platform()}.zip.DELETE`, { dir: fs.BaseDirectory.AppLocalData })))
-        return Promise.resolve('')
+export const check_whether_asset_update_required = () => {
+    if (get(felionlibVersion) >= import.meta.env.VITE_FELIONPY_MIN_VERSION) return
+    asset_download_required.set(true)
+}
 
-    outputbox.info('removing temp files from localdir')
-
-    const [_err] = await oO(
-        fs.removeFile(`felionpy-${await platform()}.zip.DELETE`, {
-            dir: fs.BaseDirectory.AppLocalData,
-        })
-    )
-
-    if (_err) {
-        console.warn('Could not remove temp files')
-        console.error(_err)
-    } else {
-        console.warn('Temp files removed from localdir')
-    }
+export const auto_download_and_install_assets = async () => {
+    downloadoverrideURL.set(false)
+    await check_assets_update()
+    await download_assets()
+    await unZIP(false)
+    python_asset_ready.set(true)
 }

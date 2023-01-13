@@ -17,7 +17,7 @@
     // import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
-    import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
+    // import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
     import { outputbox } from './Pages/settings/utils/stores'
     import { LOGGER } from '$console'
 
@@ -42,7 +42,7 @@
     onMount(async () => {
         const unlisteners = await events_listeners()
         console.log('App mounted')
-        check_assets_to_delete().then(outputbox.info).catch(outputbox.error)
+        // check_assets_to_delete().then(outputbox.info).catch(outputbox.error)
 
         mounted = true
         LOGGER.info('App mounted')
