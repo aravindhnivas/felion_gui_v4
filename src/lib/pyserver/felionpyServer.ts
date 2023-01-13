@@ -25,10 +25,10 @@ export async function startServer() {
             title: 'Missing assets',
             type: 'error',
         })
-        return Promise.reject('python assets are missing')
+        return
     }
 
-    if (get(pyServerReady)) return Promise.reject('server already running')
+    if (get(pyServerReady)) return window.createToast('server already running', 'danger')
 
     if (get(felionlibVersion)) {
         await check_assets_update()
@@ -53,7 +53,7 @@ export async function startServer() {
     const [err, pyChild] = await oO(py.spawn())
     if (err) {
         window.handleError(err)
-        return Promise.reject(err)
+        return
     }
 
     pyChildProcess.set(pyChild)
