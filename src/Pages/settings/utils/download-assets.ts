@@ -2,9 +2,11 @@ import { felionlibVersion } from '$lib/pyserver/stores'
 import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
-import axios from 'axios'
 import { isEmpty, round } from 'lodash-es'
-import { stopServer } from '$src/lib/pyserver/felionpyServer'
+import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+import { footerMsg } from '$src/layout/main/footer_utils/stores'
+
+import axios from 'axios'
 
 let assets_downloading = false
 let assets_version_available = ''
@@ -63,11 +65,28 @@ export async function downloadZIP(filename) {
 
 export function unZIP(filename) {
     return new Promise(async (resolve, reject) => {
+        footerMsg.set({ msg: 'installing assets...', status: 'running' })
+
         if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' }))) {
             return resolve('')
         }
-
         await stopServer()
+        if (
+            await fs.exists('felionpy', {
+                dir: fs.BaseDirectory.AppLocalData,
+            })
+        ) {
+            outputbox.warn('Trying to remove existing felionpy folder')
+
+            const [_err] = await oO(
+                fs.removeDir('felionpy', {
+                    dir: fs.BaseDirectory.AppLocalData,
+                    recursive: true,
+                })
+            )
+            if (_err) return reject(`Could not delete the existing felionpy folder\n ${_err}`)
+        }
+
         const currentplatform = await platform()
         const filepath = await path.appLocalDataDir()
         const zipfile = await path.join(filepath, filename)
@@ -86,16 +105,22 @@ export function unZIP(filename) {
 
         cmd.on('close', async () => {
             if (err) {
+                footerMsg.set({ msg: 'failed to install assets', status: 'done' })
                 outputbox.error('failed to UNZIP')
                 reject('failed to UNZIP')
             } else {
+                footerMsg.set({ msg: 'assets installation completed', status: 'done' })
                 outputbox.success('UNZIP success')
                 resolve('UNZIP success')
+
+                await window.sleep(1000)
+                await fs.removeFile(filename, { dir: fs.BaseDirectory.AppLocalData })
             }
-            outputbox.info('UNZIP closed')
-            await window.sleep(1000)
-            await fs.renameFile(filename, `${filename}.DELETE`, { dir: fs.BaseDirectory.AppLocalData })
+            outputbox.warn('UNZIP process closed')
             python_asset_ready_to_install.set(false)
+
+            await window.sleep(1000)
+            await startServer()
         })
 
         cmd.on('error', (error) => {
@@ -136,19 +161,18 @@ export const check_assets_update = async (toast = false) => {
         outputbox.error('Could not download the assets')
         return Promise.resolve(false)
     }
-
     current_release_data = response.data
     const { tag_name } = response.data
-    // outputbox.warn(response.data)
+
     outputbox.info(`Available version: ${tag_name}`)
     if (get(felionlibVersion)) {
         outputbox.info(`Current version: v${get(felionlibVersion)}`)
     } else {
         outputbox.error('Current version not determined yet.')
     }
-
     assets_version_available = tag_name
-    const assets_download_needed = `v${get(felionlibVersion)}` < tag_name
+    const assets_download_needed = get(felionlibVersion) ? `v${get(felionlibVersion)}` < tag_name : true
+
     if (assets_download_needed) {
         outputbox.warn(`Download required`)
     } else {
@@ -169,9 +193,7 @@ export const download_assets = async () => {
 
         let assets_download_needed: boolean
         if (!assets_version_available) {
-            // outputbox.warn('Check for assets update first.')
-            assets_download_needed = await check_assets_update()
-            // return
+            assets_download_needed = !(await check_assets_update())
         }
 
         if (assets_download_needed) {
@@ -179,7 +201,7 @@ export const download_assets = async () => {
             return
         }
 
-        if (!(await dialog.confirm('Download not required', { title: 'Download anyway' }))) return
+        // if (!(await dialog.confirm('Download not required', { title: 'Download anyway' }))) return
     }
 
     await downloadZIP(asset_name)
