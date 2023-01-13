@@ -170,12 +170,13 @@
 
                 <button
                     class="button is-link"
-                    class:is-loading={serverCurrentStatus.value.includes('starting')}
-                    on:click={async () => {
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
                         await startServer()
                         serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
                         await updateServerInfo()
                         if ($pyServerReady) await getPyVersion()
+                        toggle_loading(currentTarget)
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
                 >
