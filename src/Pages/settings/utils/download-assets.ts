@@ -1,4 +1,4 @@
-import { felionlibVersion } from '$lib/pyserver/stores'
+import { felionlibVersion, pyServerReady } from '$lib/pyserver/stores'
 import {
     outputbox,
     downloadURL,
@@ -84,7 +84,15 @@ export function unZIP(installation_request = true) {
             if (!(await dialog.confirm('Install it now ?', { title: 'Python assets downloaded ready.' })))
                 return resolve('')
         }
-        await stopServer()
+
+        if (get(pyServerReady)) {
+            const stopServerButton = document.getElementById('stopServerButton')
+            if (stopServerButton) {
+                stopServerButton.click()
+            } else {
+                await stopServer()
+            }
+        }
 
         if (await fs.exists(asset_folder)) {
             outputbox.warn('Trying to remove existing felionpy folder')
@@ -121,7 +129,12 @@ export function unZIP(installation_request = true) {
             python_asset_ready_to_install.set(false)
 
             await window.sleep(1000)
-            await startServer()
+            const startServerButton = document.getElementById('startServerButton')
+            if (startServerButton) {
+                startServerButton.click()
+            } else {
+                await startServer()
+            }
         })
 
         cmd.on('error', (error) => {

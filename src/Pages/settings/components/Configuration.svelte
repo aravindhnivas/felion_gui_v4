@@ -170,6 +170,7 @@
 
                 <button
                     class="button is-link"
+                    id="startServerButton"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
                         await startServer()
@@ -188,6 +189,7 @@
                 {#if $pyServerReady && serverCurrentStatus.value.includes('running')}
                     <button
                         class="button is-danger"
+                        id="stopServerButton"
                         on:click={async () => {
                             await stopServer()
                             await updateServerInfo()
