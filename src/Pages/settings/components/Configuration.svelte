@@ -19,11 +19,7 @@
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    import {
-        auto_download_and_install_assets,
-        check_felionpy_assets_status,
-        check_whether_asset_update_required,
-    } from '../utils/assets-status'
+    import { auto_download_and_install_assets, check_felionpy_assets_status } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
 
@@ -79,7 +75,6 @@
             await startServer()
             await updateServerInfo()
             await getPyVersion()
-            check_whether_asset_update_required()
 
             if ($asset_download_required) {
                 if (!(await dialog.confirm('python assets download required', { title: 'Download required' }))) return
