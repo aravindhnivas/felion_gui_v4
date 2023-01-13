@@ -120,7 +120,7 @@
         if (import.meta.env.DEV) return
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-        assetsUpdateIntervalCycle = setInterval(check_assets_update, $updateInterval * 60 * 1000)
+        assetsUpdateIntervalCycle = setInterval(check_assets_update, 60 * 60 * 1000)
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
