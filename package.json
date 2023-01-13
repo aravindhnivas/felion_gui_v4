@@ -4,16 +4,12 @@
   "version": "4.0.8",
   "type": "module",
   "scripts": {
-    "dev": "npm run tauri dev --release",
-    "build": "npm run tauri build ",
+    "dev": "yarn tauri dev",
+    "build": "yarn tauri build ",
     "dev:vite": "vite",
     "build:vite": "vite build",
-    "publish": "tsx .\\scripts\\gh-release.ts",
-    "bpublish": "npm run build && tsx .\\scripts\\gh-release.ts",
-    "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "tauri": "tauri",
-    "buildpy": "tsx .\\scripts\\felionpy-build.ts"
+    "tauri": "tauri"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0"

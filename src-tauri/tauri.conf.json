@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "npm run dev:vite",
-    "beforeBuildCommand": "npm run build:vite",
+    "beforeDevCommand": "yarn dev:vite",
+    "beforeBuildCommand": "yarn build:vite",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
     "withGlobalTauri": true
