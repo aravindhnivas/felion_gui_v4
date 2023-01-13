@@ -8,6 +8,8 @@ const fail = (error) => {
     return false
 }
 export const checkNetstat = async () => {
+    serverInfo.warn('checking server network status...')
+
     const args = {
         win32: ['Get-Process', '-Id', `(Get-NetTCPConnection -LocalPort ${get(pyServerPORT)}).OwningProcess`],
         darwin: ['-i', `:${get(pyServerPORT)}`],

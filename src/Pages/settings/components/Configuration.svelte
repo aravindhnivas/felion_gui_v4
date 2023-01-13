@@ -44,11 +44,10 @@
         serverInfo.success(rootpage.data)
         dispatch_server_status({ closed: false })
     }
-    const updateServerInfo = async (delay = true) => {
+    const updateServerInfo = async () => {
         serverCurrentStatus = { value: 'checking server status...', type: 'info' }
         serverInfo.info(serverCurrentStatus.value)
 
-        if (delay) await window.sleep(1000) // give time for the server to get ready
         const status = await checkNetstat()
 
         if (!status) {
@@ -183,7 +182,7 @@
                         class="button is-danger"
                         on:click={async () => {
                             await stopServer()
-                            await updateServerInfo(false)
+                            await updateServerInfo()
                         }}
                     >
                         STOPserver
