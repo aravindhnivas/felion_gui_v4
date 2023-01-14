@@ -52,4 +52,4 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: v__VERSION__
-          releaseDraft: false
+          releaseDraft: true
