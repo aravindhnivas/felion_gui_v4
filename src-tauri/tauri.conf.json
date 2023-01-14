@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "feliongui",
-    "version": "4.0.12"
+    "version": "4.1.0"
   },
   "tauri": {
     "allowlist": {
