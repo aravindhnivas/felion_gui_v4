@@ -30,6 +30,7 @@
     let OPOcalibFiles = []
 
     const update_opo_files = async (loc: string, files: string[]) => {
+        if(!await(fs.exists(loc))) return
         const dirs = await fs.readDir(loc)
         OPOcalibFiles = dirs.map((f) => f.name).filter((file) => file.endsWith('.calibOPO'))
         opofiles = await Promise.all(files.map(async (file) => await path.resolve(loc, file)))
