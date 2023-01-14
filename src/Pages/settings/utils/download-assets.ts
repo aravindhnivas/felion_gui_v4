@@ -190,8 +190,8 @@ export const check_assets_update = async (toast = false) => {
 
     if (!get(felionlibVersion)) {
         outputbox.error('Current version not determined yet.')
-        outputbox.warn(`Download required`)
-        asset_download_required.set(true)
+        // outputbox.warn(`Download required`)
+        // asset_download_required.set(true)
         return
     }
     outputbox.info(`Current version: v${get(felionlibVersion)}`)
