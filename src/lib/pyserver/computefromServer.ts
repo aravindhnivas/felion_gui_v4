@@ -15,6 +15,7 @@ export default async function ({ pyfile, args, target, general }: Type): Promise
             target?.classList.add('is-loading')
             const filename = pyfile.split('.').at(-1) + '_data.json'
             const outputFile = await path.join(window.tempdirPath, 'com.felion.app', filename)
+            console.warn(await path.dirname(outputFile))
             if (await fs.exists(outputFile)) {
                 const [_err] = await oO(fs.removeFile(outputFile))
                 if (_err) console.error(_err)

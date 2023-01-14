@@ -15,7 +15,8 @@
       "all": true,
       "fs": {
         "scope": [
-          "**"
+          "**",
+          "$APPLOCALDATA/**"
         ]
       },
       "shell": {

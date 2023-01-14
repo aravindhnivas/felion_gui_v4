@@ -78,6 +78,10 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     windowLoaded.set(true)
     bulmaQuickview.attach()
     window.tempdirPath = await tempdir()
+    const tempfiledir = await path.join(window.tempdirPath, 'com.felion.app')
+    if(!await fs.exists(tempfiledir)) {
+        await fs.createDir(tempfiledir)
+    }
 })
 
 window.getID = () => Math.random().toString(32).substring(2)
