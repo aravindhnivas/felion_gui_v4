@@ -18,6 +18,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Cache Rust
+      - uses: actions/cache@v3
+        with:
+          path: ./src-tauri/target
+          key: ${{matrix.platform}}-${{ hashFiles('./src-tauri/Cargo.lock') }}
+
+      # Cache Rust
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cargo
+          key: ${{matrix.platform}}-${{ hashFiles('./src-tauri/Cargo.lock') }}
+
+      # Cache Node
+      - uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{matrix.platform}}-${{ hashFiles('./package-lock.json') }}
+
       - name: Node.js setup
         uses: actions/setup-node@v3
         with:
