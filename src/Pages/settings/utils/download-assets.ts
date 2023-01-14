@@ -180,7 +180,7 @@ export const check_assets_update = async (toast = false) => {
     if (_err1) return outputbox.error(_err1)
 
     if (response.status !== 200) return outputbox.error('Could not download the assets')
-    LOGGER.warn(response.data)
+    // LOGGER.warn(response.data)
     current_release_data = response.data
     assets_version_available = response.data.tag_name
 

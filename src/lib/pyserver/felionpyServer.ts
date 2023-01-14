@@ -66,8 +66,6 @@ export async function startServer() {
         LOGGER.info("Server's stdout: ", stdout)
     })
 
-    await window.sleep(500)
-
     return Promise.resolve('server started')
 }
 

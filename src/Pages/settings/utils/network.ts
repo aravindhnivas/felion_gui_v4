@@ -8,6 +8,7 @@ const fail = (error) => {
     return false
 }
 export const checkNetstat = async () => {
+    
     serverInfo.warn('checking server network status...')
 
     const args = {

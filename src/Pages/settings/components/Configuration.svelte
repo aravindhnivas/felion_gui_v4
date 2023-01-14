@@ -38,6 +38,7 @@
     }
 
     const fetchServerROOT = async () => {
+        await window.sleep(1000)
         const [_err, rootpage] = await oO(axios.get<{ string }>(`http://localhost:${$pyServerPORT}/`))
         if (_err) return serverInfo.error(`failed to fetch rootpage /`)
 
@@ -49,7 +50,7 @@
     const updateServerInfo = async () => {
         serverCurrentStatus = { value: 'checking server status...', type: 'info' }
         serverInfo.info(serverCurrentStatus.value)
-
+        await window.sleep(500)
         const status = await checkNetstat()
 
         if (!status) {
