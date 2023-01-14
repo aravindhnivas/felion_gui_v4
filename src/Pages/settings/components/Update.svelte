@@ -25,6 +25,8 @@
     import { auto_download_and_install_assets } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
+        outputbox.warn('checking for app update')
+        if(assets_download_progress) return outputbox.warn('waiting for assets to complete downloading')
         try {
             if (devMODE) {
                 if (!$allow_to_check_update) {
@@ -68,7 +70,7 @@
 
     let download_progress = 0
     let assets_download_progress = 0
-    let appupdate_downloading = false
+    // let appupdate_downloading = false
     let version_info = ''
 
     const update_footer_download_label = (percent: number) => {
