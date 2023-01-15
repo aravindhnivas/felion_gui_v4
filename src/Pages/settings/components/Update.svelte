@@ -47,7 +47,7 @@
                     title: `Update available ${newVersion}`,
                 })
                 if (install) {
-                    appupdate_downloading = true
+                    // appupdate_downloading = true
                     await stopServer()
                     outputbox.success(
                         `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`
