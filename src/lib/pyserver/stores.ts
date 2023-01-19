@@ -4,7 +4,7 @@ import { writable, get, derived } from 'svelte/store'
 import type { Child } from '@tauri-apps/api/shell'
 export const pythonpath = persistentWritable('pythonpath', 'python')
 export const pythonscript = persistentWritable('pythonscript', '')
-export const felionpy = persistentWritable('felionpy', 'felionpy')
+export const felionpy = writable('felionpy')
 
 export const developerMode = writable(import.meta.env.DEV)
 export const pyProgram = derived([developerMode, pythonpath, felionpy], ([$developerMode, $pythonpath, $felionpy]) => {
