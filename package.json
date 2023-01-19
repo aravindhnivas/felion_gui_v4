@@ -47,6 +47,7 @@
     "lottie-web": "^5.10.1",
     "material-symbols": "^0.4.2",
     "plotly.js-basic-dist": "^2.17.1",
+    "prettier": "^2.8.3",
     "prettier-plugin-svelte": "^2.9.0",
     "regression": "^2.0.1",
     "sass": "^1.57.1",
