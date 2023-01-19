@@ -72,9 +72,8 @@ export async function downloadZIP() {
     }
 }
 export function unZIP(installation_request = true) {
-    if(!get(python_asset_ready_to_install)) return
+    if (!get(python_asset_ready_to_install)) return
     return new Promise(async (resolve, reject) => {
-
         const localdir = await path.appLocalDataDir()
         const asset_folder = await path.join(localdir, asset_name_prefix)
         const asset_name = `${asset_name_prefix}-${await platform()}.zip`
@@ -166,7 +165,7 @@ let no_more_asset_check = false
 
 const get_assets_url = async (toast = false) => {
     const URL = import.meta.env.VITE_FELIONPY_URL
-    if(toast) outputbox.info('checking for assets update...')
+    if (toast) outputbox.info('checking for assets update...')
 
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
     if (_err1) return outputbox.error(_err1)
@@ -181,7 +180,6 @@ const get_assets_url = async (toast = false) => {
 }
 
 export const check_assets_update = async (toast = false) => {
-
     if (get(python_asset_ready_to_install)) {
         if (!no_more_asset_check) return outputbox.warn('assets updates are ready to install')
         no_more_asset_check = true
@@ -192,7 +190,7 @@ export const check_assets_update = async (toast = false) => {
         return
     }
 
-    if(!(await get_assets_url(toast))) return
+    if (!(await get_assets_url(toast))) return
 
     outputbox.info(`Available version: ${assets_version_available}`)
     if (!get(felionlibVersion)) {
@@ -220,16 +218,15 @@ export const download_assets = async () => {
         await downloadZIP()
         return
     }
-    if (!get(python_asset_ready)){
-        if(!(await get_assets_url(true))) return
+    if (!get(python_asset_ready)) {
+        if (!(await get_assets_url(true))) return
         await downloadZIP()
         return
     }
-    
+
     if (!get(python_asset_ready) && !get(asset_download_required)) {
         if (!(await dialog.confirm('continue downloading', { title: 'Download NOT required' }))) return
     }
-    
-    await downloadZIP()
 
+    await downloadZIP()
 }
