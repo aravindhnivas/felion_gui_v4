@@ -13,7 +13,7 @@ import { isEmpty, round } from 'lodash-es'
 import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
 import axios from 'axios'
-import { LOGGER } from '$console'
+// import { LOGGER } from '$console'
 
 let assets_downloading = false
 let assets_version_available = ''
