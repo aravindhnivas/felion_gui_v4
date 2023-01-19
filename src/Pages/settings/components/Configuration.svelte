@@ -132,14 +132,16 @@
                 />
             </div>
         {/if}
-
-        <BrowseTextfield
-            class="three_col_browse"
-            label="felionpy"
-            bind:value={$felionpy}
-            dir={false}
-            lock={$developerMode}
-        />
+        
+        {#if import.meta.env.DEV}
+            <BrowseTextfield
+                class="three_col_browse"
+                label="felionpy"
+                bind:value={$felionpy}
+                dir={false}
+                lock={$developerMode}
+            />
+        {/if}
 
         <button class="button is-link mt-6" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls
