@@ -11,7 +11,7 @@
         serverDebug,
         felionpy,
     } from '$lib/pyserver/stores'
-    import { asset_download_required, serverInfo } from '../utils/stores'
+    import { asset_download_required, python_asset_ready_to_install, serverInfo } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
@@ -78,6 +78,7 @@
             await updateServerInfo()
             await getPyVersion()
 
+            if($python_asset_ready_to_install) return
             await check_assets_update()
             if ($asset_download_required) {
                 await auto_download_and_install_assets({ installation_request: true })

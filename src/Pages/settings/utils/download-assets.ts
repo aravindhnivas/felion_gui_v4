@@ -163,6 +163,7 @@ export function unZIP(installation_request = true) {
 let current_release_data = {}
 let no_more_asset_check = false
 export const check_assets_update = async (toast = false) => {
+    
     if (get(python_asset_ready_to_install)) {
         if (!no_more_asset_check) return outputbox.warn('assets updates are ready to install')
         no_more_asset_check = true
