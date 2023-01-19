@@ -13,6 +13,6 @@ import './scss/changelog.scss'
 
 import './scss/ck-editor.scss'
 import './scss/toast.scss'
-import './scss/gridjs.scss'
+// import './scss/gridjs.scss'
 import './scss/dygraph.scss'
 import '@material/typography/_typography.scss'
