@@ -57,7 +57,6 @@
             dispatch_server_status({ closed: true })
             return
         }
-
         await fetchServerROOT()
     }
 
@@ -65,8 +64,8 @@
 
     onMount(async () => {
         try {
+            
             await check_felionpy_assets_status()
-
             if (import.meta.env.DEV) return
 
             if ($currentPortPID.length > 0) {
@@ -74,6 +73,7 @@
             }
 
             if (!$python_asset_ready) return
+            
             await startServer()
             await updateServerInfo()
             await getPyVersion()

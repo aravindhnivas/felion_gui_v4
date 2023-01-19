@@ -17,13 +17,14 @@ import { path, shell } from '@tauri-apps/api'
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
-    if (!get(developerMode) && !get(python_asset_ready)) {
-        dialog.message('python assets are missing. Download it in Settings -> Update', {
-            title: 'Missing assets',
-            type: 'error',
-        })
-        return
-    }
+    if (!get(python_asset_ready)) return
+    // if (!get(developerMode) && !get(python_asset_ready)) {
+    //     dialog.message('python assets are missing. Download it in Settings -> Update', {
+    //         title: 'Missing assets',
+    //         type: 'error',
+    //     })
+    //     return
+    // }
 
     if (get(pyServerReady)) return window.createToast('server already running', 'danger')
 
