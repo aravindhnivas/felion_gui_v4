@@ -1,6 +1,6 @@
 <script lang="ts">
     import autoAnimate from '@formkit/auto-animate'
-
+    import IconAdd from 'virtual:icons/mdi/add'
     export let prefixId: string = window.getID()
     export let list: { name: string; id: string; active: boolean }[] = []
 
@@ -80,7 +80,7 @@
         {/each}
         <li class="tabs-li">
             <button class="button is-link ml-2" style="border: none" on:click={() => addTab()}>
-                <span class="material-symbols-outlined"> add </span>
+                <IconAdd />
             </button>
         </li>
     </ul>

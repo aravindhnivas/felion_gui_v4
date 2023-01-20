@@ -3,7 +3,14 @@
     import Editor from '$lib/Editor.svelte'
     import { graph_detached } from '$src/js/plot'
     import { resizableDiv } from '$src/js/resizableDiv.js'
-    import { IconButton, BrowseTextfield, Modal, FileBrowser } from '$src/components'
+    import { BrowseTextfield, Modal, FileBrowser } from '$src/components'
+    import IconButton, { Icon } from '@smui/icon-button'
+    import Icon_fullscreen_exit from 'virtual:icons/mdi/fullscreen-exit'
+    import Icon_fullscreen from 'virtual:icons/mdi/fullscreen'
+    import Icon_visibility_off from 'virtual:icons/mdi/visibility-off'
+    import Icon_visibility from 'virtual:icons/mdi/visibility'
+    import IconCached from 'virtual:icons/mdi/cached'
+    import IconBuild from 'virtual:icons/mdi/build'
 
     export let id: string
     export let display = 'none'
@@ -82,15 +89,18 @@
                 <div class="top-row mr-auto"><slot name="toggle_row" /></div>
                 <div class="tag is-link" aria-label="fullscreen" data-cooltipz-dir="bottom">
                     <IconButton
+                        toggle
                         on:click={() => {
                             files_div_toggle = fullscreen_toggle
                             browse_location_div_toggle = fullscreen_toggle
                             button_row_div_toggle = fullscreen_toggle
                             changeGraphDivWidth()
                         }}
-                        bind:value={fullscreen_toggle}
-                        icons={{ on: 'fullscreen_exit', off: 'fullscreen' }}
-                    />
+                        bind:pressed={fullscreen_toggle}
+                    >
+                        <Icon><Icon_fullscreen_exit /></Icon>
+                        <Icon on><Icon_fullscreen /></Icon>
+                    </IconButton>
                 </div>
                 <div
                     role="presentation"
@@ -99,38 +109,37 @@
                     data-cooltipz-dir="bottom"
                     on:click={() => changeGraphDivWidth()}
                 >
-                    <span class="material-symbols-outlined">cached</span>
+                    <IconCached />
                 </div>
                 <div class="tag is-link">
-                    <IconButton
-                        on:change={changeGraphDivWidth}
-                        bind:value={files_div_toggle}
-                        icons={{ on: 'visibility', off: 'visibility_off' }}
-                    />Files
+                    <IconButton toggle bind:pressed={files_div_toggle}>
+                        <Icon><Icon_visibility_off /></Icon>
+                        <Icon on><Icon_visibility /></Icon>
+                    </IconButton>
+                    Files
                 </div>
                 <div class="tag is-link">
-                    <IconButton
-                        bind:value={browse_location_div_toggle}
-                        icons={{ on: 'visibility', off: 'visibility_off' }}
-                    />Location
+                    <IconButton toggle bind:pressed={browse_location_div_toggle}>
+                        <Icon><Icon_visibility_off /></Icon>
+                        <Icon on><Icon_visibility /></Icon>
+                    </IconButton>
+                    Location
                 </div>
                 <div class="tag is-link">
-                    <IconButton
-                        bind:value={button_row_div_toggle}
-                        icons={{ on: 'visibility', off: 'visibility_off' }}
-                    />fx
+                    <IconButton toggle bind:pressed={button_row_div_toggle}>
+                        <Icon><Icon_visibility_off /></Icon>
+                        <Icon on><Icon_visibility /></Icon>
+                    </IconButton>
+                    fx
                 </div>
                 <div class="tag is-link">
-                    <IconButton
-                        bind:value={reports_div_toggle}
-                        icons={{ on: 'visibility', off: 'visibility_off' }}
-                    />Reports
+                    <IconButton toggle bind:pressed={reports_div_toggle}>
+                        <Icon><Icon_visibility_off /></Icon>
+                        <Icon on><Icon_visibility /></Icon>
+                    </IconButton>
+                    Reports
                 </div>
-                <span
-                    role="presentation"
-                    class="material-symbols-outlined"
-                    on:click={() => (activateConfigModal = true)}>build</span
-                >
+                <span role="presentation" on:click={() => (activateConfigModal = true)}><IconBuild /></span>
             </div>
             {#if browse_location_div_toggle}
                 <BrowseTextfield class="three_col_browse" bind:value={currentLocation} label="Current location" />

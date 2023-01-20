@@ -1,9 +1,13 @@
 <script lang="ts">
     import { opoMode, felixopoLocation } from '../../functions/svelteWritables'
-    import { IconSwitch, Table } from '$src/components'
+    import { Table } from '$src/components'
     import { savefile, loadfile } from '../../functions/misc'
     import computePy_func from '$lib/pyserver/computePy'
     import { get_details_func } from '../../functions/get_details'
+
+    import IconButton, { Icon } from '@smui/icon-button'
+    import Icon_arrow_drop_up from 'virtual:icons/mdi/arrow-drop-up'
+    import Icon_arrow_drop_down from 'virtual:icons/mdi/arrow-drop-down'
 
     export let felixfiles: string[]
     export let opofiles: string[]
@@ -39,7 +43,10 @@
 
 <div class="align">
     <button class="button is-link" on:click={(e) => plotData({ e: e })}>Get details</button>
-    <IconSwitch bind:toggler={toggleFileDetailsTable} icons={['arrow_drop_down', 'arrow_drop_up']} />
+    <IconButton toggle bind:pressed={toggleFileDetailsTable}>
+        <Icon><Icon_arrow_drop_down /></Icon>
+        <Icon on><Icon_arrow_drop_up /></Icon>
+    </IconButton>
     <button
         class="button is-link"
         on:click={async () =>

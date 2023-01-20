@@ -1,4 +1,5 @@
 <script lang="ts">
+    import IconRefresh from 'virtual:icons/mdi/refresh'
     export let options: string[] = []
     export let label = ''
     export let value: string[] | string = ''
@@ -57,17 +58,17 @@
         </div>
 
         {#if update}
-            <i
+            <div
                 role="presentation"
-                class="material-symbols-outlined animate__animated animate__faster"
+                class="animate__animated animate__faster"
                 on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
                 on:click={({ currentTarget }) => {
                     currentTarget.classList.add('animate__rotateIn')
                     update?.()
                 }}
             >
-                refresh
-            </i>
+                <IconRefresh />
+            </div>
         {/if}
     </div>
 </div>

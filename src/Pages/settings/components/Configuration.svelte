@@ -23,7 +23,7 @@
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
     import { check_assets_update } from '../utils/download-assets'
-
+    import IconRefresh from 'virtual:icons/mdi/refresh'
     let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
@@ -154,11 +154,10 @@
             <div class="align">
                 <span
                     role="presentation"
-                    class="material-symbols-outlined"
                     on:click={async () => {
                         if ($pyServerReady) return window.createToast('server already running')
                         $pyServerPORT = await invoke('get_tcp_port')
-                    }}>refresh</span
+                    }}><IconRefresh /></span
                 >
 
                 <BrowseTextfield

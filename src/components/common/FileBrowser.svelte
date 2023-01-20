@@ -1,7 +1,16 @@
 <script lang="ts">
     import { slide } from 'svelte/transition'
-    import { Textfield, VirtualCheckList, IconSwitch } from '$src/components'
+    import { Textfield, VirtualCheckList } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
+    import IconButton, { Icon } from '@smui/icon-button'
+    import IconRefresh from 'virtual:icons/mdi/refresh'
+    import Icon_arrow_back from 'virtual:icons/mdi/arrow-back'
+    import IconSearch from 'virtual:icons/mdi/search'
+    import Icon_select_all from 'virtual:icons/mdi/select-all'
+    import Icon_remove_done from 'virtual:icons/mdi/cancel-outline'
+    import Icon_keyboard_arrow_right from 'virtual:icons/mdi/keyboard-arrow-right'
+    import Icon_trending_down from 'virtual:icons/mdi/trending-down'
+    import Icon_trending_up from 'virtual:icons/mdi/trending-up'
 
     export let filetype = '*.*'
     export let markedFile = ''
@@ -112,36 +121,48 @@
 </script>
 
 <div class="top__div px-2">
-    <i role="presentation" class="material-symbols-outlined" on:click={() => changeDirectory('..')}>arrow_back</i>
-    <i
+    <i role="presentation" on:click={() => changeDirectory('..')}>
+        <Icon_arrow_back />
+    </i>
+    <div
         role="presentation"
-        class="material-symbols-outlined animate__animated animate__faster"
+        class="animate__animated animate__faster"
         on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
         on:click={({ currentTarget }) => {
             currentTarget.classList.add('animate__rotateIn')
             keepfiles = true
             refresh = !refresh
-        }}>refresh</i
+        }}
     >
-    <IconSwitch bind:toggler={sortFile} icons={['trending_up', 'trending_down']} />
+        <IconRefresh />
+    </div>
+
+    <IconButton toggle bind:pressed={sortFile}>
+        <Icon><Icon_trending_up /></Icon>
+        <Icon on><Icon_trending_down /></Icon>
+    </IconButton>
+
     <div class="ml-auto">
-        <span
+        <i
             role="presentation"
-            class="material-symbols-outlined"
             on:click={() => {
                 selectAll = !selectAll
                 console.log('selected all files')
                 selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
             }}
         >
-            {selectAll ? 'remove_done' : 'select_all'}
-        </span>
+            {#if selectAll}
+                <Icon_remove_done />
+            {:else}
+                <Icon_select_all />
+            {/if}
+            <!-- {selectAll ? 'remove_done' : 'select_all'} -->
+        </i>
         <i
             role="presentation"
-            class="material-symbols-outlined"
             on:click={() => {
                 searchSurface.setOpen(true)
-            }}>search</i
+            }}><IconSearch /></i
         >
     </div>
     <MenuSurface
@@ -168,7 +189,7 @@
         : 'auto 1fr'}
 >
     <div class="file-dir">
-        <i class="material-symbols-outlined">keyboard_arrow_right</i>
+        <Icon_keyboard_arrow_right />
         <div class="folder_name__div">
             <!-- {#if currentLocation} -->
             <!-- svelte-ignore missing-declaration -->
@@ -217,7 +238,7 @@
                                 on:click={() => changeDirectory(folder.name)}
                                 transition:slide|local
                             >
-                                <i role="presentation" class="material-symbols-outlined">keyboard_arrow_right</i>
+                                <Icon_keyboard_arrow_right />
                                 <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
                             </div>
                         {/each}

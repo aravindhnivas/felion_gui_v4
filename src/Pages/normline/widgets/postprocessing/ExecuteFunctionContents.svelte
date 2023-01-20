@@ -15,6 +15,7 @@
     import { dropRight, sortBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
     import { Switch, TextAndSelectOptsToggler } from '$src/components'
+    import IconSettings from 'virtual:icons/mdi/settings'
     // //////////////////////////////////////////////////////////////////////
 
     export let writeFile: boolean = false
@@ -242,8 +243,7 @@
 {#if toggleFindPeaksRow}
     <div class="align v-baseline">
         <div class="align">
-            <i role="presentation" class="material-symbols-outlined" on:click={() => (modalActivate = true)}>settings</i
-            >
+            <i role="presentation" on:click={() => (modalActivate = true)}><IconSettings /></i>
             <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
             <Switch bind:selected={fitall} label="fit all methods" />
             <button

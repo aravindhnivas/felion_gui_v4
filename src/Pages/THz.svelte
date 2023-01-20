@@ -6,6 +6,7 @@
     import { Textfield, STable, Select, TextSwitch, Checkbox } from '$src/components'
     import THzFitParamsTable from './thz/components/THzFitParamsTable.svelte'
     import Matplotlib from './thz/Matplotlib.svelte'
+    import IconSettings from 'virtual:icons/mdi/settings'
 
     export let id = 'THz'
     export let display = 'grid'
@@ -206,7 +207,7 @@
         </div>
 
         <div class="align" style="justify-content: flex-end;" class:hide={!fit_options_div}>
-            <i role="presentation" class="material-symbols-outlined" on:click={() => (openTable = true)}>settings</i>
+            <i role="presentation" on:click={() => (openTable = true)}><IconSettings /></i>
             <Select bind:value={fitfile} label="fitfile" options={[...fileChecked, 'averaged']} />
             <Select bind:value={fitMethod} label="fit method" options={['gaussian', 'lorentz', 'voigt']} />
             <button

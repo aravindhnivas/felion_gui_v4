@@ -3,7 +3,7 @@
     import { differenceBy, find } from 'lodash-es'
     import { Textfield, Switch, FileReadAndLoad } from '$src/components'
     import default_channels, { get_slider_controller, base_slider_values_str } from './default_channels'
-
+    import IconRefresh from 'virtual:icons/mdi/refresh'
     // import type { loss_channelsType } from 'types/types'
 
     import CustomPanel from '$src/components/Panel.svelte'
@@ -132,7 +132,7 @@
     <div class="align h-center mb-5">
         {#if !rateConstantMode}
             <Textfield bind:value={maxGuess} label="max-guess-value" />
-            <i role="presentation" class="material-symbols-outlined" on:click={updateGuessMaxValues}>refresh</i>
+            <i role="presentation" on:click={updateGuessMaxValues}><IconRefresh /></i>
         {/if}
     </div>
 

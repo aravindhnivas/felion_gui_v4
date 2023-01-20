@@ -22,7 +22,7 @@
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
     import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
     import Accordion from '@smui-extra/accordion'
-
+    import IconSettings from 'virtual:icons/mdi/settings'
     const currentLocation = persistentWritable('kinetics_location', '')
 
     let timestartIndexScan = 0
@@ -507,11 +507,7 @@
     <svelte:fragment slot="footer_content__slot">
         <Select bind:value={selectedFile} label="Filename" options={fileCollections} />
         <button class="button is-link" on:click={async () => await computeParameters()}>compute</button>
-        <i
-            role="presentation"
-            class="material-symbols-outlined"
-            on:click={() => (kinetic_plot_adjust_dialog_active = true)}>settings</i
-        >
+        <i role="presentation" on:click={() => (kinetic_plot_adjust_dialog_active = true)}><IconSettings /></i>
         <ButtonBadge id="kinetic-submit-button" on:click={kineticSimulation} />
     </svelte:fragment>
 </LayoutDiv>

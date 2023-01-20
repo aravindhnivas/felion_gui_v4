@@ -2,11 +2,16 @@ import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
+import Icons from 'unplugin-icons/vite'
 const PACKAGE_ROOT = __dirname
 
 export default defineConfig({
     plugins: [
         svelte(),
+        Icons({
+            compiler: 'svelte',
+            defaultClass: 'icon', // Class names apply to icons
+        }),
         AutoImport({
             imports: [
                 'svelte',
@@ -20,6 +25,14 @@ export default defineConfig({
             ],
             dts: './src/auto-imports.d.ts',
         }),
+        // UnoCSS({
+        //     presets: [
+        //         presetIcons({
+        //             /* options */
+        //         }),
+        //         // ...other presets
+        //     ],
+        // }),
     ],
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

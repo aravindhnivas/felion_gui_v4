@@ -2,6 +2,7 @@
     import { isEmpty, uniqBy } from 'lodash-es'
     import { Textfield, TextAndSelectOptsToggler } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
+    import IconHelp from 'virtual:icons/mdi/help'
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
     export let configDir: string = ''
     export let selectedFile: string = ''
@@ -184,7 +185,7 @@
             <Textfield bind:value={configDir} label="save location" />
         </div>
     </MenuSurface>
-    <span role="presentation" class="material-symbols-outlined" on:click={() => surface.setOpen(true)}> help </span>
+    <span role="presentation" on:click={() => surface.setOpen(true)}> <IconHelp /> </span>
 </div>
 
 <style>

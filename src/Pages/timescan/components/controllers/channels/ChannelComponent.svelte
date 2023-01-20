@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Textfield, Select } from '$src/components'
     import { isUndefined } from 'lodash-es'
-
+    import IconMenu from 'virtual:icons/mdi/menu'
     export let item: Timescan.LossChannel
     export let rateConstantMode = false
     export let ions_lists: string[] = []
@@ -10,7 +10,7 @@
 </script>
 
 <div class="channel_div">
-    <i class="material-symbols-outlined">menu</i>
+    <IconMenu />
     <Select bind:value={item.type} label="type" options={['forwards', 'backwards']} />
     <Textfield bind:value={item.name} label="name" />
     <Select bind:value={item.lossFrom} label="lossFrom" options={['<resp. ion>', ...ions_lists]} />

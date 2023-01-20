@@ -3,6 +3,9 @@
     import { orderBy, uniqBy } from 'lodash-es'
     import IconButton, { Icon } from '@smui/icon-button'
     import { FileReadAndLoad } from '$src/components'
+    import IconClose from 'virtual:icons/mdi/close'
+    import Icon_arrow_upward from 'virtual:icons/mdi/arrow-upward'
+    import Icon_arrow_downward from 'virtual:icons/mdi/arrow-downward'
     export let idKey: string = 'id'
     export let rowKeys: string[]
     export let rows = []
@@ -70,8 +73,8 @@
                                 <span>{key}</span>
                                 {#if sortable}
                                     <IconButton toggle bind:pressed={sortToggle[rowKeys[i]]}>
-                                        <Icon class="material-symbols-outlined">arrow_downward</Icon>
-                                        <Icon class="material-symbols-outlined" on>arrow_upward</Icon>
+                                        <Icon><Icon_arrow_downward /></Icon>
+                                        <Icon on><Icon_arrow_upward /></Icon>
                                     </IconButton>
                                 {/if}
                             </div>
@@ -122,7 +125,7 @@
                                         rows = rows.filter((r) => r[idKey] !== row[idKey])
                                     }}
                                 >
-                                    <span class="material-symbols-outlined">close</span>
+                                    <IconClose />
                                 </button>
                             </Cell>
                         {/if}

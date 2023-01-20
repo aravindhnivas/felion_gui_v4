@@ -7,6 +7,6 @@
 </script>
 
 <button {id} {style} class="button is-{type}" on:click on:pyEvent on:pyEventData on:pyEventStderr on:pyEventClosed>
-    {label}<span class="material-symbols-outlined"> double_arrow </span>
+    {label}
     <Badge><div id="{id}_badge" class="tag is-warning is-rounded mr-2" /></Badge>
 </button>

@@ -7,7 +7,7 @@
     import MenuSurface from '@smui/menu-surface'
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
     import { persistentWritable } from '$src/js/persistentStore'
-
+    import IconSettings from 'virtual:icons/mdi/settings'
     /////////////////////////////////////////////////////////////////////////
     let surface: MenuSurfaceComponentDev
 
@@ -228,9 +228,7 @@
                 >
                     <Textfield bind:value={$depletionplot_figure_kwargs['rows_cols']} label="subplot (rows, cols)" />
                 </MenuSurface>
-                <i role="presentation" class="material-symbols-outlined" on:click={() => surface.setOpen(true)}
-                    >settings</i
-                >
+                <i role="presentation" on:click={() => surface.setOpen(true)}><IconSettings /></i>
             </div>
             <ButtonBadge on:click={(e) => plotData({ e: e, filetype: 'general' })}>Submit</ButtonBadge>
         </div>

@@ -1,6 +1,9 @@
 <script lang="ts">
-    import { Textfield, IconButton } from '$src/components'
-
+    import { Textfield } from '$src/components'
+    import IconButton, { Icon } from '@smui/icon-button'
+    import Icon_unlock from 'virtual:icons/mdi/lock-off'
+    import Icon_lock from 'virtual:icons/mdi/lock'
+    import IconRefresh from 'virtual:icons/mdi/refresh'
     export let value: string | number = ''
     export let label: string = ''
     export let browseBtn: boolean = true
@@ -14,6 +17,7 @@
     let className: string = ''
     export { className as class }
 
+    // console.warn(mdiIcons)
     const dispatch = createEventDispatcher()
     const update = async (e: { currentTarget: HTMLElement }) => {
         e.currentTarget.classList.add('animate__rotateIn')
@@ -47,22 +51,24 @@
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
     <Textfield disabled={lock ?? false} bind:value {label} {type} />
-
     {#if updateMode !== null}
-        <i
+        <div
             role="presentation"
-            class="material-symbols-outlined animate__animated animate__faster"
+            class="animate__animated animate__faster"
             on:animationend={({ currentTarget }) => {
                 currentTarget.classList.remove('animate__rotateIn')
             }}
             on:click={update}
         >
-            refresh
-        </i>
+            <IconRefresh />
+        </div>
     {/if}
 
     {#if lock !== null}
-        <IconButton bind:value={lock} icons={{ on: 'lock', off: 'lock_open' }} />
+        <IconButton toggle bind:pressed={lock}>
+            <Icon><Icon_unlock /></Icon>
+            <Icon on><Icon_lock /></Icon>
+        </IconButton>
     {/if}
     <slot />
 </div>

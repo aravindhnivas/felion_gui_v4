@@ -17,6 +17,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
     "@formkit/auto-animate": "^1.0.0-beta.5",
+    "@iconify/json": "^2.2.9",
     "@octokit/rest": "^19.0.5",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
@@ -62,7 +63,10 @@
     "tslib": "^2.4.1",
     "tsx": "^3.12.2",
     "typescript": "^4.9.4",
+    "unocss": "^0.48.4",
     "unplugin-auto-import": "^0.12.1",
+    "unplugin-icons": "^0.15.1",
+    "unplugin-svelte-components": "^0.2.5",
     "vite": "^4.0.4",
     "winbox": "^0.2.6",
     "yaml": "^2.2.1"

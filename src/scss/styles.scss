@@ -16,7 +16,9 @@ table td:not([align]) {text-align: center; padding: 1em;}
 .averagedTable td { color: $white; }
 .tableContainer {border: 1px solid $primaryColor; width:100%; padding-right: 1em;}
 .tableContainer thead {background-color: #e1e1e1;}
-
+.icon {
+    cursor: pointer;
+}
 .align {
     display: flex; 
     justify-content: flex-start;

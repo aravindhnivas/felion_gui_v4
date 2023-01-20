@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Checkbox, Modal, ButtonBadge, VirtualCheckList } from '$src/components'
-
+    import IconRefresh from 'virtual:icons/mdi/refresh'
     export let active = false
     export let currentLocation = ''
 
@@ -50,7 +50,7 @@
 <Modal bind:active title="THz plots">
     <svelte:fragment slot="body_header__div">
         <div class="align">
-            <span role="presentation" class="material-symbols-outlined" on:click={loadfiles}>refresh</span>
+            <span role="presentation" on:click={loadfiles}><IconRefresh /></span>
             <span class="tag is-{loadStatus.type}">{loadStatus.name}</span>
         </div>
     </svelte:fragment>

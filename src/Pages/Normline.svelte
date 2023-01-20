@@ -197,7 +197,7 @@
             data-cooltipz-dir="bottom"
             on:click={() => demo_plot()}
         >
-            <span class="material-symbols-outlined"> insights </span>
+            show graph
         </div>
     </svelte:fragment>
 

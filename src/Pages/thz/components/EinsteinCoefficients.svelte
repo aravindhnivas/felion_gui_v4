@@ -13,7 +13,7 @@
     import { tick } from 'svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTable, formatNumber } from '../functions/utils'
-
+    import IconSync from 'virtual:icons/mdi/sync-problem'
     export let lorrentz = 0.32
     export let gaussian = 0.21
     export let power: string | number = '2e-5'
@@ -205,7 +205,7 @@
     <div class="align h-center ">
         <button class="button is-link" class:is-loading={computing_lineshape} on:click={computeEinsteinB}>
             {#if $einsteinCoefficientB.length < 1}
-                <i class="material-symbols-outlined">sync_problem</i>
+                <IconSync class="mr-3" />
             {/if}
             Compute Einstein B
         </button>
@@ -236,7 +236,7 @@
             <Textfield bind:value={voigtline} label="voigt lineshape (Hz)" />
             <button class="button is-link " on:click={computeRates}>
                 {#if !einsteinB_rateComputed}
-                    <i class="material-symbols-outlined">sync_problem</i>
+                    <IconSync class="mr-3" />
                 {/if}
                 Compute rate constants
             </button>
