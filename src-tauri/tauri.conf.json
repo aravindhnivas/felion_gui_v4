@@ -78,18 +78,16 @@
           },
           {
             "name": "unzip-win32",
-            "cmd": "powershell",
+            "cmd": "tar",
             "args": [
-              "Expand-Archive",
-              "-Path",
+              "-xf",
               {
                 "validator": "\\S+"
               },
-              "-DestinationPath",
+              "-C",
               {
                 "validator": "\\S+"
-              },
-              "-Force"
+              }
             ]
           },
           {
