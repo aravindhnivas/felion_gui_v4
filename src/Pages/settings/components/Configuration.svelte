@@ -43,6 +43,7 @@
         if (_err) return serverInfo.error(`failed to fetch rootpage /`)
 
         $pyServerReady = true
+
         serverInfo.success(rootpage.data)
         dispatch_server_status({ closed: false })
     }
@@ -50,13 +51,15 @@
     const updateServerInfo = async () => {
         serverCurrentStatus = { value: 'checking server status...', type: 'info' }
         serverInfo.info(serverCurrentStatus.value)
-        await window.sleep(500)
-        const status = await checkNetstat()
 
+        await window.sleep(500)
+
+        const status = await checkNetstat()
         if (!status) {
             dispatch_server_status({ closed: true })
             return
         }
+
         await fetchServerROOT()
     }
 
@@ -64,21 +67,19 @@
 
     onMount(async () => {
         try {
-            
-            await check_felionpy_assets_status()
-            if (import.meta.env.DEV) return
-
-            if ($currentPortPID.length > 0) {
+            if (import.meta.env.PROD && $currentPortPID.length > 0) {
                 await killPID()
             }
+            await check_felionpy_assets_status()
 
+            if (import.meta.env.DEV) return
             if (!$python_asset_ready) return
-            
+
             await startServer()
             await updateServerInfo()
             await getPyVersion()
 
-            if($python_asset_ready_to_install) return
+            if ($python_asset_ready_to_install) return
             await check_assets_update()
             if ($asset_download_required) {
                 await auto_download_and_install_assets({ installation_request: true })
@@ -132,7 +133,7 @@
                 />
             </div>
         {/if}
-        
+
         {#if import.meta.env.DEV}
             <BrowseTextfield
                 class="three_col_browse"
