@@ -1,10 +1,11 @@
-import { downloadoverrideURL, python_asset_ready, outputbox } from './stores'
-import { check_assets_update, download_assets, unZIP } from './download-assets'
+import { downloadoverrideURL, python_asset_ready, outputbox, python_asset_ready_to_install } from './stores'
+import { download_assets, unZIP } from './download-assets'
+import { asset_name_prefix } from './download-assets'
 
 export const check_felionpy_assets_status = async () => {
     try {
         python_asset_ready.set(false)
-        if (await fs.exists('felionpy', { dir: fs.BaseDirectory.AppLocalData })) {
+        if (await fs.exists(asset_name_prefix, { dir: fs.BaseDirectory.AppLocalData })) {
             python_asset_ready.set(true)
             return
         }
@@ -19,8 +20,13 @@ export const check_felionpy_assets_status = async () => {
 
 export const auto_download_and_install_assets = async ({ installation_request = false } = {}) => {
     downloadoverrideURL.set(false)
-    // await check_assets_update()
-    await download_assets()
+    outputbox.warn('Starting auto download python assets')
+    if (!(await fs.exists(`${asset_name_prefix}-${await platform()}.zip`, { dir: fs.BaseDirectory.AppLocalData }))) {
+        await download_assets()
+    } else {
+        outputbox.warn('assets already downloaded')
+        python_asset_ready_to_install.set(true)
+    }
     await unZIP(installation_request)
     python_asset_ready.set(true)
 }

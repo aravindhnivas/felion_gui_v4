@@ -19,7 +19,18 @@ import axios from 'axios'
 let assets_downloading = false
 let assets_version_available = ''
 
-const asset_name_prefix = 'felionpy'
+export const asset_name_prefix = 'felionpy'
+
+export const remove_asset_folder = async () => {
+    const asset_folder = await path.join(await path.appLocalDataDir(), asset_name_prefix)
+    if (await fs.exists(asset_folder)) {
+        outputbox.warn('Trying to remove existing felionpy folder')
+        const [err] = await oO(fs.removeDir(asset_folder, { recursive: true }))
+        if (err) return Promise.reject(`Could not delete the existing felionpy folder\n ${JSON.stringify(err)}`)
+
+        return Promise.resolve(asset_folder + ' folder deleted')
+    }
+}
 
 export async function downloadZIP() {
     try {
@@ -72,12 +83,13 @@ export async function downloadZIP() {
         assets_downloading = false
     }
 }
+
 export function unZIP(installation_request = true) {
     if (!get(python_asset_ready_to_install)) return
 
     return new Promise(async (resolve, reject) => {
         const localdir = await path.appLocalDataDir()
-        const asset_folder = await path.join(localdir, asset_name_prefix)
+        // const asset_folder = await path.join(localdir, asset_name_prefix)
         const asset_name = `${asset_name_prefix}-${await platform()}.zip`
         const asset_zipfile = await path.join(localdir, asset_name)
 
@@ -99,11 +111,7 @@ export function unZIP(installation_request = true) {
             }
         }
 
-        if (await fs.exists(asset_folder)) {
-            outputbox.warn('Trying to remove existing felionpy folder')
-            const [err] = await oO(fs.removeDir(asset_folder, { recursive: true }))
-            if (err) return reject(`Could not delete the existing felionpy folder\n ${JSON.stringify(err)}`)
-        }
+        await remove_asset_folder()
 
         const args = {
             // win32: ['Expand-Archive', '-Path', asset_zipfile, '-DestinationPath', `${localdir}`, '-Force'],
