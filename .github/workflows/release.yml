@@ -54,7 +54,7 @@ jobs:
         with:
           cond: ${{ matrix.platform == 'macos-latest' }}
           if_true: --target universal-apple-darwin
-          if_false: false
+          if_false: ""
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0.3
