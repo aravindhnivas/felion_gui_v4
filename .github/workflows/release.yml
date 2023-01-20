@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         # platform: [macos-latest, ubuntu-20.04, windows-latest]
-        # platform: [macos-latest, ubuntu-latest, windows-latest]
-        platform: [macos-latest]
+        # platform: [macos-latest]
+        platform: [macos-latest, ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -59,16 +59,4 @@ jobs:
           tagName: v__VERSION__
           releaseName: v__VERSION__
           releaseDraft: true
-      
-      - name: Build the app (Apple silicon)
-        if: matrix.platform == 'macos-latest'
-        uses: tauri-apps/tauri-action@v0.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-        with:
-          tagName: v__VERSION__
-          releaseName: v__VERSION__
-          releaseDraft: true
-          args: --target aarch64-apple-darwin
+          args: --target universal-apple-darwin
