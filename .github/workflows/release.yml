@@ -49,6 +49,13 @@ jobs:
       - name: Install app dependencies from lockfile
         run: yarn install --frozen-lockfile
 
+      - uses: haya14busa/action-cond@v1
+        id: condval
+        with:
+          cond: ${{ matrix.platform == 'macos-latest' }}
+          if_true: --target universal-apple-darwin
+          if_false: false
+
       - name: Build the app
         uses: tauri-apps/tauri-action@v0.3
         env:
@@ -59,4 +66,5 @@ jobs:
           tagName: v__VERSION__
           releaseName: v__VERSION__
           releaseDraft: true
-          args: --target universal-apple-darwin
+          if: matrix.platform == 'ubuntu-latest'
+          args: "${{ steps.condval.outputs.value }}" 
