@@ -6,6 +6,7 @@ import {
     python_asset_ready_to_install,
     asset_download_required,
     python_asset_ready,
+    installing_python_assets,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
@@ -73,6 +74,7 @@ export async function downloadZIP() {
 }
 export function unZIP(installation_request = true) {
     if (!get(python_asset_ready_to_install)) return
+
     return new Promise(async (resolve, reject) => {
         const localdir = await path.appLocalDataDir()
         const asset_folder = await path.join(localdir, asset_name_prefix)
@@ -115,6 +117,7 @@ export function unZIP(installation_request = true) {
         let err: string
         const child = await cmd.spawn()
 
+        installing_python_assets.set(true)
         outputbox.info(`unzip PID: ${child.pid}`)
 
         cmd.on('close', async () => {
@@ -126,10 +129,11 @@ export function unZIP(installation_request = true) {
                 footerMsg.set({ msg: 'assets installation completed', status: 'done' })
                 outputbox.success('UNZIP success')
                 resolve('UNZIP success')
-
                 await window.sleep(1000)
                 await fs.removeFile(asset_name, { dir: fs.BaseDirectory.AppLocalData })
             }
+            installing_python_assets.set(false)
+
             outputbox.warn('UNZIP process closed')
             python_asset_ready_to_install.set(false)
 

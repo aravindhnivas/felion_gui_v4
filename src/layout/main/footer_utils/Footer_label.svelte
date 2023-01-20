@@ -1,6 +1,10 @@
 <script lang="ts">
     import { pyServerReady } from '$lib/pyserver/stores'
-    import { python_asset_ready, python_asset_ready_to_install } from '$src/Pages/settings/utils/stores'
+    import {
+        python_asset_ready,
+        python_asset_ready_to_install,
+        installing_python_assets,
+    } from '$src/Pages/settings/utils/stores'
     import { activePage } from '$src/sveltewritables'
 </script>
 
@@ -31,7 +35,7 @@
         </div>
     {/if}
 
-    {#if $python_asset_ready_to_install}
+    {#if $python_asset_ready_to_install && !$installing_python_assets}
         <div
             role="presentation"
             class="tag is-warning"
