@@ -9,7 +9,6 @@ export const check_felionpy_assets_status = async () => {
             python_asset_ready.set(true)
             return
         }
-
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
 
         await auto_download_and_install_assets()
@@ -21,12 +20,14 @@ export const check_felionpy_assets_status = async () => {
 export const auto_download_and_install_assets = async ({ installation_request = false } = {}) => {
     downloadoverrideURL.set(false)
     outputbox.warn('Starting auto download python assets')
+
     if (!(await fs.exists(`${asset_name_prefix}-${await platform()}.zip`, { dir: fs.BaseDirectory.AppLocalData }))) {
         await download_assets()
     } else {
         outputbox.warn('assets already downloaded')
         python_asset_ready_to_install.set(true)
     }
+
     await unZIP(installation_request)
     python_asset_ready.set(true)
 }
