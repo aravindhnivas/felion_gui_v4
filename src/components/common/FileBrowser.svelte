@@ -117,12 +117,10 @@
     }
 
     $: fileSelected = fileChecked
-    $: selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
     let refresh = false
 </script>
 
 <div class="top__div p-0 mb-3 tag">
-    <!-- <div class="mr-auto"> -->
     <IconButton on:click={() => changeDirectory('..')}>
         <Icon><Icon_arrow_back /></Icon>
     </IconButton>
@@ -140,18 +138,20 @@
         <Icon><Icon_trending_up /></Icon>
         <Icon on><Icon_trending_down /></Icon>
     </IconButton>
-    <!-- </div> -->
 
-    <!-- <div class="ml-auto"> -->
-    <IconButton toggle bind:pressed={selectAll} on:change={(e) => console.log(e)}>
+    <IconButton
+        toggle
+        bind:pressed={selectAll}
+        on:MDCIconButtonToggle:change={() => {
+            selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
+        }}
+    >
         <Icon><Icon_select_all /></Icon>
         <Icon on><Icon_remove_done /></Icon>
     </IconButton>
-
     <IconButton on:click={() => searchSurface.setOpen(true)}>
         <Icon><IconSearch /></Icon>
     </IconButton>
-    <!-- </div> -->
 
     <MenuSurface
         style="background: var(--background-color);"
