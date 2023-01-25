@@ -53,7 +53,7 @@
     })
 </script>
 
-<div class="tabs is-toggle m-1 grid">
+<div class="tabs is-toggle my-1 grid">
     <ul class="tabs-ul" use:autoAnimate bind:this={ul}>
         {#each list as item, index (item.id)}
             {@const border = !item.active && index > 0 && index !== list.length ? 'solid 1px darkgrey' : 'none'}
@@ -85,7 +85,9 @@
         </li>
     </ul>
     {#if list.length > 1}
-        <button class="tag is-small ml-auto button is-danger" style="border: none" on:click={closeAllTabs}> X </button>
+        <button class="tag is-small ml-auto mr-2 button is-danger" style="border: none" on:click={closeAllTabs}>
+            X
+        </button>
     {/if}
 </div>
 
@@ -94,7 +96,7 @@
         background-color: var(--color-primary-light);
         display: grid;
         grid-template-columns: 1fr auto;
-        width: calc(100vw - 5px);
+        // width: calc(100vw - 5px);
         align-items: center;
         gap: 2em;
         min-width: 0;

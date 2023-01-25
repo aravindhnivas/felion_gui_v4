@@ -102,14 +102,10 @@
                         <Icon on><Icon_fullscreen /></Icon>
                     </IconButton>
                 </div>
-                <div
-                    role="presentation"
-                    class="tag is-link"
-                    aria-label="update plot width"
-                    data-cooltipz-dir="bottom"
-                    on:click={() => changeGraphDivWidth()}
-                >
-                    <IconCached />
+                <div class="tag is-link" aria-label="update plot width" data-cooltipz-dir="bottom">
+                    <IconButton on:click={() => changeGraphDivWidth()}>
+                        <Icon><IconCached /></Icon>
+                    </IconButton>
                 </div>
                 <div class="tag is-link">
                     <IconButton toggle bind:pressed={files_div_toggle}>
@@ -218,7 +214,8 @@
             display: grid;
             grid-template-rows: auto 1fr;
             width: 100%;
-            max-width: 300px;
+            min-width: 300px;
+            max-width: 500px;
         }
 
         .left_container__div,

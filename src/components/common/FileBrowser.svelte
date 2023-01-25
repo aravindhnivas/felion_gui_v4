@@ -30,7 +30,7 @@
     const saveLocationToDB = getContext('saveLocationToDB')
     let searchKey = ''
     const searchfile = () => {
-        console.log(searchKey)
+        // console.log(searchKey)
         if (!searchKey) {
             fullfiles = original_files
         } else {
@@ -95,7 +95,7 @@
         } else {
             fullfiles = fullfiles.sort((a, b) => (a.name < b.name ? 1 : -1))
         }
-        // console.log(fileChecked)
+        // console.log(fullfiles)
         // fileSelected = fileChecked
     }
     $: sort_files(sortFile)
@@ -117,54 +117,42 @@
     }
 
     $: fileSelected = fileChecked
+    $: selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
     let refresh = false
 </script>
 
-<div class="top__div px-2">
-    <i role="presentation" on:click={() => changeDirectory('..')}>
-        <Icon_arrow_back />
-    </i>
-    <div
-        role="presentation"
-        class="animate__animated animate__faster"
-        on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
+<div class="top__div p-0 mb-3 tag">
+    <!-- <div class="mr-auto"> -->
+    <IconButton on:click={() => changeDirectory('..')}>
+        <Icon><Icon_arrow_back /></Icon>
+    </IconButton>
+    <IconButton
         on:click={({ currentTarget }) => {
             currentTarget.classList.add('animate__rotateIn')
             keepfiles = true
             refresh = !refresh
         }}
     >
-        <IconRefresh />
-    </div>
+        <Icon><IconRefresh /></Icon>
+    </IconButton>
 
     <IconButton toggle bind:pressed={sortFile}>
         <Icon><Icon_trending_up /></Icon>
         <Icon on><Icon_trending_down /></Icon>
     </IconButton>
+    <!-- </div> -->
 
-    <div class="ml-auto">
-        <i
-            role="presentation"
-            on:click={() => {
-                selectAll = !selectAll
-                console.log('selected all files')
-                selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
-            }}
-        >
-            {#if selectAll}
-                <Icon_remove_done />
-            {:else}
-                <Icon_select_all />
-            {/if}
-            <!-- {selectAll ? 'remove_done' : 'select_all'} -->
-        </i>
-        <i
-            role="presentation"
-            on:click={() => {
-                searchSurface.setOpen(true)
-            }}><IconSearch /></i
-        >
-    </div>
+    <!-- <div class="ml-auto"> -->
+    <IconButton toggle bind:pressed={selectAll} on:change={(e) => console.log(e)}>
+        <Icon><Icon_select_all /></Icon>
+        <Icon on><Icon_remove_done /></Icon>
+    </IconButton>
+
+    <IconButton on:click={() => searchSurface.setOpen(true)}>
+        <Icon><IconSearch /></Icon>
+    </IconButton>
+    <!-- </div> -->
+
     <MenuSurface
         style="background: var(--background-color);"
         bind:this={searchSurface}
@@ -191,14 +179,11 @@
     <div class="file-dir">
         <Icon_keyboard_arrow_right />
         <div class="folder_name__div">
-            <!-- {#if currentLocation} -->
-            <!-- svelte-ignore missing-declaration -->
             {#await path.basename(currentLocation) then name}
                 <div>{name}</div>
             {:catch _}
                 <div>undefined</div>
             {/await}
-            <!-- {/if} -->
             {#if searchKey}
                 <div class="tag is-small is-warning">{searchKey}</div>
                 <button
@@ -206,6 +191,7 @@
                     on:click={() => {
                         searchKey = ''
                         searchfile()
+                        refresh != refresh
                     }}>X</button
                 >
             {/if}
@@ -251,13 +237,11 @@
     {/key}
 </div>
 
-<style>
-    .top__div {
+<style lang="scss">
+    div.top__div {
         display: flex;
-        align-items: center;
-        background-color: #634e96;
-        border-radius: 1em;
-        margin-bottom: 1em;
+        gap: 0.2em;
+        height: 3em;
     }
     .main__container {
         width: 100%;
