@@ -38,14 +38,6 @@ export default defineConfig({
             ],
             dts: './src/auto-imports.d.ts',
         }),
-        // UnoCSS({
-        //     presets: [
-        //         presetIcons({
-        //             /* options */
-        //         }),
-        //         // ...other presets
-        //     ],
-        // }),
     ],
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
