@@ -3,10 +3,25 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Icons from 'unplugin-icons/vite'
+import UnoCSS from 'unocss/vite'
+import { presetAttributify, presetUno } from 'unocss'
+import presetIcons from '@unocss/preset-icons'
 const PACKAGE_ROOT = __dirname
 
 export default defineConfig({
     plugins: [
+        UnoCSS({
+            presets: [
+                presetIcons({
+                    /* options */
+                }),
+                presetAttributify({
+                    /* preset options */
+                }),
+                presetUno(),
+                // ...custom presets
+            ],
+        }),
         svelte(),
         Icons({
             compiler: 'svelte',
@@ -70,7 +85,6 @@ export default defineConfig({
         alias: {
             $src: join(PACKAGE_ROOT, 'src'),
             $lib: join(PACKAGE_ROOT, 'src/lib'),
-            $console: join(PACKAGE_ROOT, 'src/Pages/settings/components/Console.svelte'),
         },
     },
 })

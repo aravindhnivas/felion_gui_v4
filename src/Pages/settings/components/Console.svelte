@@ -1,9 +1,5 @@
-<script context="module">
-    import { create_logger_store } from '../utils/stores'
-    export const LOGGER = create_logger_store([])
-</script>
-
-<script>
+<script lang="ts">
+    import { LOGGER } from '../utils/stores'
     import { currentTab } from '$lib/pyserver/stores'
     import { OutputBox } from '$src/components/'
 </script>

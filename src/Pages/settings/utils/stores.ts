@@ -35,3 +35,4 @@ export const downloadURL = persistentWritable(
     'download_URL_test',
     'https://github.com/aravindhnivas/felionpy/archive/refs/tags/v0.0.11.zip'
 )
+export const LOGGER = create_logger_store([])

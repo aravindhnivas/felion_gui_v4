@@ -38,7 +38,7 @@ export default async function ({
 
         if (!general) {
             const filename = pyfile.split('.').at(-1) + '_data.json'
-            const outputFile = await path.join(window.tempdirPath, 'com.felion.app', filename)
+            const outputFile = await path.join(window.tempdirPath, filename)
             if (fs.exists(outputFile)) {
                 const [_err] = await oO(fs.removeFile(outputFile))
                 if (_err) console.error(_err)

@@ -18,8 +18,8 @@
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
     // import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
-    import { outputbox } from './Pages/settings/utils/stores'
-    import { LOGGER } from '$console'
+    // import { outputbox } from './Pages/settings/utils/stores'
+    import { LOGGER } from '$src/Pages/settings/utils/stores'
 
     console.warn({ LOGGER })
     LOGGER.info('App starting')

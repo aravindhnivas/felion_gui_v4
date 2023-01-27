@@ -8,7 +8,7 @@ import {
     pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
-import { LOGGER } from '$console'
+import { LOGGER } from '$src/Pages/settings/utils/stores'
 import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 
 import { persistentWritable } from '$src/js/persistentStore'

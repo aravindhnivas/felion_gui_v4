@@ -19,7 +19,6 @@
     "paths": {
       "$src/*": ["./src/*"],
       "$lib/*": ["./src/lib/*"],
-      "$console": ["./src/Pages/settings/components/Console.svelte"],
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "types/**/*.d.ts",],
