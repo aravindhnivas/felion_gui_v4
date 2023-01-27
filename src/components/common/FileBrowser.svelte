@@ -111,33 +111,37 @@
     let refresh = false
 </script>
 
-<div class="top__div p-0 mb-3 tag">
-    <button class="i-mdi-arrow-back text-2xl" on:click={() => changeDirectory('..')} />
-    <button
-        class="animate__animated animate__faster i-mdi-refresh text-2xl"
-        on:click={({ currentTarget }) => {
-            currentTarget.classList.add('animate__rotateIn')
-            keepfiles = true
-            refresh = !refresh
-        }}
-        on:animationend={({ currentTarget }) => {
-            currentTarget.classList.remove('animate__rotateIn')
-        }}
-    />
-    <button
-        class="{sortFile ? 'i-mdi-trending-up' : 'i-mdi-trending-down'} text-2xl"
-        on:click={() => (sortFile = !sortFile)}
-    />
+<div class="top__div px-1 mb-3 box">
+    <div class="mr-auto">
+        <button class="i-mdi-arrow-back text-2xl" on:click={() => changeDirectory('..')} />
+        <button
+            class="animate__animated animate__faster i-mdi-refresh text-2xl"
+            on:click={({ currentTarget }) => {
+                currentTarget.classList.add('animate__rotateIn')
+                keepfiles = true
+                refresh = !refresh
+            }}
+            on:animationend={({ currentTarget }) => {
+                currentTarget.classList.remove('animate__rotateIn')
+            }}
+        />
+        <button
+            class="{sortFile ? 'i-mdi-trending-up' : 'i-mdi-trending-down'} text-2xl"
+            on:click={() => (sortFile = !sortFile)}
+        />
+    </div>
 
-    <button
-        class="{selectAll ? 'i-mdi-cancel-outline' : 'i-mdi-select-all'} text-2xl"
-        on:click={() => {
-            selectAll = !selectAll
-            selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
-        }}
-    />
+    <div class="ml-auto">
+        <button
+            class="{selectAll ? 'i-mdi-cancel-outline' : 'i-mdi-select-all'} text-2xl"
+            on:click={() => {
+                selectAll = !selectAll
+                selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
+            }}
+        />
 
-    <button class="i-mdi-search text-2xl" on:click={() => searchSurface.setOpen(true)} />
+        <button class="i-mdi-search text-2xl" on:click={() => searchSurface.setOpen(true)} />
+    </div>
 
     <MenuSurface
         style="background: var(--background-color);"
@@ -228,6 +232,7 @@
         display: flex;
         gap: 0.2em;
         height: 3em;
+        align-items: center;
     }
     .main__container {
         width: 100%;
