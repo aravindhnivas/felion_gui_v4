@@ -3,9 +3,6 @@
     import { excitedFrom, excitedTo } from '../stores/common'
     import Panel from '$src/components/Panel.svelte'
     import Select from '$src/components/Select.svelte'
-    import IconButton, { Icon } from '@smui/icon-button'
-    import Icon_unlock from 'virtual:icons/mdi/lock-off'
-    import Icon_lock from 'virtual:icons/mdi/lock'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import { Textfield } from '$src/components'
     import type WinBox from 'winbox'
@@ -82,10 +79,11 @@
         >
             Show Boltzmann distribution
         </button>
-        <IconButton toggle bind:pressed={lock_energylevels}>
-            <Icon><Icon_unlock /></Icon>
-            <Icon on><Icon_lock /></Icon>
-        </IconButton>
+
+        <button
+            class="{lock_energylevels ? 'i-mdi-lock' : 'i-mdi-lock-open-outline'} text-2xl"
+            on:click={() => (lock_energylevels = !lock_energylevels)}
+        />
     </div>
 
     <div class="align h-center">

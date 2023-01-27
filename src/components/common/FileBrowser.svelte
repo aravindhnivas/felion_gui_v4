@@ -2,15 +2,6 @@
     import { slide } from 'svelte/transition'
     import { Textfield, VirtualCheckList } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
-    import IconButton, { Icon } from '@smui/icon-button'
-    import IconRefresh from 'virtual:icons/mdi/refresh'
-    import Icon_arrow_back from 'virtual:icons/mdi/arrow-back'
-    import IconSearch from 'virtual:icons/mdi/search'
-    import Icon_select_all from 'virtual:icons/mdi/select-all'
-    import Icon_remove_done from 'virtual:icons/mdi/cancel-outline'
-    import Icon_keyboard_arrow_right from 'virtual:icons/mdi/keyboard-arrow-right'
-    import Icon_trending_down from 'virtual:icons/mdi/trending-down'
-    import Icon_trending_up from 'virtual:icons/mdi/trending-up'
 
     export let filetype = '*.*'
     export let markedFile = ''
@@ -121,37 +112,32 @@
 </script>
 
 <div class="top__div p-0 mb-3 tag">
-    <IconButton on:click={() => changeDirectory('..')}>
-        <Icon><Icon_arrow_back /></Icon>
-    </IconButton>
-    <IconButton
+    <button class="i-mdi-arrow-back text-2xl" on:click={() => changeDirectory('..')} />
+    <button
+        class="animate__animated animate__faster i-mdi-refresh text-2xl"
         on:click={({ currentTarget }) => {
             currentTarget.classList.add('animate__rotateIn')
             keepfiles = true
             refresh = !refresh
         }}
-    >
-        <Icon><IconRefresh /></Icon>
-    </IconButton>
+        on:animationend={({ currentTarget }) => {
+            currentTarget.classList.remove('animate__rotateIn')
+        }}
+    />
+    <button
+        class="{sortFile ? 'i-mdi-trending-up' : 'i-mdi-trending-down'} text-2xl"
+        on:click={() => (sortFile = !sortFile)}
+    />
 
-    <IconButton toggle bind:pressed={sortFile}>
-        <Icon><Icon_trending_up /></Icon>
-        <Icon on><Icon_trending_down /></Icon>
-    </IconButton>
-
-    <IconButton
-        toggle
-        bind:pressed={selectAll}
-        on:MDCIconButtonToggle:change={() => {
+    <button
+        class="{selectAll ? 'i-mdi-cancel-outline' : 'i-mdi-select-all'} text-2xl"
+        on:click={() => {
+            selectAll = !selectAll
             selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
         }}
-    >
-        <Icon><Icon_select_all /></Icon>
-        <Icon on><Icon_remove_done /></Icon>
-    </IconButton>
-    <IconButton on:click={() => searchSurface.setOpen(true)}>
-        <Icon><IconSearch /></Icon>
-    </IconButton>
+    />
+
+    <button class="i-mdi-search text-2xl" on:click={() => searchSurface.setOpen(true)} />
 
     <MenuSurface
         style="background: var(--background-color);"
@@ -177,7 +163,7 @@
         : 'auto 1fr'}
 >
     <div class="file-dir">
-        <Icon_keyboard_arrow_right />
+        <div class="i-mdi-keyboard-arrow-right" />
         <div class="folder_name__div">
             {#await path.basename(currentLocation) then name}
                 <div>{name}</div>
@@ -224,7 +210,7 @@
                                 on:click={() => changeDirectory(folder.name)}
                                 transition:slide|local
                             >
-                                <Icon_keyboard_arrow_right />
+                                <div class="i-mdi-keyboard-arrow-right" />
                                 <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
                             </div>
                         {/each}

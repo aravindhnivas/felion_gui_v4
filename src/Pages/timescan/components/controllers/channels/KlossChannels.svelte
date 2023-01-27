@@ -3,15 +3,11 @@
     import { differenceBy, find } from 'lodash-es'
     import { Textfield, Switch, FileReadAndLoad } from '$src/components'
     import default_channels, { get_slider_controller, base_slider_values_str } from './default_channels'
-    import IconRefresh from 'virtual:icons/mdi/refresh'
-    // import type { loss_channelsType } from 'types/types'
-
     import CustomPanel from '$src/components/Panel.svelte'
 
     export let loss_channels: Timescan.LossChannel[] = []
     export let nameOfReactants = ''
     export let rateConstantMode = false
-
     export let configDir: string = ''
     export let useTaggedFile: boolean = false
     export let useParamsFile: boolean = false
@@ -132,7 +128,7 @@
     <div class="align h-center mb-5">
         {#if !rateConstantMode}
             <Textfield bind:value={maxGuess} label="max-guess-value" />
-            <i role="presentation" on:click={updateGuessMaxValues}><IconRefresh /></i>
+            <button class="i-mdi-refresh text-2xl" on:click={() => updateGuessMaxValues()} />
         {/if}
     </div>
 

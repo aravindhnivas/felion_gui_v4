@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
-import Icons from 'unplugin-icons/vite'
 import UnoCSS from 'unocss/vite'
 import { presetAttributify, presetUno } from 'unocss'
 import presetIcons from '@unocss/preset-icons'
@@ -13,7 +12,10 @@ export default defineConfig({
         UnoCSS({
             presets: [
                 presetIcons({
-                    /* options */
+                    scale: 1.2,
+                    extraProperties: {
+                        cursor: 'pointer',
+                    },
                 }),
                 presetAttributify({
                     /* preset options */
@@ -23,10 +25,6 @@ export default defineConfig({
             ],
         }),
         svelte(),
-        Icons({
-            compiler: 'svelte',
-            defaultClass: 'icon', // Class names apply to icons
-        }),
         AutoImport({
             imports: [
                 'svelte',

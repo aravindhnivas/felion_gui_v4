@@ -17,7 +17,6 @@
     import Panel from '$src/components/Panel.svelte'
     import Clipboard from 'svelte-clipboard'
     import { makeTableRow, makeTable, formatNumber } from '../functions/utils'
-    import Icon_fullscreen from 'virtual:icons/mdi/fullscreen'
 
     export let collisionalFilename = ''
     export let moleculeName = ''
@@ -175,9 +174,8 @@
             >
 
             <button class="button is-link " on:click={compteCollisionalBalanceConstants}>Compute balance rate</button>
-
             <button class="button is-link flex" on:click={() => (activate_collisional_simulation_window = true)}>
-                <span>Simulate Collisional Cooling</span><Icon_fullscreen />
+                Simulate Collisional Cooling
             </button>
 
             <Clipboard

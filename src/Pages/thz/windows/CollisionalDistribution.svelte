@@ -9,8 +9,6 @@
     import { persistentWritable } from '$src/js/persistentStore'
     import { plt_styles } from '$src/js/constants'
     import { save_data_to_file, replaceMathFormats } from '../functions/utils'
-    import IconRefresh from 'virtual:icons/mdi/refresh'
-
     import type WinBox from 'winbox'
 
     export let active: boolean = false
@@ -272,9 +270,8 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot" let:changeGraphDivWidth>
-        <span role="presentation" on:click={() => changeGraphDivWidth()}>
-            <IconRefresh />
-        </span>
+        <button class="i-mdi-refresh text-2xl" on:click={() => changeGraphDivWidth()} />
+
         <div class="graph__container p-3">
             <div id={plotID} class="graph__div" />
             <div id="{plotID}_collisionalBoltzman" class="graph__div" />

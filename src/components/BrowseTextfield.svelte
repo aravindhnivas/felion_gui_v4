@@ -1,9 +1,6 @@
 <script lang="ts">
     import { Textfield } from '$src/components'
     import IconButton, { Icon } from '@smui/icon-button'
-    import Icon_unlock from 'virtual:icons/mdi/lock-off'
-    import Icon_lock from 'virtual:icons/mdi/lock'
-    import IconRefresh from 'virtual:icons/mdi/refresh'
     export let value: string | number = ''
     export let label: string = ''
     export let browseBtn: boolean = true
@@ -60,14 +57,14 @@
             }}
             on:click={update}
         >
-            <IconRefresh />
+            <div class="i-mdi-refresh" />
         </div>
     {/if}
 
     {#if lock !== null}
         <IconButton toggle bind:pressed={lock}>
-            <Icon><Icon_unlock /></Icon>
-            <Icon on><Icon_lock /></Icon>
+            <Icon><div class="i-mdi-lock-open-outline" /></Icon>
+            <Icon on><div class="i-mdi-lock" /></Icon>
         </IconButton>
     {/if}
     <slot />

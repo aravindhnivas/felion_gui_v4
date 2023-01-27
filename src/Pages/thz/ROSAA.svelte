@@ -48,7 +48,6 @@
     import { persistentWritable } from '$src/js/persistentStore'
     import { setID, correctObjValue } from '$src/js/utils'
     import VariableSelector from './components/header/VariableSelector.svelte'
-    import Icon_fullscreen from 'virtual:icons/mdi/fullscreen'
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let [mainParameters, simulationParameters, dopplerLineshape, powerBroadening]: Coefficients[] = Array(4).fill([])
@@ -407,9 +406,7 @@
                 <Select options={plt_styles} bind:value={$plot_style} label="plot style" />
                 <Select options={variablesList} bind:value={variable} label="variable" />
                 <button class="button is-link" on:click={resetConfig}>Reset Config</button>
-                <button class="button is-warning flex" on:click={() => (toggle_modal = !toggle_modal)}
-                    ><span>Full-Screen</span><Icon_fullscreen /></button
-                >
+                <button class="i-mdi-open-in-new text-2xl" on:click={() => (toggle_modal = !toggle_modal)} />
             </div>
             <VariableSelector
                 {variable}

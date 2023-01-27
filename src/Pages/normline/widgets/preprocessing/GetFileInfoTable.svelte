@@ -5,10 +5,6 @@
     import computePy_func from '$lib/pyserver/computePy'
     import { get_details_func } from '../../functions/get_details'
 
-    import IconButton, { Icon } from '@smui/icon-button'
-    import Icon_arrow_drop_up from 'virtual:icons/mdi/arrow-drop-up'
-    import Icon_arrow_drop_down from 'virtual:icons/mdi/arrow-drop-down'
-
     export let felixfiles: string[]
     export let opofiles: string[]
     export let normMethod: string
@@ -43,10 +39,10 @@
 
 <div class="align">
     <button class="button is-link" on:click={(e) => plotData({ e: e })}>Get details</button>
-    <IconButton toggle bind:pressed={toggleFileDetailsTable}>
-        <Icon><Icon_arrow_drop_down /></Icon>
-        <Icon on><Icon_arrow_drop_up /></Icon>
-    </IconButton>
+    <button
+        class="{toggleFileDetailsTable ? 'i-mdi-arrow-drop-up' : 'i-mdi-arrow-drop-down'} text-2xl mr-2"
+        on:click={() => (toggleFileDetailsTable = !toggleFileDetailsTable)}
+    />
     <button
         class="button is-link"
         on:click={async () =>

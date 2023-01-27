@@ -2,7 +2,6 @@
     import { showConfirm } from '$src/lib/alert/store'
     import { BrowseTextfield, Switch, TextAndSelectOptsToggler } from '$src/components'
     import WinBox from 'winbox/src/js/winbox.js'
-    import Icon_zoom_out_map from 'virtual:icons/mdi/open-in-new'
 
     export let id = window.getID()
     export let location = ''
@@ -152,7 +151,7 @@
             {showReport ? 'hideReport' : 'showReport'}
         </div>
         {#if reportWindowClosed}
-            <i role="presentation" on:click={openReport}><Icon_zoom_out_map /></i>
+            <button class="i-mdi-open-in-new text-2xl" on:click={openReport} />
         {/if}
     </div>
 

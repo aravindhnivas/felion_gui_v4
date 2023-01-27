@@ -1,5 +1,4 @@
 <script lang="ts">
-    import IconRefresh from 'virtual:icons/mdi/refresh'
     export let options: string[] = []
     export let label = ''
     export let value: string[] | string = ''
@@ -67,7 +66,7 @@
                     update?.()
                 }}
             >
-                <IconRefresh />
+                <div class="i-mdi-refresh" />
             </div>
         {/if}
     </div>

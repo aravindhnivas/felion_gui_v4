@@ -1,11 +1,7 @@
 <script lang="ts">
     import DataTable, { Head, Body, Row, Cell } from '@smui/data-table'
     import { orderBy, uniqBy } from 'lodash-es'
-    import IconButton, { Icon } from '@smui/icon-button'
     import { FileReadAndLoad } from '$src/components'
-    import IconClose from 'virtual:icons/mdi/close'
-    import Icon_arrow_upward from 'virtual:icons/mdi/arrow-upward'
-    import Icon_arrow_downward from 'virtual:icons/mdi/arrow-downward'
     export let idKey: string = 'id'
     export let rowKeys: string[]
     export let rows = []
@@ -72,10 +68,12 @@
                             <div class="header_cell has-background-link">
                                 <span>{key}</span>
                                 {#if sortable}
-                                    <IconButton toggle bind:pressed={sortToggle[rowKeys[i]]}>
-                                        <Icon><Icon_arrow_downward /></Icon>
-                                        <Icon on><Icon_arrow_upward /></Icon>
-                                    </IconButton>
+                                    <button
+                                        class="{sortToggle[rowKeys[i]]
+                                            ? 'i-mdi-arrow-upward'
+                                            : 'i-mdi-arrow-downward'} text-2xl"
+                                        on:click={() => (sortToggle[rowKeys[i]] = !sortToggle[rowKeys[i]])}
+                                    />
                                 {/if}
                             </div>
                         </Cell>
@@ -119,14 +117,11 @@
                         {#if closeableRows}
                             <Cell>
                                 <button
-                                    style="background-color: var(--color-danger);"
-                                    class="button is-danger"
+                                    class="i-mdi-close text-2xl bg-red"
                                     on:click={() => {
                                         rows = rows.filter((r) => r[idKey] !== row[idKey])
                                     }}
-                                >
-                                    <IconClose />
-                                </button>
+                                />
                             </Cell>
                         {/if}
                     </Row>

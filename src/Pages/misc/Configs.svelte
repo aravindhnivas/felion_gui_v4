@@ -1,7 +1,5 @@
 <script lang="ts">
     import { Textfield } from '$src/components';
-    import IconClose from 'virtual:icons/mdi/close'
-    import IconBackup from 'virtual:icons/mdi/backup'
     let CONFIGS = {}
     const update_list = () => {
         const len = localStorage.length
@@ -28,21 +26,24 @@
                             window.createToast('Saved', 'success')
                         }
                     }} />
-                    <span role="presentation" on:click={()=>{
+
+                    <button
+                        class="i-mdi-backup text-2xl"
+                        on:click={() => {
                             window.localStorage.setItem(label, CONFIGS[label])
                             update_list()
                             window.createToast('Saved', 'success')
-                        }}>
-                        <IconBackup />
-                    </span>
+                        }}
+                    />
                     
-                    <span role="presentation" 
+                    <button
+                        class="i-mdi-close bg-red text-2xl"
                         on:click={() => {
                             window.localStorage.removeItem(label)
                             update_list()
                             window.createToast(`${label} deleted`, 'danger')
                         }}
-                        ><IconClose /></span>
+                    />
                 </div>
                 {:else}
                 <h1>No data</h1>
