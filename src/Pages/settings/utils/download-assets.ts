@@ -192,13 +192,11 @@ const get_assets_url = async (toast = false) => {
 }
 
 export const check_assets_update = async (toast = false) => {
+    if (!window.navigator.onLine) return
+
     if (get(python_asset_ready_to_install)) {
         if (!no_more_asset_check) return outputbox.warn('assets updates are ready to install')
         no_more_asset_check = true
-        return
-    }
-    if (!window.navigator.onLine) {
-        if (toast) outputbox.warn('No internet connection')
         return
     }
 
@@ -226,6 +224,11 @@ export const check_assets_update = async (toast = false) => {
 }
 
 export const download_assets = async () => {
+    if (!window.navigator.onLine) {
+        outputbox.warn('No internet connection')
+        return
+    }
+
     if (get(downloadoverrideURL)) {
         await downloadZIP()
         return

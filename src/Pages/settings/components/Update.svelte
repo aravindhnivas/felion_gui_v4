@@ -25,8 +25,9 @@
     import { auto_download_and_install_assets } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
+        if (!window.navigator.onLine) return
         outputbox.warn('checking for app update')
-        if(assets_download_progress) return outputbox.warn('waiting for assets to complete downloading')
+        if (assets_download_progress) return outputbox.warn('waiting for assets to complete downloading')
         try {
             if (devMODE) {
                 if (!$allow_to_check_update) {
@@ -47,7 +48,6 @@
                     title: `Update available ${newVersion}`,
                 })
                 if (install) {
-                    // appupdate_downloading = true
                     await stopServer()
                     outputbox.success(
                         `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`
@@ -130,7 +130,9 @@
         check_for_update()
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
         assetsUpdateIntervalCycle = setInterval(async () => {
+            if (!window.navigator.onLine) return
             if ($python_asset_ready_to_install) return
+
             await check_assets_update()
             if ($asset_download_required) {
                 await auto_download_and_install_assets({ installation_request: true })
@@ -157,6 +159,7 @@
                     class:is-warning={updateReadyToInstall}
                     id="updateCheckBtn"
                     on:click={async () => {
+                        if (!window.navigator.onLine) return outputbox.warn('No internet connection')
                         await check_for_update(true)
                     }}
                 >
@@ -206,6 +209,7 @@
                 id="btn-check-asset-update"
                 class="button is-link"
                 on:click={async ({ currentTarget }) => {
+                    if (!window.navigator.onLine) return outputbox.warn('No internet connection')
                     toggle_loading(currentTarget)
                     const [_err] = await oO(check_assets_update(true))
                     toggle_loading(currentTarget)
@@ -215,6 +219,7 @@
                 id="btn-download-asset"
                 class="button is-link"
                 on:click={async ({ currentTarget }) => {
+                    if (!window.navigator.onLine) return outputbox.warn('No internet connection')
                     assets_download_progress = 0
                     toggle_loading(currentTarget)
                     const [_err] = await oO(download_assets())
