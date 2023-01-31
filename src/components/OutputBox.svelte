@@ -1,4 +1,6 @@
 <script lang="ts">
+    import VirtualList from '@sveltejs/svelte-virtual-list'
+
     export let output: OutputBoxtype[] = []
     export let heading: string = ''
     export let style: string = ''
@@ -17,12 +19,13 @@
                 <button
                     class="button is-link ml-auto"
                     on:click={(e) => {
+                        console.log('adding to output')
                         const value = 'Testing\nNew line\n\tTabbed line'
                         if (e.ctrlKey) {
                             output = [...Array(5).fill({ value, type: 'warning' }), ...output]
-                            console.log(output)
                         }
                         output = [{ value, type: 'warning' }, ...output]
+                        console.log(output)
                     }}>Test</button
                 >
             {/if}
@@ -39,13 +42,12 @@
     <hr style="width: 100%;" />
 
     <div class="console-box">
-        {#each output as info}
-            {#if info.value}
-                {#each info.value.split('\n') as item}
-                    <span class="has-text-{info.type}" style="width: 100%;">>> {item}</span>
-                {/each}
-            {/if}
-        {/each}
+        <VirtualList height="100vh" width="100%" items={output} let:item>
+            {#each item.value.split('\n') as val}
+                <span class="has-text-{item.type}" style="width: 100%;">>> {val}</span>
+                <br />
+            {/each}
+        </VirtualList>
     </div>
 </div>
 
