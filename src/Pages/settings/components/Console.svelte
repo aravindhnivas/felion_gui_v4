@@ -5,8 +5,6 @@
 </script>
 
 <div id="console-log-main" class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'Console'}>
-    <h1>Console</h1>
-    <hr style="width: 100%;" />
     <OutputBox output={$LOGGER} heading="console logs" testMode={true} />
 </div>
 
