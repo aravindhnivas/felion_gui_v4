@@ -17,11 +17,12 @@
                 <button
                     class="button is-link ml-auto"
                     on:click={(e) => {
+                        const value = 'Testing\nNew line\n\tTabbed line'
                         if (e.ctrlKey) {
-                            output = [...Array(5).fill({ value: 'Testing', type: 'warning' }), ...output]
-                            return
+                            output = [...Array(5).fill({ value, type: 'warning' }), ...output]
+                            console.log(output)
                         }
-                        output = [{ value: 'Testing', type: 'warning' }, ...output]
+                        output = [{ value, type: 'warning' }, ...output]
                     }}>Test</button
                 >
             {/if}
@@ -40,7 +41,9 @@
     <div class="console-box">
         {#each output as info}
             {#if info.value}
-                <span class="has-text-{info.type}" style="width: 100%;">>> {info.value}</span>
+                {#each info.value.split('\n') as item}
+                    <span class="has-text-{info.type}" style="width: 100%;">>> {item}</span>
+                {/each}
             {/if}
         {/each}
     </div>
