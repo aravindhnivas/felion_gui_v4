@@ -51,4 +51,5 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: v__VERSION__
-          releaseDraft: true
+          releaseDraft: false
+          prerelease: false
