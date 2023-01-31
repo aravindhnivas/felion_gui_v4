@@ -80,13 +80,13 @@
                 <div class="top-row mr-auto"><slot name="toggle_row" /></div>
                 <div class="tag is-link" aria-label="fullscreen" data-cooltipz-dir="bottom">
                     <button
-                        class="{fullscreen_toggle ? 'i-mdi-fullscreen' : 'i-mdi-fullscreen-exit'} text-2xl"
+                        class="{fullscreen_toggle ? 'i-mdi-fullscreen-exit' : 'i-mdi-fullscreen'} text-2xl"
                         on:click={async () => {
-                            fullscreen_toggle = !fullscreen_toggle
                             files_div_toggle = fullscreen_toggle
                             browse_location_div_toggle = fullscreen_toggle
                             button_row_div_toggle = fullscreen_toggle
                             await changeGraphDivWidth()
+                            fullscreen_toggle = !fullscreen_toggle
                         }}
                     />
                 </div>

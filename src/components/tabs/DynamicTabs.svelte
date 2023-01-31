@@ -77,7 +77,7 @@
                 </a>
             </li>
         {/each}
-        <li class="tabs-li">
+        <li class="tabs-li ml-3 border-1 hover:border-solid hover:bg-violet-500">
             <button class="i-mdi-add text-2xl" on:click={() => addTab()} />
         </li>
     </ul>
