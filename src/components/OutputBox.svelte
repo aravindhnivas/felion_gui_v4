@@ -16,9 +16,13 @@
             {#if testMode}
                 <button
                     class="button is-link ml-auto"
-                    on:click={() => {
+                    on:click={(e) => {
+                        if (e.ctrlKey) {
+                            output = [...Array(5).fill({ value: 'Testing', type: 'warning' }), ...output]
+                            return
+                        }
                         output = [{ value: 'Testing', type: 'warning' }, ...output]
-                    }}>Add</button
+                    }}>Test</button
                 >
             {/if}
 
@@ -34,7 +38,7 @@
     <hr style="width: 100%;" />
 
     <div class="console-box">
-        {#each output as info (info)}
+        {#each output as info}
             {#if info.value}
                 <span class="has-text-{info.type}" style="width: 100%;">>> {info.value}</span>
             {/if}
