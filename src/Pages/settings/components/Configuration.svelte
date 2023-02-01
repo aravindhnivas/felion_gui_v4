@@ -22,7 +22,7 @@
     import { auto_download_and_install_assets, check_felionpy_assets_status } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
-    import { check_assets_update } from '../utils/download-assets'
+
     let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
@@ -79,7 +79,6 @@
             await getPyVersion()
 
             if ($python_asset_ready_to_install) return
-            await check_assets_update()
             if ($asset_download_required) {
                 await auto_download_and_install_assets({ installation_request: true })
             }
