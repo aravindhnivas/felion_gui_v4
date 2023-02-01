@@ -8,7 +8,7 @@
     import { numberDensity, collisionalTemp, configLoaded } from '../stores/common'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import { Textfield } from '$src/components'
-    import { find, cloneDeep, isEmpty } from 'lodash-es'
+    import { find, isEmpty } from 'lodash-es'
     import { tick } from 'svelte'
 
     import balance_distribution from '../functions/balance_distribution'
