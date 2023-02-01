@@ -125,19 +125,21 @@
         }
         console.warn('Update destroyed')
     })
+
     onMount(async () => {
         if (import.meta.env.DEV) return
-        check_for_update()
-        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+
+        await check_assets_update()
         assetsUpdateIntervalCycle = setInterval(async () => {
             if (!window.navigator.onLine) return
             if ($python_asset_ready_to_install) return
-
             await check_assets_update()
             if ($asset_download_required) {
                 await auto_download_and_install_assets({ installation_request: true })
             }
         }, 60 * 60 * 1000)
+        await check_for_update()
+        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
