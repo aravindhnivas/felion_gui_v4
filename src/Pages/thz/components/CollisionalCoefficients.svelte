@@ -58,7 +58,8 @@
     }
 
     $: if ($collisionalRateConstants.length > 0 && $numberDensity) {
-        $collisionalRates = cloneDeep($collisionalRateConstants).map(computeRate)
+        // $collisionalRates = $collisionalRateConstants.map(computeRate)
+        $collisionalRates = structuredClone($collisionalRateConstants).map(computeRate)
     }
 
     let OpenRateConstantsPlot = false

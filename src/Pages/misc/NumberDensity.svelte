@@ -1,9 +1,6 @@
 <script lang="ts">
     import { Textfield, Switch } from '$src/components';
     import computePy_func from '$lib/pyserver/computePy'
-    import { cloneDeep } from 'lodash-es';
-
-    // let args = {};
     
     const set_config = (config) => {
         ;({trap_temperature, background_pressure, added_pressure, calibration_factor, srgMode, tube_diameter} = config)
@@ -95,8 +92,8 @@
         numberDensity = {nHe: datafromPython.nHe, nHe_transpiration: datafromPython.nHe_transpiration}
         ;({X, F} = datafromPython)
         dispatch_current_numberdensity()
-        if(get_data) return Promise.resolve(cloneDeep({...args, ...datafromPython }))
-        return Promise.resolve(dispatch_current_numberdensity(cloneDeep({...args, ...datafromPython })))
+        if(get_data) return Promise.resolve(structuredClone({...args, ...datafromPython }))
+        return Promise.resolve(dispatch_current_numberdensity(structuredClone({...args, ...datafromPython })))
     }
 
 

@@ -67,7 +67,7 @@
             })
 
             $einsteinCoefficientB = [...einsteinCoefficientB_emission, ...einsteinCoefficientB_absorption]
-            $einsteinCoefficientB_rateConstant = cloneDeep($einsteinCoefficientB)
+            $einsteinCoefficientB_rateConstant = structuredClone($einsteinCoefficientB)
             console.log({ $einsteinCoefficientB, $einsteinCoefficientB_rateConstant })
             await computeRates()
         } catch (error) {

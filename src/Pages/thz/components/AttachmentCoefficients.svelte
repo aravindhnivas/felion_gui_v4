@@ -1,7 +1,6 @@
 <script lang="ts">
     import { numberDensity } from '../stores/common'
     import { Textfield, TextSwitch, Panel } from '$src/components'
-    import { cloneDeep } from 'lodash-es'
 
     export let attachmentCoefficients: ValueLabel[] = []
     export let k3: AttachmentRate = { constant: [], rate: [] }
@@ -9,13 +8,13 @@
 
     const computeAttachmentRate = async () => {
         await tick()
-        k3.rate = cloneDeep(k3.constant).map((rate) => ({
+        k3.rate = structuredClone(k3.constant).map((rate) => ({
             ...rate,
             value: Number(Number(rate.value) * Number($numberDensity) ** 2).toFixed(3),
             id: window.getID(),
         }))
 
-        kCID.rate = cloneDeep(kCID.constant).map((rate) => ({
+        kCID.rate = structuredClone(kCID.constant).map((rate) => ({
             ...rate,
             value: Number(+rate.value * +$numberDensity).toFixed(3),
             id: window.getID(),

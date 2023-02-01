@@ -2,7 +2,6 @@
     import { Textfield, Switch, Select, ButtonBadge } from '$src/components'
     import Layout from '$src/layout/pages/Layout.svelte'
     import { plot } from '../js/functions'
-    import { cloneDeep } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
     import MenuSurface from '@smui/menu-surface'
     import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
@@ -57,7 +56,7 @@
     let timescanData = {}
 
     function sliceData(modifyData) {
-        const reduceData = cloneDeep(modifyData)
+        const reduceData = structuredClone(modifyData)
 
         Object.keys(reduceData).forEach((data) => {
             Object.keys(reduceData[data]).forEach((innerData) => {
@@ -69,7 +68,7 @@
             })
         })
 
-        return cloneDeep(reduceData)
+        return structuredClone(reduceData)
     }
 
     async function plotData({ e = null, filetype = 'scan', tkplot = 'run' } = {}) {

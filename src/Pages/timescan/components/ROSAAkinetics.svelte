@@ -1,7 +1,6 @@
 <script lang="ts">
     import { persistentWritable } from '$src/js/persistentStore'
     import { onMount } from 'svelte'
-    import { cloneDeep } from 'lodash-es'
     import {
         Textfield,
         TextSwitch,
@@ -56,7 +55,7 @@
     let currentDataBackup: Timescan.Data
 
     const sliceSUM = () => {
-        const newData: Timescan.PlotData = cloneDeep(currentDataBackup).SUM
+        const newData: Timescan.PlotData = structuredClone(currentDataBackup).SUM
         currentData.SUM.x = newData.x.slice(timestartIndexScan)
         currentData.SUM.y = newData.y.slice(timestartIndexScan)
         currentData['SUM']['error_y']['array'] = newData['error_y']['array'].slice(timestartIndexScan)
@@ -67,7 +66,7 @@
         if (!selectedFile.endsWith('.scan')) return
 
         totalMassKey.forEach(({ mass }) => {
-            const newData: Timescan.PlotData = cloneDeep(currentDataBackup)[mass]
+            const newData: Timescan.PlotData = structuredClone(currentDataBackup)[mass]
             if (!newData) return window.createToast(`${mass} not found`, 'danger', { target: 'left' })
             newData.x = newData.x.slice(timestartIndexScan)
             newData.y = newData.y.slice(timestartIndexScan)
@@ -110,7 +109,7 @@
             return
         }
 
-        currentDataBackup = cloneDeep(currentData)
+        currentDataBackup = structuredClone(currentData)
         console.log({ currentData })
         const totalMass = Object.keys(currentData).filter((m) => m !== 'SUM')
         totalMassKey = totalMass.map((m) => ({
