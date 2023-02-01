@@ -21,6 +21,8 @@ Go to the project directory
   cd my-project
 ```
 
+Follow Tauri prerequisite [here](https://tauri.app/v1/guides/getting-started/prerequisites/)
+
 Install dependencies
 
 ```bash
@@ -48,12 +50,6 @@ This project is used by the following Instruments:
 ## Authors
 
 - [A. N. Marimuthu](https://www.github.com/aravindhnivas)
-
-## 🚀 About Me
-
-I'm a PhD student investigating vibrational and rotational transitions of cold molecular ion in cryogenic ion trap such as FELion instrument.
-
-Avid user of python for solving scientific problems with GUI using web-technologies.
 
 ## License
 
