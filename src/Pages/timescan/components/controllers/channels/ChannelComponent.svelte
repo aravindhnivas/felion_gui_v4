@@ -8,7 +8,7 @@
 </script>
 
 <div class="channel_div">
-    <button class="i-mdi-menu text-2xl" />
+    <button class="i-mdi-menu text-2xl" style="cursor: move;" />
     <Select bind:value={item.type} label="type" options={['forwards', 'backwards']} />
     <Textfield bind:value={item.name} label="name" />
     <Select bind:value={item.lossFrom} label="lossFrom" options={['<resp. ion>', ...ions_lists]} />
@@ -37,8 +37,5 @@
         justify-content: space-evenly;
         align-items: flex-end;
         gap: 1em;
-    }
-    i {
-        cursor: move;
     }
 </style>
