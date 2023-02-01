@@ -2,7 +2,7 @@
     import { energyUnit, energyLevels } from '../stores/energy'
     import { einsteinCoefficientA, einsteinCoefficientB, einsteinCoefficientB_rateConstant } from '../stores/einstein'
     import { trapArea, configLoaded } from '../stores/common'
-    import { cloneDeep, find, isArray } from 'lodash-es'
+    import { isArray } from 'lodash-es'
     import { Textfield } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { PlanksConstant, SpeedOfLight } from '$src/js/constants'
@@ -32,8 +32,8 @@
             const einsteinCoefficientB_emission = $einsteinCoefficientA.map(({ label, value }) => {
                 const [final, initial] = label.split('-->').map((l) => l.trim())
 
-                const v0 = find($energyLevels, (e) => e?.label == initial)?.value ?? 0
-                const v1 = find($energyLevels, (e) => e?.label == final)?.value ?? 0
+                const v0 = $energyLevels.find((e) => e?.label == initial)?.value ?? 0
+                const v1 = $energyLevels.find((e) => e?.label == final)?.value ?? 0
 
                 const freq = Number(v1) - Number(v0)
                 const freqInHz = $energyUnit === 'MHz' ? freq * 1e6 : freq * SpeedOfLight * 100
@@ -163,11 +163,11 @@
             const [from, to] = level.split('-->')
             body += `\n\t\t${from.trim()} & ${to.trim()} & `
 
-            const A_val = find($einsteinCoefficientA, (e) => e.label == level)?.value
-
-            const B_val = find($einsteinCoefficientB, (e) => e.label == level)?.value
-            const B_balance = find($einsteinCoefficientB, (e) => e.label == `${to.trim()} --> ${from.trim()}`)?.value
+            const A_val = $einsteinCoefficientA.find((e) => e.label == level)?.value
+            const B_val = $einsteinCoefficientB.find((e) => e.label == level)?.value
+            const B_balance = $einsteinCoefficientB.find((e) => e.label == `${to.trim()} --> ${from.trim()}`)?.value
             console.log({ A_val, B_val, B_balance })
+
             if (A_val && B_val && B_balance) {
                 body += `${formatNumber(A_val)} & ${formatNumber(B_val)} & ${formatNumber(B_balance)} \\\\`
             }

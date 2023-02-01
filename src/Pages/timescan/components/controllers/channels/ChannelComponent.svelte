@@ -1,6 +1,5 @@
 <script lang="ts">
     import { Textfield, Select } from '$src/components'
-    import { isUndefined } from 'lodash-es'
     export let item: Timescan.LossChannel
     export let rateConstantMode = false
     export let ions_lists: string[] = []
@@ -21,7 +20,7 @@
     {#if item.sliderController}
         <Textfield bind:value={item.sliderController} label="(min, max, step)" style="width: 10em;" />
     {/if}
-    {#if rateConstantMode && !isUndefined(item.numberDensity)}
+    {#if item?.numberDensity && rateConstantMode}
         <Textfield bind:value={item.numberDensity} label="He^n" style="width: 7em;" />
     {/if}
     <button

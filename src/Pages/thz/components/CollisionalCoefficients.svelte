@@ -8,7 +8,7 @@
     import { numberDensity, collisionalTemp, configLoaded } from '../stores/common'
     import BrowseTextfield from '$src/components/BrowseTextfield.svelte'
     import { Textfield } from '$src/components'
-    import { find, isEmpty } from 'lodash-es'
+    import { isEmpty } from 'lodash-es'
     import { tick } from 'svelte'
 
     import balance_distribution from '../functions/balance_distribution'
@@ -36,18 +36,17 @@
 
             const newValue = Number(value) * balance
             const newLabel = `${levelLabels[1]} --> ${levelLabels[0]}`
+            const alreadyComputed = $collisionalCoefficient.find((rate) => rate.label == newLabel)
+            if (alreadyComputed) return
 
-            const alreadyComputed = find($collisionalCoefficient, (rate) => rate.label == newLabel)
-            if (!alreadyComputed) {
-                $collisionalCoefficient_balance = [
-                    ...$collisionalCoefficient_balance,
-                    {
-                        label: newLabel,
-                        value: newValue.toExponential(3),
-                        id: window.getID(),
-                    },
-                ]
-            }
+            $collisionalCoefficient_balance = [
+                ...$collisionalCoefficient_balance,
+                {
+                    label: newLabel,
+                    value: newValue.toExponential(3),
+                    id: window.getID(),
+                },
+            ]
         })
     }
 
