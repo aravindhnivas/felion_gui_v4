@@ -8,7 +8,6 @@ import {
     python_asset_ready,
     installing_python_assets,
     assets_version_available,
-    LOGGER,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
