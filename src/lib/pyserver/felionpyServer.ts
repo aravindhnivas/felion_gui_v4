@@ -17,10 +17,9 @@ import { path, shell } from '@tauri-apps/api'
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
-    if (!get(python_asset_ready)) return
-    if (get(pyServerReady)) return
-
-    console.info('starting felionpy server at port: ', get(pyServerPORT))
+    if (!get(python_asset_ready)) return window.createToast('python asset not ready', 'danger')
+    if (get(pyServerReady)) return window.createToast('server already running', 'danger')
+    LOGGER.warn('starting felionpy server at port: ' + get(pyServerPORT))
 
     pyServerReady.set(false)
     const pyfile = 'server'
