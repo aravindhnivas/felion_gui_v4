@@ -6,7 +6,6 @@ export const check_felionpy_assets_status = async () => {
         python_asset_ready.set(false)
         if (await fs.exists(asset_name_prefix, { dir: fs.BaseDirectory.AppLocalData })) {
             python_asset_ready.set(true)
-            await check_assets_update()
             return
         }
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return

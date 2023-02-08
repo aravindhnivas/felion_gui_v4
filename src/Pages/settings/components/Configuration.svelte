@@ -11,7 +11,7 @@
         serverDebug,
         felionpy,
     } from '$lib/pyserver/stores'
-    import { asset_download_required, python_asset_ready_to_install, serverInfo } from '../utils/stores'
+    import { LOGGER, serverInfo } from '../utils/stores'
     import { python_asset_ready } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
@@ -19,9 +19,10 @@
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    import { auto_download_and_install_assets } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
+    import { check_assets_update } from '../utils/download-assets'
+    import { check_felionpy_assets_status } from '../utils/assets-status'
 
     let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
@@ -65,23 +66,28 @@
 
     const dispatch = createEventDispatcher()
 
+    const start_and_check_felionpy = async () => {
+        await startServer()
+        serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
+
+        await updateServerInfo(1500)
+        if ($pyServerReady) await getPyVersion()
+    }
+
     onMount(async () => {
         try {
+            LOGGER.info('Configuration mounted')
+
             if (import.meta.env.PROD && $currentPortPID.length > 0) {
                 await killPID()
             }
 
             if (import.meta.env.DEV) return
+
+            await check_felionpy_assets_status()
             if (!$python_asset_ready) return
-
-            await startServer()
-            await updateServerInfo(1500)
-            await getPyVersion()
-
-            if ($python_asset_ready_to_install) return
-            if ($asset_download_required) {
-                await auto_download_and_install_assets({ installation_request: true })
-            }
+            await start_and_check_felionpy()
+            await check_assets_update()
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {
@@ -177,10 +183,7 @@
                     id="startServerButton"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
-                        await startServer()
-                        serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
-                        await updateServerInfo(1500)
-                        if ($pyServerReady) await getPyVersion()
+                        await start_and_check_felionpy()
                         toggle_loading(currentTarget)
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}

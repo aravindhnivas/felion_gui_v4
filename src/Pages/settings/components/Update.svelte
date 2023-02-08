@@ -15,7 +15,6 @@
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install, LOGGER } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
-    import { check_felionpy_assets_status } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
 
     const check_for_update = async (log = false) => {
@@ -126,11 +125,9 @@
 
     onMount(async () => {
         LOGGER.info('Update mounted')
-        await check_felionpy_assets_status()
         if (import.meta.env.DEV) return
         update_cycle()
         await check_for_update()
-        // await check_felionpy_assets_status()
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
