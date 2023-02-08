@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.2.1
+
+- Bug fix: STARTserver on app starting
+
 ## v4.2.0
 
 - New features
