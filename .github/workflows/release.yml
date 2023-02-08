@@ -22,16 +22,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: latest
-          cache: 'yarn' # Set this to npm, yarn or pnpm.
+          # cache: 'yarn' # Set this to npm, yarn or pnpm.
 
       - name: Install Rust (Stable)
         run:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
       
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
+      # - name: Rust cache
+      #   uses: swatinem/rust-cache@v2
+      #   with:
+      #     workspaces: './src-tauri -> target'
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
