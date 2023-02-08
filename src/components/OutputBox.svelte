@@ -42,7 +42,7 @@
     <hr style="width: 100%;" />
 
     <div class="console-box">
-        <VirtualList height="100vh" width="100%" items={output} let:item>
+        <VirtualList height="100vh" items={output} let:item>
             {#each item.value.split('\n') as val}
                 <span class="has-text-{item.type}" style="width: 100%;">>> {val}</span>
                 <br />
