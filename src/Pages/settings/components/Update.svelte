@@ -126,10 +126,11 @@
 
     onMount(async () => {
         LOGGER.info('Update mounted')
+        await check_felionpy_assets_status()
         if (import.meta.env.DEV) return
         update_cycle()
         await check_for_update()
-        await check_felionpy_assets_status()
+        // await check_felionpy_assets_status()
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
