@@ -13,23 +13,16 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import {
-        outputbox,
-        downloadURL,
-        downloadoverrideURL,
-        python_asset_ready_to_install,
-        asset_download_required,
-    } from '../utils/stores'
+    import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install, LOGGER } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
-    import { auto_download_and_install_assets } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
         outputbox.warn('checking for app update')
         if (assets_download_progress) return outputbox.warn('waiting for assets to complete downloading')
         try {
-            if (devMODE) {
+            if (import.meta.env.DEV) {
                 if (!$allow_to_check_update) {
                     return window.createToast('Update check skipped in dev mode', 'danger')
                 }
@@ -42,7 +35,7 @@
             const update = await checkUpdate()
             if (log) outputbox.info(update)
 
-            if (!devMODE && update.shouldUpdate) {
+            if (import.meta.env.PROD && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
                 const install = await confirm(`Do you want to install the latest update and restart.`, {
                     title: `Update available ${newVersion}`,
@@ -100,8 +93,6 @@
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
-    const devMODE = import.meta.env.DEV
-
     const unlisten_download_asset_event = listen<string>('assets-download-progress', (event) => {
         const percent = event.payload
         assets_download_progress = Number(percent) / 100
@@ -127,18 +118,14 @@
     })
 
     onMount(async () => {
+        LOGGER.info('Update mounted')
         if (import.meta.env.DEV) return
 
         await check_assets_update()
-        assetsUpdateIntervalCycle = setInterval(async () => {
-            if (!window.navigator.onLine) return
-            if ($python_asset_ready_to_install) return
-            await check_assets_update()
-            if ($asset_download_required) {
-                await auto_download_and_install_assets({ installation_request: true })
-            }
-        }, 60 * 60 * 1000)
         await check_for_update()
+        assetsUpdateIntervalCycle = setInterval(async () => {
+            await check_assets_update()
+        }, 60 * 60 * 1000)
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
     })
 
@@ -175,7 +162,7 @@
                     }}>What's New</button
                 >
             </div>
-            {#if devMODE}
+            {#if import.meta.env.DEV}
                 <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
             {/if}
 
