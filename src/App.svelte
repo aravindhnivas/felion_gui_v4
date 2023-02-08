@@ -17,12 +17,10 @@
     // import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
-    // import { check_assets_to_delete } from './Pages/settings/utils/assets-status'
-    // import { outputbox } from './Pages/settings/utils/stores'
     import { LOGGER } from '$src/Pages/settings/utils/stores'
 
-    console.warn({ LOGGER })
-    LOGGER.info('App starting')
+    // console.warn({ LOGGER })
+    // LOGGER.info('App starting')
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -41,15 +39,13 @@
 
     onMount(async () => {
         const unlisteners = await events_listeners()
-        console.log('App mounted')
-        // check_assets_to_delete().then(outputbox.info).catch(outputbox.error)
-
         mounted = true
         LOGGER.info('App mounted')
-
+        console.warn('App mounted')
         return () => {
             unlisteners.forEach((unlisten) => unlisten())
             console.log('App destroyed')
+            LOGGER.clear()
         }
     })
 </script>
