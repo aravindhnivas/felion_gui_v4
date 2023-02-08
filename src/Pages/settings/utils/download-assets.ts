@@ -7,6 +7,8 @@ import {
     asset_download_required,
     python_asset_ready,
     installing_python_assets,
+    assets_version_available,
+    LOGGER,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
@@ -14,11 +16,10 @@ import { isEmpty, round } from 'lodash-es'
 import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
 import axios from 'axios'
-
-let assets_downloading = false
-let assets_version_available = ''
+import { auto_download_and_install_assets } from './assets-status'
 
 export const asset_name_prefix = 'felionpy'
+let assets_downloading = false
 
 export const remove_asset_folder = async () => {
     const asset_folder = await path.join(await path.appLocalDataDir(), asset_name_prefix)
@@ -33,15 +34,17 @@ export const remove_asset_folder = async () => {
 
 export async function downloadZIP() {
     try {
-        const asset_name = `${asset_name_prefix}-${await platform()}.zip`
         if (!window.navigator.onLine) {
             outputbox.warn('No internet connection')
             return
         }
         if (assets_downloading) return outputbox.warn('already downloading assets...')
+
+        const asset_name = `${asset_name_prefix}-${await platform()}.zip`
         let browser_download_url = ''
 
         assets_downloading = true
+
         if (!get(downloadoverrideURL)) {
             if (isEmpty(current_release_data)) {
                 outputbox.error('To download assets, first check assets update to obtain release data...')
@@ -88,7 +91,6 @@ export function unZIP(installation_request = true) {
 
     return new Promise(async (resolve, reject) => {
         const localdir = await path.appLocalDataDir()
-        // const asset_folder = await path.join(localdir, asset_name_prefix)
         const asset_name = `${asset_name_prefix}-${await platform()}.zip`
         const asset_zipfile = await path.join(localdir, asset_name)
 
@@ -173,7 +175,6 @@ export function unZIP(installation_request = true) {
 }
 
 let current_release_data = {}
-let no_more_asset_check = false
 
 const get_assets_url = async (toast = false) => {
     const URL = import.meta.env.VITE_FELIONPY_URL
@@ -185,38 +186,41 @@ const get_assets_url = async (toast = false) => {
     if (response.status !== 200) return outputbox.error('Could not download the assets')
 
     current_release_data = response.data
-    assets_version_available = response.data.tag_name
+    assets_version_available.set(response.data.tag_name)
 
-    if (!assets_version_available) return outputbox.error('Could not determine assets version')
+    if (!get(assets_version_available)) return outputbox.error('Could not determine assets version')
     return true
+}
+
+const fn_asset_download_required = async () => {
+    outputbox.warn(`Download required`)
+    asset_download_required.set(true)
+    await auto_download_and_install_assets({ installation_request: true })
+    return
 }
 
 export const check_assets_update = async (toast = false) => {
     if (!window.navigator.onLine) return
 
     if (get(python_asset_ready_to_install)) {
-        if (!no_more_asset_check) return outputbox.warn('assets updates are ready to install')
-        no_more_asset_check = true
-        return
+        return outputbox.warn('assets updates are ready to install')
     }
 
     if (!(await get_assets_url(toast))) return
 
-    outputbox.info(`Available version: ${assets_version_available}`)
+    outputbox.info(`Available version: ${get(assets_version_available)}`)
     if (!get(felionlibVersion)) {
         outputbox.error('Current version not determined yet.')
         return
     }
     outputbox.info(`Current version: v${get(felionlibVersion)}`)
 
-    if (`v${get(felionlibVersion)}` < assets_version_available) {
-        outputbox.warn(`Download required`)
-        asset_download_required.set(true)
+    if (`v${get(felionlibVersion)}` < get(assets_version_available)) {
+        await fn_asset_download_required()
         return
     }
     if (get(felionlibVersion) <= import.meta.env.VITE_FELIONPY_MIN_VERSION) {
-        outputbox.warn(`Download required`)
-        asset_download_required.set(true)
+        await fn_asset_download_required()
         return
     }
     outputbox.warn(`Download not required`)
