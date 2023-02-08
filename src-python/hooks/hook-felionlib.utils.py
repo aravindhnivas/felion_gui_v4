@@ -1,3 +1,0 @@
-hiddenimports = [
-    "felionlib.utils.plotXY"
-]
