@@ -63,7 +63,6 @@
 
     let download_progress = 0
     let assets_download_progress = 0
-    // let appupdate_downloading = false
     let version_info = ''
 
     const update_footer_download_label = (percent: number) => {
@@ -100,6 +99,13 @@
         update_footer_download_label(Number(percent))
     })
 
+    const update_cycle = () => {
+        assetsUpdateIntervalCycle = setInterval(async () => {
+            await check_assets_update()
+        }, 60 * 60 * 1000)
+        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+    }
+
     onDestroy(async () => {
         const unlisten1 = await unlisten_download_asset_event
         unlisten1()
@@ -120,13 +126,9 @@
     onMount(async () => {
         LOGGER.info('Update mounted')
         if (import.meta.env.DEV) return
-
+        update_cycle()
         await check_assets_update()
         await check_for_update()
-        assetsUpdateIntervalCycle = setInterval(async () => {
-            await check_assets_update()
-        }, 60 * 60 * 1000)
-        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
