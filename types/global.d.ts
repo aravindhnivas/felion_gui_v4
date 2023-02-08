@@ -6,7 +6,7 @@ declare global {
     interface DataFromPython {
         [key: string]: PlotData
     }
-    type FELIXData = Record<typeof felix_opo_data_from_python[number], DataFromPython>
+    type FELIXData = Record<(typeof felix_opo_data_from_python)[number], DataFromPython>
 
     type OPOData = Omit<FELIXData, 'SA'>
 
@@ -36,6 +36,7 @@ declare global {
         handleError: typeof import('../src/js/functions').handleError
         sleep: (ms: number) => Promise<void>
         tempdirPath: string
+        currentPlatform: string
         getID: () => string
         error: unknown
         // LOGGER: ReturnType<typeof import('../src/Pages/settings/utils/stores').create_logger_store>
