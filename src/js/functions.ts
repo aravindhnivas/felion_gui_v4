@@ -3,7 +3,7 @@ import { writable } from 'svelte/store'
 import { toast } from '@zerodevx/svelte-toast'
 import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
 import bulmaQuickview from 'bulma-extensions/bulma-quickview/dist/js/bulma-quickview'
-import { tempdir } from '@tauri-apps/api/os'
+import { tempdir, platform } from '@tauri-apps/api/os'
 import { getVersion } from '@tauri-apps/api/app'
 import { LOGGER } from '$src/Pages/settings/utils/stores'
 export const activateChangelog = writable(false)
@@ -54,7 +54,6 @@ export const handleError = (error: unknown) => {
         mainPreModal.error(error)
     }
 }
-
 window.createToast = createToast
 window.handleError = handleError
 window.sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -62,9 +61,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     currentVersion.set(await getVersion())
     bulmaQuickview.attach()
     window.tempdirPath = await path.join(await tempdir(), 'com.felion.app')
+    window.currentPlatform = await platform()
+
     if (!(await fs.exists(window.tempdirPath))) {
         await fs.createDir(window.tempdirPath)
     }
+    console.warn('DOM fully loaded and parsed')
     LOGGER.info('DOM fully loaded and parsed')
 })
 
