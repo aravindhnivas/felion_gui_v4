@@ -1,13 +1,14 @@
 # CHANGELOG
 
-## v4.0.0
+## v4.2.0
 
 - New features
   - Multi tab feature for Normline, Masspec, Timescan and THz mode
   - Toggle rows and full screen advantage in main layout
   - Normline different mode (FELIX or OPO) at topbar
 - System update
-  - Python 3.11.0
+  - Python 3.11
+  - GUI and felionpy is independently developed and not integrated with the bundle
   - Electron.js is replaced with Tauri.js (based on Rust)
 - Bug fixes
 
