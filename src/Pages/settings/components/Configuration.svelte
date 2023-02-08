@@ -19,7 +19,7 @@
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    import { auto_download_and_install_assets, check_felionpy_assets_status } from '../utils/assets-status'
+    import { auto_download_and_install_assets } from '../utils/assets-status'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
 
@@ -69,7 +69,6 @@
             if (import.meta.env.PROD && $currentPortPID.length > 0) {
                 await killPID()
             }
-            await check_felionpy_assets_status()
 
             if (import.meta.env.DEV) return
             if (!$python_asset_ready) return

@@ -18,15 +18,7 @@ export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
     if (!get(python_asset_ready)) return
-    // if (!get(developerMode) && !get(python_asset_ready)) {
-    //     dialog.message('python assets are missing. Download it in Settings -> Update', {
-    //         title: 'Missing assets',
-    //         type: 'error',
-    //     })
-    //     return
-    // }
-
-    if (get(pyServerReady)) return window.createToast('server already running', 'danger')
+    if (get(pyServerReady)) return
 
     console.info('starting felionpy server at port: ', get(pyServerPORT))
 
@@ -60,11 +52,11 @@ export async function startServer() {
     })
 
     py.stderr.on('data', (stderr) => {
-        LOGGER.warn("Server's stderr", stderr)
+        LOGGER.warn("Server's stderr: \n" + stderr)
     })
 
     py.stdout.on('data', (stdout) => {
-        LOGGER.info("Server's stdout: ", stdout)
+        LOGGER.info("Server's stdout: \n" + stdout)
     })
 
     return Promise.resolve('server started')
