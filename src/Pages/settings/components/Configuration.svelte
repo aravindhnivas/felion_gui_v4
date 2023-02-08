@@ -12,10 +12,10 @@
         felionpy,
     } from '$lib/pyserver/stores'
     import { asset_download_required, python_asset_ready_to_install, serverInfo } from '../utils/stores'
+    import { python_asset_ready } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
-    import { python_asset_ready } from '../utils/stores'
     import Badge from '@smui-extra/badge'
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
@@ -30,14 +30,16 @@
         if (closed) {
             serverCurrentStatus = { value: 'server closed', type: 'danger' }
             dispatch('serverStatusChanged', { closed: true })
-        } else {
-            serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
-            dispatch('serverStatusChanged', { closed: false })
+            return
         }
+
+        serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
+        dispatch('serverStatusChanged', { closed: false })
     }
 
-    const fetchServerROOT = async () => {
-        await window.sleep(1000)
+    const fetchServerROOT = async (delay = 0) => {
+        if (delay > 0) await window.sleep(delay)
+
         const [_err, rootpage] = await oO(axios.get<{ string }>(`http://localhost:${$pyServerPORT}/`))
         if (_err) return serverInfo.error(`failed to fetch rootpage /`)
 
@@ -47,19 +49,18 @@
         dispatch_server_status({ closed: false })
     }
 
-    const updateServerInfo = async () => {
+    const updateServerInfo = async (delay = 0) => {
         serverCurrentStatus = { value: 'checking server status...', type: 'info' }
         serverInfo.info(serverCurrentStatus.value)
 
-        await window.sleep(500)
+        if (delay > 0) await window.sleep(delay)
 
         const status = await checkNetstat()
         if (!status) {
             dispatch_server_status({ closed: true })
             return
         }
-
-        await fetchServerROOT()
+        await fetchServerROOT(delay)
     }
 
     const dispatch = createEventDispatcher()
@@ -74,7 +75,7 @@
             if (!$python_asset_ready) return
 
             await startServer()
-            await updateServerInfo()
+            await updateServerInfo(1500)
             await getPyVersion()
 
             if ($python_asset_ready_to_install) return
@@ -178,7 +179,7 @@
                         toggle_loading(currentTarget)
                         await startServer()
                         serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
-                        await updateServerInfo()
+                        await updateServerInfo(1500)
                         if ($pyServerReady) await getPyVersion()
                         toggle_loading(currentTarget)
                     }}
@@ -195,7 +196,7 @@
                         id="stopServerButton"
                         on:click={async () => {
                             await stopServer()
-                            await updateServerInfo()
+                            await updateServerInfo(1500)
                         }}
                     >
                         STOPserver
