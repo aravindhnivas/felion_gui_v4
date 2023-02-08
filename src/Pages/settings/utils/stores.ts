@@ -20,13 +20,14 @@ export const create_logger_store = (value: OutputBoxtype[]) => {
         error: (log: string | Object) => add({ value: setVal(log), type: 'danger' }),
         info: (log: string | Object) => add({ value: setVal(log), type: 'info' }),
         success: (log: string | Object) => add({ value: setVal(log), type: 'success' }),
+        clear: () => set([]),
     }
 }
 
 export const outputbox = create_logger_store([])
 export const serverInfo = create_logger_store([])
 export const asset_download_required = writable(false)
-
+export const assets_version_available = writable('')
 export const downloadoverrideURL = writable(import.meta.env.DEV)
 export const installing_python_assets = writable(false)
 export const python_asset_ready_to_install = writable(false)
