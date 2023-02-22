@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.2.2
+
+- New window for output-box (outputs from felionpy)
+
 ## v4.2.1
 
 - Bug fix: STARTserver on app starting
