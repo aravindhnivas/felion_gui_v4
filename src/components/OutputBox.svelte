@@ -21,7 +21,14 @@
     }
 </script>
 
-<SeparateWindow bind:active title={heading} graphMode={false} {autoHide} maximize={false} mainContent$style="">
+<SeparateWindow
+    bind:active
+    title={heading}
+    graphMode={false}
+    {autoHide}
+    maximize={false}
+    mainContent$style="overflow:hidden;"
+>
     <svelte:fragment slot="main_content__slot">
         <div class="main__div box {className}" {style}>
             <div class="align">
