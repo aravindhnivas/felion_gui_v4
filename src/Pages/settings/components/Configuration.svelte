@@ -24,7 +24,7 @@
     import { check_assets_update } from '../utils/download-assets'
     import { check_felionpy_assets_status } from '../utils/assets-status'
 
-    let showServerControls: boolean
+    // let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
 
     const dispatch_server_status = ({ closed }) => {
@@ -148,12 +148,19 @@
             />
         {/if}
 
-        <button class="button is-link mt-6" on:click={() => (showServerControls = !showServerControls)}>
+        <button
+            class="button is-warning mt-5"
+            on:click={async () => {
+                await check_felionpy_assets_status({ installation_request: true })
+            }}>check-felionpy-asset</button
+        >
+        <!-- <button class="button is-link mt-6" on:click={() => (showServerControls = !showServerControls)}>
             Show server controls
             {#if !$pyServerReady}
                 <Badge class="has-background-danger" />
             {/if}
-        </button>
+        </button> -->
+
         <div id="serverControllers" class="align server-control">
             <div class="align">
                 <button
@@ -193,6 +200,7 @@
                         <Badge class="has-background-danger" />
                     {/if}
                 </button>
+
                 {#if $pyServerReady && serverCurrentStatus.value.includes('running')}
                     <button
                         class="button is-danger"
@@ -237,6 +245,7 @@
                 <button class="button is-danger" on:click={async () => await killPID()}>killPID</button>
             </div>
         </div>
+
         <OutputBox bind:output={$serverInfo} heading="Server outputs" />
     </div>
 </div>
