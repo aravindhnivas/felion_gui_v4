@@ -35,7 +35,7 @@
             const { stdout } = e.detail
             const val = stdout?.trim()
             if (val) statusReport.warn(val)
-            console.warn('stdout', { val, stdout })
+            // console.warn('stdout', { val, stdout })
             if (stdout.includes('%')) {
                 const percent = parseFloat(stdout.split('%')[0].trim())
                 if (percent > 0) {
