@@ -57,7 +57,7 @@
             }}
             on:click={update}
         >
-            <div class="i-mdi-refresh" />
+            <div class="i-mdi-refresh text-2xl" />
         </div>
     {/if}
 
