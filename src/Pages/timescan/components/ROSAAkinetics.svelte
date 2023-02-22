@@ -390,17 +390,17 @@
 <LayoutDiv id="ROSAA-kinetics">
     <svelte:fragment slot="header_content__slot">
         <BrowseTextfield
-            class="three_col_browse box"
+            class="three_col_browse box p-2"
             bind:value={$currentLocation}
             label="Timescan EXPORT data location"
-            updateMode={true}
-            on:update={async () => await updateFiles()}
-        />
+        >
+            <button class="button is-warning" on:click={async () => await updateFiles()}>load</button>
+        </BrowseTextfield>
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
         <div class="main_container__div">
-            <Accordion multiple style="width: 100%;">
+            <Accordion class="mb-2" multiple style="width: 100%;">
                 <Panel loaded={nHe?.length > 0} label="Number density">
                     <Textfield value={nHe || ''} label="numberDensity" disabled />
                     <button
