@@ -51,11 +51,15 @@ export async function startServer() {
     })
 
     py.stderr.on('data', (stderr) => {
-        LOGGER.warn("Server's stderr: \n" + stderr)
+        if (stderr.trim()) {
+            LOGGER.warn("Server's stderr: \n" + stderr)
+        }
     })
 
     py.stdout.on('data', (stdout) => {
-        LOGGER.info("Server's stdout: \n" + stdout)
+        if (stdout.trim()) {
+            LOGGER.info("Server's stdout: \n" + stdout)
+        }
     })
 
     return Promise.resolve('server started')
