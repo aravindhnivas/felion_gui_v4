@@ -2,7 +2,7 @@ import { pyProgram, pythonscript, get, pyVersion, pyServerReady, developerMode }
 import { running_processes } from '$src/sveltewritables'
 import { path, fs, shell } from '@tauri-apps/api'
 export const dispatchEvent = (target: HTMLButtonElement | null | undefined, detail: Object, eventName: string) => {
-    if (!target) return
+    if (!target) return console.warn('No target to dispatch event')
     const event = new CustomEvent(eventName, { bubbles: false, detail })
     target.dispatchEvent(event)
     console.info(eventName + ' dispatched')

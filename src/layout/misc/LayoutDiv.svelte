@@ -41,6 +41,7 @@
         gap: 0.5em;
         padding: 0;
         overflow-y: auto;
+        width: 100%;
         .header_content {
             display: grid;
             grid-row-gap: 0.5em;

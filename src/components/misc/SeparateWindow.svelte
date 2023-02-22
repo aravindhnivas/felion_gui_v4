@@ -107,7 +107,7 @@
         height: 100%;
         gap: 1em;
         padding: 0;
-
+        width: 100%;
         .header_content {
             display: grid;
             grid-row-gap: 1em;

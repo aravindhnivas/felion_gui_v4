@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { statusReport, showlogs } from './stores/'
     import { energyLevels, numberOfLevels, energyUnit, transitionFrequency } from './stores/energy'
     import { einsteinCoefficientA, einsteinCoefficientB, einsteinCoefficientB_rateConstant } from './stores/einstein'
     import {
@@ -26,6 +27,7 @@
         SeparateWindow,
         SegBtn,
         BrowseTextfield,
+        OutputBox,
     } from '$src/components'
     import Accordion from '@smui-extra/accordion'
     import { parse as Yml } from 'yaml'
@@ -59,8 +61,8 @@
     let collisionalRateType = 'excitation'
     $: deexcitation = collisionalRateType === 'deexcitation'
 
-    let showreport = false
-    let statusReport = ''
+    // let showreport = false
+    // let statusReport = ''
 
     const simulation = async (e?: Event) => {
         if (!(await fs.exists($currentLocation))) return window.createToast("Location doesn't exist", 'danger')
@@ -175,7 +177,7 @@
         }
         progress = 0
         showProgress = true
-        statusReport = ''
+        statusReport.clear()
         await computePy_func({ e, pyfile: 'ROSAA', args, general: true })
     }
 
@@ -391,13 +393,13 @@
             label="output data directory"
             bind:lock={data_dir_locked}
         />
-        <div class="align box px-3 py-2" class:hide={showreport} style="border: solid 1px #fff9;">
+        <div class="align box px-3 py-2" style="border: solid 1px #fff9;">
             <SegBtn bind:choices={simulation_choices} />
             <Checkbox bind:value={$electronSpin} label="Electron Spin" />
             <Checkbox bind:value={$zeemanSplit} label="Zeeman" />
         </div>
 
-        <div class="align box px-3 py-2" class:hide={showreport} style="border: solid 1px #fff9; min-height: 5em;">
+        <div class="align box px-3 py-2" style="border: solid 1px #fff9; min-height: 5em;">
             <div class="align subtitle">
                 Simulate signal(%) as a function of {variable}
             </div>
@@ -427,15 +429,13 @@
             mainContent$style=""
         >
             <svelte:fragment slot="main_content__slot">
-                <div
-                    class="align status_report__div p-5"
-                    id="THz_simulation_status"
-                    style="user-select: text; white-space: pre-wrap;"
-                    class:hide={!showreport}
-                >
-                    {statusReport}
-                </div>
-                <div class="pr-5" class:hide={showreport}>
+                <OutputBox
+                    bind:active={$showlogs}
+                    bind:output={$statusReport}
+                    autoHide={true}
+                    heading="ROSAA outputs"
+                />
+                <div class="pr-5">
                     <Accordion multiple style="width: 100%;">
                         <Panel label="Main Parameters" loaded={mainParameters.length > 0}>
                             <div class="align h-center">
@@ -502,11 +502,10 @@
     <svelte:fragment slot="left_footer_content__slot">
         <Checkbox bind:value={$writefile} label="writefile" />
         <Checkbox bind:value={figure.show} label="show figure" />
-        <!-- <SegBtn bind:choices={output_choices} bind:selected={output_choices_selected} /> -->
         <Textfield bind:value={savefilename} label="savefilename" />
         <Textfield style="width: 5em;" bind:value={figure.dpi} label="DPI" type="number" input$step={10} />
     </svelte:fragment>
     <svelte:fragment slot="footer_content__slot">
-        <ROSAA_Footer bind:showreport bind:statusReport bind:progress bind:simulationMethod {simulation} />
+        <ROSAA_Footer bind:progress bind:simulationMethod {simulation} />
     </svelte:fragment>
 </LayoutDiv>
