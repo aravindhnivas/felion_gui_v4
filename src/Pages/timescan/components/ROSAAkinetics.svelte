@@ -43,7 +43,7 @@
             .map((f) => f.name)
             .filter((f) => f.endsWith('_scan.json'))
             .map((f) => f.split('.')[0].replace('_scan', '.scan'))
-        console.log(fileCollections)
+        // console.log(fileCollections)
         selectedFile ||= fileCollections[0]
     }
 
@@ -361,9 +361,9 @@
     const update_file_kinetic = async (_loc: string, _file: string) => {
         kineticfile = await path.join(_loc, _file)
     }
+
     $: update_file_kinetic($currentLocation, kineticEditorFilename)
     let kineticfile = ''
-
     let reportRead = false
     let reportSaved = false
     const fit_config_filename = persistentWritable('kinetics_fitted_values', 'kinetics.fit.json')
