@@ -27,7 +27,7 @@
 
     const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
-
+        $install_update_without_promt = false
         await check_assets_update()
 
         outputbox.warn('checking for app update')
