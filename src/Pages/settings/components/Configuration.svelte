@@ -88,7 +88,7 @@
             await check_felionpy_assets_status()
             if (!$python_asset_ready) return
             await start_and_check_felionpy()
-            await check_assets_update()
+            // await check_assets_update()
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {

@@ -20,12 +20,16 @@
         python_asset_ready_to_install,
         LOGGER,
         assets_installation_required,
+        install_update_without_promt,
     } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
 
     const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
+
+        await check_assets_update()
+
         outputbox.warn('checking for app update')
         if (assets_download_progress) return outputbox.warn('waiting for assets to complete downloading')
         try {
@@ -44,10 +48,15 @@
 
             if (import.meta.env.PROD && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
-                const install = await confirm(`Do you want to install the latest update and restart.`, {
-                    title: `Update available ${newVersion}`,
-                })
-                if (install) {
+
+                let install_promted = $install_update_without_promt
+                if (!install_promted) {
+                    install_promted = await confirm(`Do you want to install the latest update and restart.`, {
+                        title: `Update available ${newVersion}`,
+                    })
+                }
+
+                if (install_promted) {
                     await stopServer()
                     outputbox.success(
                         `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`
@@ -95,7 +104,7 @@
     })
 
     let updateIntervalCycle: NodeJS.Timer | null = null
-    let assetsUpdateIntervalCycle: NodeJS.Timer | null = null
+    // let assetsUpdateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
@@ -107,9 +116,9 @@
     })
 
     const update_cycle = () => {
-        assetsUpdateIntervalCycle = setInterval(async () => {
-            await check_assets_update()
-        }, 60 * 60 * 1000)
+        // assetsUpdateIntervalCycle = setInterval(async () => {
+        //     await check_assets_update()
+        // }, 60 * 60 * 1000)
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
     }
 
@@ -124,15 +133,15 @@
             clearInterval(updateIntervalCycle)
         }
 
-        if (assetsUpdateIntervalCycle) {
-            clearInterval(assetsUpdateIntervalCycle)
-        }
+        // if (assetsUpdateIntervalCycle) {
+        //     clearInterval(assetsUpdateIntervalCycle)
+        // }
         console.warn('Update destroyed')
     })
 
     onMount(async () => {
         LOGGER.info('Update mounted')
-        LOGGER.warn({ $assets_installation_required })
+        // LOGGER.warn({ $assets_installation_required })
         if ($assets_installation_required) {
             const [_err] = await oO(unZIP(false))
         }
@@ -212,7 +221,7 @@
                 on:click={async ({ currentTarget }) => {
                     if (!window.navigator.onLine) return outputbox.warn('No internet connection')
                     toggle_loading(currentTarget)
-                    const [_err] = await oO(check_assets_update(true))
+                    const [_err] = await oO(check_assets_update())
                     toggle_loading(currentTarget)
                 }}>Check assets update</button
             >

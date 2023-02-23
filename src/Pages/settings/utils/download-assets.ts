@@ -9,6 +9,7 @@ import {
     assets_version_available,
     assets_installation_required,
     python_asset_ready_to_install,
+    install_update_without_promt,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
@@ -88,11 +89,11 @@ export async function downloadZIP() {
 let assets_installing = false
 
 export function unZIP(installation_request = true) {
-    let warning = '';
-    if(assets_installing) warning = 'already installing assets...'
+    let warning = ''
+    if (assets_installing) warning = 'already installing assets...'
     if (!get(python_asset_ready_to_install)) warning = 'no assets to install'
 
-    if(warning) {
+    if (warning) {
         console.warn(warning)
         outputbox.warn(warning)
         return Promise.reject(warning)
@@ -116,6 +117,7 @@ export function unZIP(installation_request = true) {
                 return reject('installation skipped')
             }
         }
+        install_update_without_promt.set(true)
 
         if (get(pyServerReady)) {
             const stopServerButton = document.getElementById('stopServerButton')
@@ -192,9 +194,9 @@ export function unZIP(installation_request = true) {
 
 let current_release_data = {}
 
-const get_assets_url = async (toast = false) => {
+const get_assets_url = async () => {
     const URL = import.meta.env.VITE_FELIONPY_URL
-    if (toast) outputbox.info('checking for assets update...')
+    // if (toast) outputbox.info('checking for assets update...')
 
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
     if (_err1) return outputbox.error(_err1)
@@ -208,21 +210,21 @@ const get_assets_url = async (toast = false) => {
     return true
 }
 
-const fn_asset_download_required = async () => {
+const fn_asset_download_required = async ({ installation_request }) => {
     outputbox.warn(`Download required`)
     asset_download_required.set(true)
-    await auto_download_and_install_assets({ installation_request: true })
+    await auto_download_and_install_assets({ installation_request })
     return
 }
 
-export const check_assets_update = async (toast = false) => {
+export const check_assets_update = async ({ installation_request = true } = {}) => {
     if (!window.navigator.onLine) return
 
     if (get(python_asset_ready_to_install)) {
         return outputbox.warn('assets updates are ready to install')
     }
 
-    if (!(await get_assets_url(toast))) return
+    if (!(await get_assets_url())) return
 
     outputbox.info(`Available version: ${get(assets_version_available)}`)
     if (!get(felionlibVersion)) {
@@ -232,11 +234,11 @@ export const check_assets_update = async (toast = false) => {
     outputbox.info(`Current version: v${get(felionlibVersion)}`)
 
     if (`v${get(felionlibVersion)}` < get(assets_version_available)) {
-        await fn_asset_download_required()
+        await fn_asset_download_required({ installation_request })
         return
     }
     if (get(felionlibVersion) <= import.meta.env.VITE_FELIONPY_MIN_VERSION) {
-        await fn_asset_download_required()
+        await fn_asset_download_required({ installation_request })
         return
     }
     outputbox.warn(`Download not required`)
