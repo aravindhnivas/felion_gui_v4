@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.3.0
+
+- Install assets after restart
+
 ## v4.2.2
 
 - New window for output-box (outputs from felionpy)
