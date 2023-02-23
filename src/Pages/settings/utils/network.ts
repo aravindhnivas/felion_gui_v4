@@ -30,7 +30,7 @@ export const checkNetstat = async () => {
 export const killPID = async () => {
     const fullports = get(currentPortPID)
     if (fullports.length < 1) return window.createToast('Enter PID in currentPortPID', 'danger')
-
+    serverInfo.warn('Closed unused PIDs:' + fullports)
     const kill = async (port: string) => {
         const args = {
             win32: ['/PID', port, '/F'],

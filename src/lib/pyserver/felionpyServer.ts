@@ -8,18 +8,23 @@ import {
     pyChildProcess,
     get,
 } from '$lib/pyserver/stores'
-import { LOGGER } from '$src/Pages/settings/utils/stores'
+import { serverInfo } from '$src/Pages/settings/utils/stores'
 import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 
 import { persistentWritable } from '$src/js/persistentStore'
 import { path, shell } from '@tauri-apps/api'
+import { killPID } from '$src/Pages/settings/utils/network'
 
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
     if (!get(python_asset_ready)) return window.createToast('python asset not ready', 'danger')
     if (get(pyServerReady)) return window.createToast('server already running', 'danger')
-    LOGGER.warn('starting felionpy server at port: ' + get(pyServerPORT))
+    serverInfo.warn('starting felionpy server at port: ' + get(pyServerPORT))
+
+    if(get(currentPortPID).length > 0) {
+        await killPID()
+    }
 
     pyServerReady.set(false)
     const pyfile = 'server'
@@ -42,23 +47,24 @@ export async function startServer() {
 
     py.on('close', () => {
         pyServerReady.set(false)
-        LOGGER.warn('server closed')
+        currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`)) // remove pid from list   
+        serverInfo.warn('server closed')
     })
 
     py.on('error', (error) => {
         window.handleError(error)
-        LOGGER.error(error)
+        serverInfo.error(error)
     })
 
     py.stderr.on('data', (stderr) => {
         if (stderr.trim()) {
-            LOGGER.warn("Server's stderr: \n" + stderr)
+            serverInfo.warn("Server's stderr: \n" + stderr)
         }
     })
 
     py.stdout.on('data', (stdout) => {
         if (stdout.trim()) {
-            LOGGER.info("Server's stdout: \n" + stdout)
+            serverInfo.info("Server's stdout: \n" + stdout)
         }
     })
 
@@ -67,19 +73,21 @@ export async function startServer() {
 
 export async function stopServer() {
     try {
+        
         if (!get(pyServerReady)) {
-            console.info('Server already stopped')
+            serverInfo.warn('Server already stopped')
             return
         }
+
         if (get(pyChildProcess).kill) {
             await get(pyChildProcess).kill()
-            currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`))
         }
 
         pyServerReady.set(false)
 
         return Promise.resolve(true)
     } catch (error) {
+
         if (error instanceof Error) {
             window.handleError(error)
         }

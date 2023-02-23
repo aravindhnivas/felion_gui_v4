@@ -1,15 +1,15 @@
 <script lang="ts">
     import {
+        felionpy,
         pyVersion,
-        felionlibVersion,
-        pythonscript,
+        currentTab,
         pythonpath,
+        serverDebug,
+        pythonscript,
         pyServerPORT,
         developerMode,
         pyServerReady,
-        currentTab,
-        serverDebug,
-        felionpy,
+        felionlibVersion,
     } from '$lib/pyserver/stores'
     import { LOGGER, serverInfo } from '../utils/stores'
     import { python_asset_ready } from '../utils/stores'
@@ -56,6 +56,7 @@
 
         if (delay > 0) await window.sleep(delay)
 
+        if (!$pyServerReady) return serverInfo.error('server not ready')
         const status = await checkNetstat()
         if (!status) {
             dispatch_server_status({ closed: true })
@@ -67,9 +68,9 @@
     const dispatch = createEventDispatcher()
 
     const start_and_check_felionpy = async () => {
-        await startServer()
-        serverInfo.add({ value: `PID: ${JSON.stringify($currentPortPID)}`, type: 'info' })
-
+        const out = await startServer()
+        if (out) serverInfo.info(out)
+        serverInfo.info(`PID: ${JSON.stringify($currentPortPID)}`)
         await updateServerInfo(1500)
         if ($pyServerReady) await getPyVersion()
     }
