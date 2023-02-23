@@ -3,9 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
-import { 
-    presetIcons, presetAttributify, presetUno, extractorSvelte
-} from 'unocss'
+import { presetIcons, presetAttributify, presetUno, extractorSvelte } from 'unocss'
 
 const PACKAGE_ROOT = __dirname
 
@@ -39,6 +37,7 @@ export default defineConfig({
                 { 'plotly.js-basic-dist': ['relayout', 'deleteTraces', 'react', 'addTraces'] },
                 { '@tauri-apps/api/os': ['platform'] },
                 { '$src/js/persistentStore': ['persistentWritable'] },
+                { '$src/layout/main/footer_utils/stores': ['footerMsg'] },
             ],
             dts: './src/auto-imports.d.ts',
         }),
