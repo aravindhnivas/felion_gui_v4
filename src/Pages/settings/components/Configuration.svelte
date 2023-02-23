@@ -11,8 +11,7 @@
         pyServerReady,
         felionlibVersion,
     } from '$lib/pyserver/stores'
-    import { LOGGER, serverInfo } from '../utils/stores'
-    import { python_asset_ready } from '../utils/stores'
+    import { LOGGER, serverInfo, python_asset_ready_to_install, python_asset_ready } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
@@ -21,8 +20,9 @@
     import { invoke } from '@tauri-apps/api/tauri'
     import { toggle_loading } from '../utils/misc'
     import axios from 'axios'
-    import { check_assets_update } from '../utils/download-assets'
+    // import { check_assets_update } from '../utils/download-assets'
     import { check_felionpy_assets_status } from '../utils/assets-status'
+    import { asset_name_prefix, unZIP } from '../utils/download-assets'
 
     // let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
@@ -95,6 +95,41 @@
             serverInfo.add({ value: `pyVersion: ${$pyVersion}`, type: 'info' })
         }
     })
+
+    const install_felionpy_from_zipfile = async ({ currentTarget }) => {
+        try {
+            toggle_loading(currentTarget)
+            const result = (await dialog.open({
+                directory: false,
+                filters: [
+                    { name: 'zip files', extensions: ['zip'] },
+                    { name: 'All files', extensions: ['*.*'] },
+                ],
+                multiple: false,
+            })) as string
+
+            if (!result) return
+
+            serverInfo.warn(result)
+
+            const asset_name = `${asset_name_prefix}-${await platform()}.zip`
+            const localdir = await path.appLocalDataDir()
+            const asset_zipfile = await path.join(localdir, asset_name)
+
+            const [_err] = await oO(fs.copyFile(result, asset_zipfile))
+            if (_err) {
+                serverInfo.error(_err)
+            } else {
+                serverInfo.warn('file copied')
+            }
+            $python_asset_ready_to_install = true
+            await oO(unZIP(false))
+        } catch (error) {
+            if (error instanceof Error) window.handleError(error)
+        } finally {
+            toggle_loading(currentTarget)
+        }
+    }
     // let joinedPorts = $currentPortPID.join(', ')
 </script>
 
@@ -148,6 +183,7 @@
                 lock={$developerMode}
             />
         {/if}
+
         <button
             class="button is-warning mt-5"
             on:click={async () => {
@@ -161,6 +197,12 @@
                 const localdir = await path.appLocalDataDir()
                 await shell.open(localdir)
             }}>APP Local data <i class="i-mdi-open-in-new text-2xl" /></button
+        >
+
+        <button class="button is-link ml-auto" on:click={install_felionpy_from_zipfile}
+            >Install from ZIPfile <i
+                class="i-material-symbols-drive-folder-upload-outline-sharp text-2xl ml-1"
+            /></button
         >
 
         <div id="serverControllers" class="align server-control">
