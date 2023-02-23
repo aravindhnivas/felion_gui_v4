@@ -57,7 +57,7 @@
                 {...fileReadProps}
             />
         {/if}
-        <DataTable style="width: 100%; max-height: {maxHeight}">
+        <DataTable table$class="pr-5" style="width: 100%; max-height: {maxHeight}">
             <Head>
                 <Row>
                     {#if includeIndex}
@@ -88,7 +88,7 @@
                                     rows = []
                                     window.createToast('Table cleared', 'danger')
                                     dispatch('tableCleared')
-                                }}>Clear Table</button
+                                }}>Clear</button
                             ></Cell
                         >
                     {/if}
@@ -134,7 +134,8 @@
 <style>
     .header_cell {
         display: flex;
-        border-radius: 1em;
+        border-radius: 0.1em;
+        padding: 0.1em;
         align-items: center;
         justify-content: center;
     }

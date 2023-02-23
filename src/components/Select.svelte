@@ -76,6 +76,7 @@
     .container {
         display: flex;
         flex-direction: column;
+        width: auto;
     }
 
     .contanier-with-icon {
