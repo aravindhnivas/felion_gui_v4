@@ -31,7 +31,7 @@
         await check_assets_update()
 
         outputbox.warn('checking for app update')
-        if (assets_download_progress < 100) return outputbox.warn('waiting for assets to complete downloading')
+        if (assets_download_progress < 1) return outputbox.warn('waiting for assets to complete downloading')
         try {
             if (import.meta.env.DEV) {
                 if (!$allow_to_check_update) {
@@ -110,6 +110,7 @@
 
     const unlisten_download_asset_event = listen<string>('assets-download-progress', (event) => {
         const percent = event.payload
+
         assets_download_progress = Number(percent) / 100
         $footerMsg.msg = `Downloading python assets (${percent} %)`
         update_footer_download_label(Number(percent))
