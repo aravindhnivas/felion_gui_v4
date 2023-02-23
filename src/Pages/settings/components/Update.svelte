@@ -251,7 +251,7 @@
             {/if}
         </div>
 
-        {#if assets_download_progress}
+        {#if assets_download_progress > 0 && assets_download_progress < 1}
             <div class="progress__div">
                 <span class="tag is-warning">update-progress</span>
                 <LinearProgress progress={assets_download_progress} />
