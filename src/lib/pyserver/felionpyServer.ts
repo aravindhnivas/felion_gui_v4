@@ -1,24 +1,20 @@
 import {
     pyProgram,
-    developerMode,
+    serverDebug,
     pyServerReady,
+    developerMode,
     pyServerPORT,
     pythonscript,
-    serverDebug,
     pyChildProcess,
-    get,
 } from '$lib/pyserver/stores'
 import { serverInfo } from '$src/Pages/settings/utils/stores'
 import { python_asset_ready } from '$src/Pages/settings/utils/stores'
-
-import { persistentWritable } from '$src/js/persistentStore'
-import { path, shell } from '@tauri-apps/api'
 import { killPID } from '$src/Pages/settings/utils/network'
 
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
 export async function startServer() {
-    if (!get(python_asset_ready)) return window.createToast('python asset not ready', 'danger')
+    if (!get(developerMode) && !get(python_asset_ready)) return serverInfo.error('python asset not ready')
     if (get(pyServerReady)) return window.createToast('server already running', 'danger')
     serverInfo.warn('starting felionpy server at port: ' + get(pyServerPORT))
 
@@ -57,15 +53,13 @@ export async function startServer() {
     })
 
     py.stderr.on('data', (stderr) => {
-        if (stderr.trim()) {
-            serverInfo.warn("Server's stderr: \n" + stderr)
-        }
+        if (!stderr.trim()) return
+        serverInfo.warn(stderr.trim())
     })
 
     py.stdout.on('data', (stdout) => {
-        if (stdout.trim()) {
-            serverInfo.info("Server's stdout: \n" + stdout)
-        }
+        if (!stdout.trim()) return
+        serverInfo.info(stdout.trim())
     })
 
     return Promise.resolve('server started')
@@ -86,8 +80,8 @@ export async function stopServer() {
         pyServerReady.set(false)
 
         return Promise.resolve(true)
-    } catch (error) {
 
+    } catch (error) {
         if (error instanceof Error) {
             window.handleError(error)
         }

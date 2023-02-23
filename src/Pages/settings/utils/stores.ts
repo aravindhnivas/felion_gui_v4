@@ -1,6 +1,3 @@
-import { persistentWritable } from '$src/js/persistentStore'
-import { writable } from 'svelte/store'
-
 export const create_logger_store = (value: OutputBoxtype[]) => {
     const { set, subscribe, update } = writable(value)
     const setVal = (log: string | Object) => {

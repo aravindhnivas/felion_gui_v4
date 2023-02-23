@@ -38,6 +38,7 @@ export default defineConfig({
                 { '@tauri-apps/api': ['fs', 'path', 'dialog', 'shell'] },
                 { 'plotly.js-basic-dist': ['relayout', 'deleteTraces', 'react', 'addTraces'] },
                 { '@tauri-apps/api/os': ['platform'] },
+                { '$src/js/persistentStore': ['persistentWritable'] },
             ],
             dts: './src/auto-imports.d.ts',
         }),
