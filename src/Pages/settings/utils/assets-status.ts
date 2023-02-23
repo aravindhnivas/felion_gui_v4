@@ -1,5 +1,6 @@
 import { downloadoverrideURL, python_asset_ready, outputbox, python_asset_ready_to_install, serverInfo } from './stores'
 import { asset_name_prefix, check_assets_update, download_assets, unZIP } from './download-assets'
+import { pyServerReady } from '$src/lib/pyserver/stores'
 
 export const check_felionpy_assets_status = async ({ installation_request = false } = {}) => {
     try {
@@ -8,9 +9,9 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
         if (await fs.exists(asset_name_prefix, { dir: fs.BaseDirectory.AppLocalData })) {
             python_asset_ready.set(true)
             python_asset_ready_to_install.set(false)
-            serverInfo.warn('Python assets already installed')
-            await check_assets_update()
+            serverInfo.warn('felionpy is installed')
 
+            if (get(pyServerReady)) await check_assets_update()
             return
         }
 

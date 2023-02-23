@@ -22,7 +22,7 @@
     import axios from 'axios'
     // import { check_assets_update } from '../utils/download-assets'
     import { check_felionpy_assets_status } from '../utils/assets-status'
-    import { asset_name_prefix, unZIP } from '../utils/download-assets'
+    import { asset_name_prefix, check_assets_update, unZIP } from '../utils/download-assets'
 
     // let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
@@ -75,20 +75,14 @@
         if ($pyServerReady) await getPyVersion()
     }
 
+    $: if ($python_asset_ready && !$pyServerReady) {
+        start_and_check_felionpy()
+    }
+
     onMount(async () => {
         try {
             LOGGER.info('Configuration mounted')
-
-            if (import.meta.env.PROD && $currentPortPID.length > 0) {
-                await killPID()
-            }
-
-            // if (import.meta.env.DEV) return
-
-            // await check_felionpy_assets_status()
-            if (!$python_asset_ready) return
-            await start_and_check_felionpy()
-            // await check_assets_update()
+            if (import.meta.env.PROD && $currentPortPID.length > 0) await killPID()
         } catch (error) {
             if (error instanceof Error) console.error(error)
         } finally {

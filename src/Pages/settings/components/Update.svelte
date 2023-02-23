@@ -1,6 +1,16 @@
 <script lang="ts">
+    import {
+        outputbox,
+        downloadURL,
+        downloadoverrideURL,
+        python_asset_ready_to_install,
+        LOGGER,
+        assets_installation_required,
+        install_update_without_promt,
+    } from '../utils/stores'
     import { currentTab } from '$lib/pyserver/stores'
     import { currentVersion } from '$src/js/functions'
+
     import Notify from '$lib/notifier/Notify.svelte'
     import { updateInterval, updateError } from '$src/sveltewritables'
     import { activateChangelog } from '$src/js/functions'
@@ -13,15 +23,6 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import {
-        outputbox,
-        downloadURL,
-        downloadoverrideURL,
-        python_asset_ready_to_install,
-        LOGGER,
-        assets_installation_required,
-        install_update_without_promt,
-    } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
     import { check_felionpy_assets_status } from '../utils/assets-status'
@@ -31,7 +32,6 @@
         $install_update_without_promt = false
 
         await check_felionpy_assets_status()
-        // await check_assets_update()
 
         outputbox.warn('checking for app update')
         if (assets_download_progress > 0 && assets_download_progress < 1)
@@ -65,6 +65,7 @@
                     outputbox.success(
                         `Installing update ${newVersion}, ${update.manifest?.date}, ${update.manifest.body}`
                     )
+
                     await installUpdate()
                     await relaunch()
                 }
@@ -138,17 +139,9 @@
         if ($assets_installation_required) {
             const [_err] = await oO(unZIP(false))
         }
-
         if (import.meta.env.DEV) return
-
         updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
         await check_for_update()
-
-        const startServerButton = document.getElementById('startServerBtn')
-
-        if (startServerButton) {
-            startServerButton.click()
-        }
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)
