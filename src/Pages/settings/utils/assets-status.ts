@@ -10,6 +10,7 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
         }
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
         await auto_download_and_install_assets({ installation_request })
+
     } catch (error) {
         outputbox.error(error)
     }
@@ -26,6 +27,7 @@ export const auto_download_and_install_assets = async ({ installation_request = 
         python_asset_ready_to_install.set(true)
     }
 
-    await unZIP(installation_request)
+    const [_err, ] = await oO(unZIP(installation_request))
+    if(_err) return
     python_asset_ready.set(true)
 }

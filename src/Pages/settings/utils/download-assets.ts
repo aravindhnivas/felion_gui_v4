@@ -2,12 +2,13 @@ import { felionlibVersion, pyServerReady } from '$lib/pyserver/stores'
 import {
     outputbox,
     downloadURL,
-    downloadoverrideURL,
-    python_asset_ready_to_install,
-    asset_download_required,
     python_asset_ready,
+    downloadoverrideURL,
+    asset_download_required,
     installing_python_assets,
     assets_version_available,
+    assets_installation_required,
+    python_asset_ready_to_install,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
@@ -22,13 +23,12 @@ let assets_downloading = false
 
 export const remove_asset_folder = async () => {
     const asset_folder = await path.join(await path.appLocalDataDir(), asset_name_prefix)
-    if (await fs.exists(asset_folder)) {
-        outputbox.warn('Trying to remove existing felionpy folder')
-        const [err] = await oO(fs.removeDir(asset_folder, { recursive: true }))
-        if (err) return Promise.reject(`Could not delete the existing felionpy folder\n ${JSON.stringify(err)}`)
+    if (!(await fs.exists(asset_folder))) return
+    outputbox.warn('Trying to remove existing felionpy folder')
+    const [err] = await oO(fs.removeDir(asset_folder, { recursive: true }))
+    if (err) return Promise.reject(`Could not delete the existing felionpy folder\n ${JSON.stringify(err)}`)
 
-        return Promise.resolve(asset_folder + ' folder deleted')
-    }
+    return Promise.resolve(asset_folder + ' folder deleted')
 }
 
 export async function downloadZIP() {
@@ -85,8 +85,21 @@ export async function downloadZIP() {
     }
 }
 
+let assets_installing = false
+
 export function unZIP(installation_request = true) {
-    if (!get(python_asset_ready_to_install)) return
+    let warning = '';
+    if(assets_installing) warning = 'already installing assets...'
+    if (!get(python_asset_ready_to_install)) warning = 'no assets to install'
+
+    if(warning) {
+        console.warn(warning)
+        outputbox.warn(warning)
+        return Promise.reject(warning)
+    }
+    assets_installing = true
+    console.warn('unzipping assets...')
+    outputbox.warn('unzipping assets...')
 
     return new Promise(async (resolve, reject) => {
         const localdir = await path.appLocalDataDir()
@@ -98,7 +111,9 @@ export function unZIP(installation_request = true) {
         if (installation_request) {
             if (!(await dialog.confirm('Install it now ?', { title: 'Python assets update ready.' }))) {
                 footerMsg.set({ msg: '', status: 'idle' })
-                return resolve('installation skipped')
+                assets_installation_required.set(true)
+                assets_installing = false
+                return reject('installation skipped')
             }
         }
 
@@ -130,6 +145,7 @@ export function unZIP(installation_request = true) {
         outputbox.info(`unzip PID: ${child.pid}`)
 
         cmd.on('close', async () => {
+            assets_installing = false
             if (err) {
                 footerMsg.set({ msg: 'failed to install assets', status: 'done' })
                 outputbox.error('failed to UNZIP')
@@ -137,6 +153,7 @@ export function unZIP(installation_request = true) {
             } else {
                 footerMsg.set({ msg: 'assets installation completed', status: 'done' })
                 outputbox.success('UNZIP success')
+                assets_installation_required.set(false)
                 resolve('UNZIP success')
                 await window.sleep(1000)
                 await fs.removeFile(asset_name, { dir: fs.BaseDirectory.AppLocalData })

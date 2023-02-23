@@ -13,7 +13,14 @@
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
-    import { outputbox, downloadURL, downloadoverrideURL, python_asset_ready_to_install, LOGGER } from '../utils/stores'
+    import {
+        outputbox,
+        downloadURL,
+        downloadoverrideURL,
+        python_asset_ready_to_install,
+        LOGGER,
+        assets_installation_required,
+    } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
 
@@ -125,6 +132,10 @@
 
     onMount(async () => {
         LOGGER.info('Update mounted')
+        LOGGER.warn({ $assets_installation_required })
+        if ($assets_installation_required) {
+            const [_err] = await oO(unZIP(false))
+        }
         if (import.meta.env.DEV) return
         update_cycle()
         await check_for_update()
