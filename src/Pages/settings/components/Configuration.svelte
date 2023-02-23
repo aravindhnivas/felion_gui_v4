@@ -148,19 +148,20 @@
                 lock={$developerMode}
             />
         {/if}
-
         <button
             class="button is-warning mt-5"
             on:click={async () => {
                 await check_felionpy_assets_status({ installation_request: true })
             }}>check-felionpy-asset</button
         >
-        <!-- <button class="button is-link mt-6" on:click={() => (showServerControls = !showServerControls)}>
-            Show server controls
-            {#if !$pyServerReady}
-                <Badge class="has-background-danger" />
-            {/if}
-        </button> -->
+
+        <button
+            class="button is-link mt-5"
+            on:click={async () => {
+                const localdir = await path.appLocalDataDir()
+                await shell.open(localdir)
+            }}>APP Local data <i class="i-mdi-open-in-new text-2xl" /></button
+        >
 
         <div id="serverControllers" class="align server-control">
             <div class="align">
