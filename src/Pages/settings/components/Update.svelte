@@ -24,11 +24,14 @@
     } from '../utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
+    import { check_felionpy_assets_status } from '../utils/assets-status'
 
     const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
         $install_update_without_promt = false
-        await check_assets_update()
+
+        await check_felionpy_assets_status()
+        // await check_assets_update()
 
         outputbox.warn('checking for app update')
         if (assets_download_progress > 0 && assets_download_progress < 1)

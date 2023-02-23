@@ -1,5 +1,5 @@
 import { downloadoverrideURL, python_asset_ready, outputbox, python_asset_ready_to_install, serverInfo } from './stores'
-import { asset_name_prefix, download_assets, unZIP } from './download-assets'
+import { asset_name_prefix, check_assets_update, download_assets, unZIP } from './download-assets'
 
 export const check_felionpy_assets_status = async ({ installation_request = false } = {}) => {
     try {
@@ -8,11 +8,17 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
         if (await fs.exists(asset_name_prefix, { dir: fs.BaseDirectory.AppLocalData })) {
             python_asset_ready.set(true)
             python_asset_ready_to_install.set(false)
-            return serverInfo.warn('Python assets already installed')
+            serverInfo.warn('Python assets already installed')
+            await check_assets_update()
+
+            return
         }
 
         if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
         await auto_download_and_install_assets({ installation_request })
+
+        // const updateCheckBtn = document.getElementById('updateCheckBtn')
+        // await updateCheckBtn.click()
     } catch (error) {
         outputbox.error(error)
     }

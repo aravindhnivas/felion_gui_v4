@@ -85,7 +85,7 @@
 
             if (import.meta.env.DEV) return
 
-            await check_felionpy_assets_status()
+            // await check_felionpy_assets_status()
             if (!$python_asset_ready) return
             await start_and_check_felionpy()
             // await check_assets_update()
