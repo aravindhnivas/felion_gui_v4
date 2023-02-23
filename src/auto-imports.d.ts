@@ -26,6 +26,7 @@ declare global {
   const onDestroy: typeof import('svelte')['onDestroy']
   const onMount: typeof import('svelte')['onMount']
   const path: typeof import('@tauri-apps/api')['path']
+  const persistentWritable: typeof import('$src/js/persistentStore')['persistentWritable']
   const platform: typeof import('@tauri-apps/api/os')['platform']
   const react: typeof import('plotly.js-basic-dist')['react']
   const readable: typeof import('svelte/store')['readable']
