@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.4.1
+
+- BUG FIX: felionpy server auto start on app start
+
 ## v4.4.0
 
 - BUG FIX and improvements on update-checking mechanism

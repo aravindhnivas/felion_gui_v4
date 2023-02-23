@@ -108,7 +108,6 @@
     })
 
     let updateIntervalCycle: NodeJS.Timer | null = null
-    // let assetsUpdateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
@@ -119,13 +118,6 @@
         $footerMsg.msg = `Downloading python assets (${percent} %)`
         update_footer_download_label(Number(percent))
     })
-
-    const update_cycle = () => {
-        // assetsUpdateIntervalCycle = setInterval(async () => {
-        //     await check_assets_update()
-        // }, 60 * 60 * 1000)
-        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-    }
 
     onDestroy(async () => {
         const unlisten1 = await unlisten_download_asset_event
@@ -138,21 +130,25 @@
             clearInterval(updateIntervalCycle)
         }
 
-        // if (assetsUpdateIntervalCycle) {
-        //     clearInterval(assetsUpdateIntervalCycle)
-        // }
         console.warn('Update destroyed')
     })
 
     onMount(async () => {
         LOGGER.info('Update mounted')
-        // LOGGER.warn({ $assets_installation_required })
         if ($assets_installation_required) {
             const [_err] = await oO(unZIP(false))
         }
+
         if (import.meta.env.DEV) return
-        update_cycle()
+
+        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
         await check_for_update()
+
+        const startServerButton = document.getElementById('startServerBtn')
+
+        if (startServerButton) {
+            startServerButton.click()
+        }
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)

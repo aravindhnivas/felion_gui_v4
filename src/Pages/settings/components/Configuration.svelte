@@ -83,7 +83,7 @@
                 await killPID()
             }
 
-            if (import.meta.env.DEV) return
+            // if (import.meta.env.DEV) return
 
             // await check_felionpy_assets_status()
             if (!$python_asset_ready) return
