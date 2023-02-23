@@ -16,6 +16,7 @@ declare global {
   const draw: typeof import('svelte/transition')['draw']
   const fade: typeof import('svelte/transition')['fade']
   const fly: typeof import('svelte/transition')['fly']
+  const footerMsg: typeof import('$src/layout/main/footer_utils/stores')['footerMsg']
   const fs: typeof import('@tauri-apps/api')['fs']
   const get: typeof import('svelte/store')['get']
   const getAllContexts: typeof import('svelte')['getAllContexts']
