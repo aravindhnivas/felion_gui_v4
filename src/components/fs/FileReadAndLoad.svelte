@@ -184,7 +184,8 @@
             <Textfield bind:value={configDir} label="save location" />
         </div>
     </MenuSurface>
-    <button class="i-mdi-help text-xl" on:click={() => surface.setOpen(true)} />
+    <!-- <button class="i-mdi-help text-xl" on:click={() => surface.setOpen(true)} /> -->
+    <button class="i-material-symbols-help-outline-sharp text-xl" on:click={() => surface.setOpen(true)} />
 </div>
 
 <style>
