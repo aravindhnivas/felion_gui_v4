@@ -622,7 +622,7 @@ dependencies = [
 
 [[package]]
 name = "felion_gui"
-version = "4.3.0"
+version = "4.4.0"
 dependencies = [
  "error-chain",
  "futures-util",

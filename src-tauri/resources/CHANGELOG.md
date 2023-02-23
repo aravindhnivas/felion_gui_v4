@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.4.0
+
+- BUG FIX and improvements on update-checking mechanism
+
 ## v4.3.0
 
 - Install assets after restart
