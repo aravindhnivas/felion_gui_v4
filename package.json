@@ -24,7 +24,7 @@
     "@tauri-apps/cli": "^1.2.3",
     "@tsconfig/svelte": "^3.0.0",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.14.0",
+    "@types/node": "^18.14.1",
     "@types/plotly.js-basic-dist": "^1.54.1",
     "@types/winbox": "^0.2.1",
     "@zerodevx/svelte-toast": "^0.8.2",
