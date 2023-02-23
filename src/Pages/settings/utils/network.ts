@@ -8,11 +8,11 @@ const fail = (error) => {
     return false
 }
 export const checkNetstat = async () => {
-    
     serverInfo.warn('checking server network status...')
 
     const args = {
-        win32: ['Get-Process', '-Id', `(Get-NetTCPConnection -LocalPort ${get(pyServerPORT)}).OwningProcess`],
+        // win32: ['Get-Process', '-Id', `(Get-NetTCPConnection -LocalPort ${get(pyServerPORT)}).OwningProcess`],
+        win32: ['-ano', '-p', 'tcp'],
         darwin: ['-i', `:${get(pyServerPORT)}`],
         linux: ['-i', `:${get(pyServerPORT)}`],
     }
@@ -20,9 +20,19 @@ export const checkNetstat = async () => {
     const command = currentplatform === 'win32' ? `netstat-${await platform()}` : 'netstat-darwin'
     const [err, output] = await oO(new shell.Command(command, args[await platform()]).execute())
     if (err) return fail(err)
-
+    const filtered_output = output.stdout
+        .trim()
+        .split('\n')
+        .map((ln) => {
+            if (ln.includes('TCP') && ln.includes(`:${get(pyServerPORT)}`)) {
+                return ln
+            }
+        })
+        .filter(Boolean)
+        .join('\n')
+    // console.log(val)
     if (output.stderr) return fail(output.stderr)
-    serverInfo.warn(output.stdout)
+    serverInfo.warn(filtered_output)
     serverInfo.warn('network status check done!')
     return true
 }

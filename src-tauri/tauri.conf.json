@@ -36,14 +36,8 @@
           },
           {
             "name": "netstat-win32",
-            "cmd": "powershell",
-            "args": [
-              "Get-Process",
-              "-Id",
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "cmd": "netstat",
+            "args": true
           },
           {
             "name": "netstat-darwin",
