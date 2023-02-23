@@ -196,7 +196,6 @@ let current_release_data = {}
 
 const get_assets_url = async () => {
     const URL = import.meta.env.VITE_FELIONPY_URL
-    // if (toast) outputbox.info('checking for assets update...')
 
     const [_err1, response] = await oO(axios<{ tag_name: string }>(URL))
     if (_err1) return outputbox.error(_err1)
@@ -219,7 +218,6 @@ const fn_asset_download_required = async ({ installation_request }) => {
 
 export const check_assets_update = async ({ installation_request = true } = {}) => {
     if (!window.navigator.onLine) return
-
     if (get(python_asset_ready_to_install)) {
         return outputbox.warn('assets updates are ready to install')
     }
@@ -227,6 +225,7 @@ export const check_assets_update = async ({ installation_request = true } = {}) 
     if (!(await get_assets_url())) return
 
     outputbox.info(`Available version: ${get(assets_version_available)}`)
+
     if (!get(felionlibVersion)) {
         outputbox.error('Current version not determined yet.')
         return
@@ -256,7 +255,7 @@ export const download_assets = async () => {
         return
     }
     if (!get(python_asset_ready)) {
-        if (!(await get_assets_url(true))) return
+        if (!(await get_assets_url())) return
         await downloadZIP()
         return
     }
