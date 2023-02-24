@@ -20,7 +20,7 @@
     </div>
 {/if}
 
-<style>
+<style global>
     .icon-footer {
         display: flex;
         align-items: center;

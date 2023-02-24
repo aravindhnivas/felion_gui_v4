@@ -2,12 +2,13 @@
     import { Modal, Select, TextAndSelectOptsToggler } from '$src/components'
     import NumberDensity from '$src/Pages/misc/NumberDensity.svelte'
     import { activePage } from '$src/sveltewritables'
-
+    import { tweened } from 'svelte/motion'
+    import { cubicOut } from 'svelte/easing'
     export let nHe = ''
     export let selectedFile = ''
     export let active = false
-
     export let configDir = ''
+    export let useParamsFile = false
     export let fileCollections = []
 
     let filename = 'kinetics.conditions.json'
@@ -18,6 +19,9 @@
     let savefilename = ''
     let contents = {}
 
+    $: if (useParamsFile) {
+        readConfigFile(false)
+    }
     const readConfigFile = async (toast = true) => {
         await update_file_kinetic(configDir, filename)
         if (!(await fs.exists(savefilename))) {
@@ -65,7 +69,8 @@
         return await updateCurrentConfig(currentConfig)
     }
 
-    $: if (selectedFile) {
+    $: if (!contents_loading_from_config && selectedFile) {
+        nHe = null
         compute()
     }
 
@@ -79,28 +84,58 @@
         if (!result) return
         config_file = result
     }
+    let loaded_contents = {}
+    let contents_loading_from_config = false
+    let loaded_contents_saved = true
+
+    const loaded_percent = tweened(0, {
+        duration: 400,
+        easing: cubicOut,
+    })
+
+    const save_loaded_contents = async () => {
+        const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(loaded_contents, null, 4)))
+        if (_err) return window.handleError(_err)
+        window.createToast(`File saved to ${await path.basename(savefilename)}`, 'success')
+        loaded_contents_saved = true
+        await readConfigFile()
+    }
 
     const loadFromConfigFile = async () => {
         if (!config_file) return window.createToast('No config file loaded')
+
+        contents_loading_from_config = true
         const content = await fs.readTextFile(config_file)
         const config_contents = tryF(() => JSON.parse(content))
         if (isError(config_contents)) return window.handleError(config_contents)
 
         window.createToast(`File read: ${await path.basename(config_file)}`)
-
         const keys = Object.keys(config_contents)
-        const contents = {}
+
+        loaded_contents = {}
+        let counter = 0
+        $loaded_percent = 0
+
         for (const key of keys) {
+            await tick()
             const config = config_contents[key]
             set_minimal_config?.(config)
             const data = await computeNumberDensity(null, true)
-            contents[key] = data
+            loaded_contents[key] = data
+            selectedFile = key
+            counter += 1
+            $loaded_percent = (counter / keys.length) * 100
         }
+        contents_loading_from_config = false
+        loaded_contents_saved = false
 
-        const [_err] = await oO(fs.writeTextFile(savefilename, JSON.stringify(contents, null, 4)))
-        if (_err) return window.handleError(_err)
-        window.createToast(`File saved to ${await path.basename(savefilename)}`, 'success')
-        await readConfigFile()
+        if (
+            !(await dialog.confirm('Do you want to save the loaded contents?', {
+                title: `${await path.basename(savefilename)}`,
+            }))
+        )
+            return
+        await save_loaded_contents()
     }
 
     let computeNumberDensity = null
@@ -129,6 +164,10 @@
         >
             <svelte:fragment slot="header">
                 <div class="align h-center">
+                    <span class="tag is-warning">savelocation</span>
+                    <span class="tag is-warning"> {configDir}</span>
+                </div>
+                <div class="align h-center">
                     <TextAndSelectOptsToggler
                         bind:value={filename}
                         label="config file (*.conditions.json)"
@@ -144,10 +183,32 @@
             </svelte:fragment>
         </NumberDensity>
     </svelte:fragment>
-    <svelte:fragment slot="footer">
+
+    <svelte:fragment slot="footerbtn">
+        {#if (contents_loading_from_config || !loaded_contents_saved) && $loaded_percent > 0}
+            <div class="icon-footer">
+                <span>loading {$loaded_percent.toFixed(0)} %</span>
+                {#if $loaded_percent < 100}
+                    <lord-icon trigger="loop" src="/assets/icons/lottie/loader.json" />
+                {:else}
+                    <lord-icon trigger="hover" src="/assets/icons/lottie/confetti.json" />
+                {/if}
+            </div>
+        {/if}
+        {#if config_file}
+            {#await path.basename(config_file) then value}
+                <span class="tag is-warning">{value}</span>
+            {/await}
+        {/if}
+
         <button class="button is-warning" on:click={async () => await browseFromConfigFile()}>browse config file</button
         >
         <button class="button is-warning" on:click={async () => await loadFromConfigFile()}>load config file</button>
         <button class="button is-success has-green-background" on:click={async () => await save_datas()}>Save</button>
+        {#if !loaded_contents_saved}
+            <button class="button is-warning" on:click={async () => await save_loaded_contents()}
+                >save loaded config</button
+            >
+        {/if}
     </svelte:fragment>
 </Modal>

@@ -49,7 +49,7 @@
         </section>
 
         <footer class="modal-card-foot">
-            <div style="margin-left:auto; display:flex; gap: 1em;">
+            <div style="margin-left:auto; display:flex; gap: 1em; align-items: center;">
                 <slot name="footerbtn" />
             </div>
         </footer>

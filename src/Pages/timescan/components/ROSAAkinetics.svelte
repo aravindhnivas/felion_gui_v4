@@ -385,7 +385,14 @@
 </script>
 
 <MatplotlibDialog bind:open={kinetic_plot_adjust_dialog_active} bind:value={$kinetic_plot_adjust_configs} />
-<KineticsNumberDensity bind:active={show_numberDensity} bind:nHe {selectedFile} {fileCollections} {configDir} />
+<KineticsNumberDensity
+    bind:active={show_numberDensity}
+    bind:nHe
+    {selectedFile}
+    {fileCollections}
+    {configDir}
+    {useParamsFile}
+/>
 <KineticConfigTable bind:active={show_fileConfigs} {configDir} />
 
 <LayoutDiv id="ROSAA-kinetics">
@@ -500,6 +507,7 @@
         <Checkbox on:change={async () => await computeParameters()} bind:value={useParamsFile} label="useParams" />
         <Checkbox bind:value={useTaggedFile} label="useTag" />
         <TextAndSelectOptsToggler
+            tooltip_dir="top"
             bind:value={tagFile}
             options={tagOptions}
             label="tag files"

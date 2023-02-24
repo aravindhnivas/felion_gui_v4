@@ -33,7 +33,7 @@
             fileReadProps={{ singleFilemode_ObjectKey: 'filename', uniqFilter: 'id' }}
         />
     </svelte:fragment>
-    <svelte:fragment slot="footer">
+    <svelte:fragment slot="footerbtn">
         <button class="button is-warning" on:click={() => (config_datas = [...config_datas, addNewRow()])}
             >Add row</button
         >
