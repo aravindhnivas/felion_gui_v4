@@ -5,7 +5,7 @@ export const dispatchEvent = (target: HTMLButtonElement | null | undefined, deta
     if (!target) return console.warn('No target to dispatch event')
     const event = new CustomEvent(eventName, { bubbles: false, detail })
     target.dispatchEvent(event)
-    console.info(eventName + ' dispatched')
+    // console.info(eventName + ' dispatched')
 }
 
 interface Type {
