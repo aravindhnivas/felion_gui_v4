@@ -5,14 +5,14 @@
         downloadoverrideURL,
         python_asset_ready_to_install,
         LOGGER,
-        assets_installation_required,
+        // assets_installation_required,
         install_update_without_promt,
     } from '../utils/stores'
     import { currentTab } from '$lib/pyserver/stores'
     import { currentVersion } from '$src/js/functions'
 
     import Notify from '$lib/notifier/Notify.svelte'
-    import { updateInterval, updateError } from '$src/sveltewritables'
+    import { updateError } from '$src/sveltewritables'
     import { activateChangelog } from '$src/js/functions'
     import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
     import { relaunch } from '@tauri-apps/api/process'
@@ -25,13 +25,14 @@
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
     import { toggle_loading } from '../utils/misc'
-    import { check_felionpy_assets_status } from '../utils/assets-status'
+    // import { check_felionpy_assets_status } from '../utils/assets-status'
 
-    const check_for_update = async (log = false) => {
+    export const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
         $install_update_without_promt = false
 
-        await check_felionpy_assets_status()
+        // await check_felionpy_assets_status()
+        await check_assets_update()
 
         outputbox.warn('checking for app update')
         if (assets_download_progress > 0 && assets_download_progress < 1)
@@ -108,7 +109,7 @@
         }
     })
 
-    let updateIntervalCycle: NodeJS.Timer | null = null
+    // let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
@@ -123,25 +124,12 @@
     onDestroy(async () => {
         const unlisten1 = await unlisten_download_asset_event
         unlisten1()
-
         const unlisten2 = await listen_download_progress
         unlisten2()
-
-        if (updateIntervalCycle) {
-            clearInterval(updateIntervalCycle)
-        }
-
-        console.warn('Update destroyed')
     })
 
     onMount(async () => {
         LOGGER.info('Update mounted')
-        if ($assets_installation_required) {
-            const [_err] = await oO(unZIP(false))
-        }
-        if (import.meta.env.DEV) return
-        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-        await check_for_update()
     })
 
     const allow_to_check_update = persistentWritable('allow_to_check_update', false)

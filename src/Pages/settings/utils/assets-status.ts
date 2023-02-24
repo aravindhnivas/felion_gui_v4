@@ -11,7 +11,7 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
             python_asset_ready_to_install.set(false)
             serverInfo.warn('felionpy is installed')
 
-            if (get(pyServerReady)) await check_assets_update()
+            // if (get(pyServerReady)) await check_assets_update()
             return
         }
 

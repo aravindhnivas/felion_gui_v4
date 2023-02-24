@@ -3,6 +3,10 @@
     import Changelog from '$src/components/misc/Changelog.svelte'
     import { Configuration, About, Update, Credits, Console } from './settings/components/'
     import { Badge } from '$src/components'
+    import { LOGGER, python_asset_ready, assets_installation_required } from './settings/utils/stores'
+    import { updateInterval } from '$src/sveltewritables'
+    import { check_felionpy_assets_status } from './settings/utils/assets-status'
+    import { unZIP } from './settings/utils/download-assets'
 
     const tabs = ['Configuration', 'Update', 'About', 'Credits', 'Console']
     const id = 'Settings'
@@ -11,6 +15,8 @@
     let navbarBadgeSettings: HTMLElement
     let updateBadge: HTMLElement
     let configBadge: HTMLElement
+
+    let updateIntervalCycle: NodeJS.Timer | null = null
 
     onMount(async () => {
         display = localStorage.getItem('active_tab') === id ? 'block' : 'none'
@@ -21,13 +27,35 @@
 
     onDestroy(() => {
         navbarBadgeSettings.style.backgroundColor = ''
+        if (updateIntervalCycle) {
+            console.warn('Update interval cleared')
+            clearInterval(updateIntervalCycle)
+        }
     })
 
+    let start_and_check_felionpy: () => Promise<void> = null
+    let check_for_update: () => Promise<void> = null
+
     const warningStatuses = [false, false]
+
     const updateSettingStatus = async () => {
         const no_active_status = warningStatuses.every((element) => element === false)
         navbarBadgeSettings.style.backgroundColor = no_active_status ? '' : 'var(--color-danger)'
     }
+
+    onMount(async () => {
+        LOGGER.info('Settings page mounted')
+        if (import.meta.env.DEV) return
+        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+
+        if ($assets_installation_required) {
+            const [_err] = await oO(unZIP(false))
+        }
+
+        await check_felionpy_assets_status()
+        if ($python_asset_ready) await start_and_check_felionpy()
+        await check_for_update()
+    })
 </script>
 
 <Changelog />
@@ -52,6 +80,7 @@
 
         <div class="mainContainer box">
             <Configuration
+                bind:start_and_check_felionpy
                 on:serverStatusChanged={({ detail: { closed } }) => {
                     console.log('server closed', closed)
                     configBadge.style.backgroundColor = closed ? 'var(--color-danger)' : ''
@@ -59,7 +88,9 @@
                     updateSettingStatus()
                 }}
             />
+
             <Update
+                bind:check_for_update
                 on:updateStatusChange={(e) => {
                     warningStatuses[1] = false
                     if (e.detail.status !== 'update-downloaded') return

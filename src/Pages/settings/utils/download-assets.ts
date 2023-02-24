@@ -19,8 +19,10 @@ import { footerMsg } from '$src/layout/main/footer_utils/stores'
 import axios from 'axios'
 import { auto_download_and_install_assets } from './assets-status'
 
-export const asset_name_prefix = 'felionpy'
 let assets_downloading = false
+let assets_installing = false
+
+export const asset_name_prefix = 'felionpy'
 
 export const remove_asset_folder = async () => {
     const asset_folder = await path.join(await path.appLocalDataDir(), asset_name_prefix)
@@ -67,8 +69,7 @@ export async function downloadZIP() {
         const [download_err, download_output] = await oO(invoke('download_url', { url: URL_to_download, fileName }))
 
         if (download_err) {
-            outputbox.error(download_err as string)
-            return
+            return outputbox.error(download_err as string)
         }
 
         outputbox.success(download_output as string)
@@ -86,8 +87,6 @@ export async function downloadZIP() {
     }
 }
 
-let assets_installing = false
-
 export function unZIP(installation_request = true) {
     let warning = ''
     if (assets_installing) warning = 'already installing assets...'
@@ -98,8 +97,8 @@ export function unZIP(installation_request = true) {
         outputbox.warn(warning)
         return Promise.reject(warning)
     }
+
     assets_installing = true
-    console.warn('unzipping assets...')
     outputbox.warn('unzipping assets...')
 
     return new Promise(async (resolve, reject) => {

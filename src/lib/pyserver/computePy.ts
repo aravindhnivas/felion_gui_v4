@@ -19,13 +19,13 @@ export default async function <T>({ e, target, pyfile, args, general }: Type) {
     let processDivGeneralNum = 0
 
     try {
-        if (!get(python_asset_ready)) {
-            dialog.message('python assets are missing. Download it in Settings -> Update', {
-                title: 'Missing assets',
-                type: 'error',
-            })
-            return window.handleError('python assets are missing')
-        }
+        // if (!get(python_asset_ready)) {
+        //     dialog.message('python assets are missing. Download it in Settings -> Update', {
+        //         title: 'Missing assets',
+        //         type: 'error',
+        //     })
+        //     return window.handleError('python assets are missing')
+        // }
 
         console.log(`Running python in ${general ? 'subprocess' : 'server'} mode`)
         console.warn(`Running python in ${get(developerMode) ? 'developer' : 'production'} mode \n ${get(pyProgram)}`)

@@ -56,7 +56,10 @@
 
         if (delay > 0) await window.sleep(delay)
 
-        if (!$pyServerReady) return serverInfo.error('server not ready')
+        if (!$pyServerReady) {
+            serverCurrentStatus = { value: 'server closed', type: 'danger' }
+            return
+        }
         const status = await checkNetstat()
         if (!status) {
             dispatch_server_status({ closed: true })
@@ -67,16 +70,14 @@
 
     const dispatch = createEventDispatcher()
 
-    const start_and_check_felionpy = async () => {
+    export const start_and_check_felionpy = async () => {
+        if (!$developerMode && !$python_asset_ready)
+            return serverInfo.error('felionpy is not installed. Maybe check-felionpy-assets?')
         const out = await startServer()
         if (out) serverInfo.info(out)
         serverInfo.info(`PID: ${JSON.stringify($currentPortPID)}`)
         await updateServerInfo(1500)
         if ($pyServerReady) await getPyVersion()
-    }
-
-    $: if ($python_asset_ready && !$pyServerReady) {
-        start_and_check_felionpy()
     }
 
     onMount(async () => {
@@ -182,7 +183,7 @@
             class="button is-warning mt-5"
             on:click={async () => {
                 await check_felionpy_assets_status({ installation_request: true })
-            }}>check-felionpy-asset</button
+            }}>check-felionpy-assets</button
         >
 
         <button
@@ -245,7 +246,7 @@
                         id="stopServerButton"
                         on:click={async () => {
                             await stopServer()
-                            await updateServerInfo(1500)
+                            await updateServerInfo()
                         }}
                     >
                         STOPserver

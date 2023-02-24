@@ -69,6 +69,9 @@ export async function stopServer() {
     try {
         
         if (!get(pyServerReady)) {
+            if(get(currentPortPID).length > 0) {
+                await killPID()
+            }
             serverInfo.warn('Server already stopped')
             return
         }
