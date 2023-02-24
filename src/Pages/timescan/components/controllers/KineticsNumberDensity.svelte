@@ -12,17 +12,22 @@
     export let fileCollections = []
 
     let filename = 'kinetics.conditions.json'
+    let includeTranspiration = true
+
     const update_file_kinetic = async (_loc: string, _file: string) => {
         savefilename = await path.join(_loc, _file)
     }
+
     $: update_file_kinetic(configDir, filename)
+
     let savefilename = ''
-    let contents = {}
+    let contents: { [name: string]: NumberDensityConfigType } = {}
 
     $: if (useParamsFile) {
-        readConfigFile(false)
+        readConfigFile({ toast: false })
     }
-    const readConfigFile = async (toast = true) => {
+
+    const readConfigFile = async ({ toast = true } = {}) => {
         await update_file_kinetic(configDir, filename)
         if (!(await fs.exists(savefilename))) {
             if ($activePage === 'Kinetics') {
@@ -38,10 +43,13 @@
         if (isError(contents)) return window.handleError(contents)
 
         if (toast) window.createToast('file read: ' + (await path.basename(savefilename)))
-        return await compute()
+
+        await compute()
+        return
     }
 
     let updateCurrentConfig
+    let set_config: (config: NumberDensityConfigType) => void
     let get_datas
 
     const save_datas = async () => {
@@ -63,14 +71,22 @@
     }
 
     const compute = async () => {
-        if (!updateCurrentConfig) return
+        nHe = null
         const currentConfig = contents?.[selectedFile]
+
+        if (currentConfig) {
+            console.log(currentConfig)
+            set_config(currentConfig)
+            nHe = includeTranspiration ? currentConfig.nHe_transpiration : currentConfig.nHe
+            return
+        }
+
+        if (!updateCurrentConfig) return
         if (active && !currentConfig) return
         return await updateCurrentConfig(currentConfig)
     }
 
     $: if (!contents_loading_from_config && selectedFile) {
-        nHe = null
         compute()
     }
 
@@ -84,6 +100,7 @@
         if (!result) return
         config_file = result
     }
+
     let loaded_contents = {}
     let contents_loading_from_config = false
     let loaded_contents_saved = true
@@ -140,6 +157,10 @@
 
     let computeNumberDensity = null
     let set_minimal_config = null
+
+    onMount(async () => {
+        await readConfigFile({ toast: false })
+    })
 </script>
 
 <svelte:window
@@ -155,6 +176,8 @@
             bind:computeNumberDensity
             bind:set_minimal_config
             bind:updateCurrentConfig
+            bind:includeTranspiration
+            bind:set_config
             on:getValue={(e) => {
                 nHe = e.detail.nHe
             }}

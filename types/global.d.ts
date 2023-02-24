@@ -42,9 +42,27 @@ declare global {
         // LOGGER: ReturnType<typeof import('../src/Pages/settings/utils/stores').create_logger_store>
     }
     interface Window extends Exposed {}
-
     interface OutputBoxtype {
         value: string
         type: 'info' | 'danger' | 'warning' | 'success'
+    }
+
+    interface NumberDensityConfigType {
+        trap_temperature: number[]
+        background_pressure: string[]
+        added_pressure: string[]
+        calibration_factor: number[]
+        srgMode: boolean
+        tube_diameter: number[]
+        room_temperature: number[]
+        TakaishiSensuiConstants: {
+            A: number[]
+            B: number[]
+            C: number[]
+        }
+        F?: string
+        X?: string
+        nHe?: string
+        nHe_transpiration?: string
     }
 }

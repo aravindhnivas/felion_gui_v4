@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Textfield, Switch } from '$src/components';
     import computePy_func from '$lib/pyserver/computePy'
-    
-    const set_config = (config) => {
+
+    export const set_config = (config: NumberDensityConfigType) => {
         ;({trap_temperature, background_pressure, added_pressure, calibration_factor, srgMode, tube_diameter} = config)
         ;([rt, rt_std_dev] = config["room_temperature"])
         const {A, B, C} = config.TakaishiSensuiConstants
@@ -10,6 +10,9 @@
         TakaishiSensuiConstants.A.value = A
         TakaishiSensuiConstants.B.value = B
         TakaishiSensuiConstants.C.value = C
+
+        if(config.X) X = config.X
+        if(config.F) F = config.F
     }
 
     export const set_minimal_config = (config) => {
@@ -26,7 +29,7 @@
         return await computeNumberDensity(null, true)
     }
 
-    let includeTranspiration = true
+    export let includeTranspiration = true
 
     interface DataFromPython {
         F: string
