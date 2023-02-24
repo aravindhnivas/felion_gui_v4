@@ -65,14 +65,20 @@
     }
     .modal-card-body {
         display: grid;
-        /* grid-template-rows: auto 1fr; */
-        grid-template-rows: auto;
+        grid-template-rows: auto 1fr;
+        /* grid-template-rows: auto; */
         align-items: flex-start;
         color: black;
         background-color: #634e96;
     }
-    .modal-card-head {
-        background-color: #836ac05c;
+    .modal-card-head,
+    .modal-card-foot {
+        /* background-color: #836ac05c; */
+        background-color: #634e96cf;
+    }
+
+    .modal-card-foot {
+        padding: 0.5em;
     }
     .delete {
         background-color: #fafafa;

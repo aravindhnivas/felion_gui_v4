@@ -393,7 +393,7 @@
     {configDir}
     {useParamsFile}
 />
-<KineticConfigTable bind:active={show_fileConfigs} {configDir} />
+<KineticConfigTable bind:active={show_fileConfigs} {configDir} {fileCollections} />
 
 <LayoutDiv id="ROSAA-kinetics">
     <svelte:fragment slot="header_content__slot">
@@ -414,14 +414,14 @@
                     <button
                         class="button is-link"
                         on:click={() => {
-                            show_numberDensity = true
-                        }}>Open number density modal</button
+                            show_fileConfigs = true
+                        }}>Show file configs</button
                     >
                     <button
                         class="button is-link"
                         on:click={() => {
-                            show_fileConfigs = true
-                        }}>Show file configs</button
+                            show_numberDensity = true
+                        }}>Open number density modal</button
                     >
                 </Panel>
 

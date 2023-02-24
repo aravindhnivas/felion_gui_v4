@@ -16,7 +16,7 @@
     export let singleFilemode_ObjectKey = null
     export let uniqFilter = null
     export let style = ''
-    // export let use_custom_functions = false
+    export let rowKeyCheck: () => boolean = null
     export let custom_load_save_fuctions: {
         save: () => Promise<void> | void
         load: () => Promise<void> | void
@@ -38,6 +38,10 @@
     }
 
     export let save_data = async () => {
+        if (rowKeyCheck) {
+            if (!rowKeyCheck()) return
+        }
+
         if (isEmpty(dataToSave)) {
             window.createToast('No data to save', 'danger', toastOpts)
             return
@@ -107,7 +111,7 @@
 
     export let load_data = async (toast = true) => {
         // await tick()
-
+        dataToSave = []
         data_loaded = false
         const loadfilename = await path.join(configDir, filename)
 
