@@ -91,6 +91,7 @@
     }
 
     let config_file = ''
+
     const browseFromConfigFile = async () => {
         config_file = ''
         const result = (await dialog.open({

@@ -385,6 +385,7 @@
 </script>
 
 <MatplotlibDialog bind:open={kinetic_plot_adjust_dialog_active} bind:value={$kinetic_plot_adjust_configs} />
+
 <KineticsNumberDensity
     bind:active={show_numberDensity}
     bind:nHe
@@ -393,6 +394,7 @@
     {configDir}
     {useParamsFile}
 />
+
 <KineticConfigTable bind:active={show_fileConfigs} {configDir} {fileCollections} />
 
 <LayoutDiv id="ROSAA-kinetics">
@@ -415,13 +417,13 @@
                         class="button is-link"
                         on:click={() => {
                             show_fileConfigs = true
-                        }}>Show file configs</button
+                        }}>Config Table</button
                     >
                     <button
                         class="button is-link"
                         on:click={() => {
                             show_numberDensity = true
-                        }}>Open number density modal</button
+                        }}>Open number density model</button
                     >
                 </Panel>
 
