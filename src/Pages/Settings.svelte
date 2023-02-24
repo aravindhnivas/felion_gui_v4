@@ -53,7 +53,7 @@
         }
 
         await check_felionpy_assets_status()
-        if ($python_asset_ready) await start_and_check_felionpy()
+        await start_and_check_felionpy()
         await check_for_update()
     })
 </script>
