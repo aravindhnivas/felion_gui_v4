@@ -66,7 +66,7 @@
             <Head>
                 <Row>
                     {#if includeIndex}
-                        <Cell># {rows.length}</Cell>
+                        <Cell style="width: 0.5em;"># {rows.length}</Cell>
                     {/if}
                     {#each headKeys as key, i (key)}
                         <Cell on:click={() => sortTable(rowKeys[i])}>
@@ -84,7 +84,7 @@
                         </Cell>
                     {/each}
                     {#if closeableRows}
-                        <Cell
+                        <Cell style="width: 7em;"
                             ><button
                                 class="button is-link"
                                 style="background-color: var(--color-danger);"

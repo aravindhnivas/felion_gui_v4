@@ -20,7 +20,7 @@
     import RateConstants from './controllers/RateConstants.svelte'
     import RateInitialise from './controllers/RateInitialise.svelte'
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
-    import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
+    // import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
     import Accordion from '@smui-extra/accordion'
 
     const currentLocation = persistentWritable('kinetics_location', '')
@@ -375,27 +375,40 @@
     })
 
     let kinetic_plot_adjust_dialog_active = false
-    let show_numberDensity = false
+    // let show_numberDensity = false
     let show_fileConfigs = false
     let nHe = ''
+    let numberDensityData = []
+
     const kinetic_plot_adjust_configs = persistentWritable(
         'kinetic_plot_adjust_configs',
         'top=0.905,\nbottom=0.135,\nleft=0.075,\nright=0.59,\nhspace=0.2,\nwspace=0.2'
     )
+
+    $: if (useParamsFile && selectedFile) {
+        const ind = numberDensityData.findIndex((d) => d.filename === selectedFile)
+        nHe = numberDensityData?.[ind]?.ND ?? ''
+        // console.log(numberDensityData, numberDensityData?.[ind], { nHe })
+    }
 </script>
 
 <MatplotlibDialog bind:open={kinetic_plot_adjust_dialog_active} bind:value={$kinetic_plot_adjust_configs} />
 
-<KineticsNumberDensity
+<!-- <KineticsNumberDensity
     bind:active={show_numberDensity}
     bind:nHe
     {selectedFile}
     {fileCollections}
     {configDir}
     {useParamsFile}
-/>
+/> -->
 
-<KineticConfigTable bind:active={show_fileConfigs} {configDir} {fileCollections} />
+<KineticConfigTable
+    bind:config_datas={numberDensityData}
+    bind:active={show_fileConfigs}
+    {configDir}
+    {fileCollections}
+/>
 
 <LayoutDiv id="ROSAA-kinetics">
     <svelte:fragment slot="header_content__slot">
@@ -419,12 +432,12 @@
                             show_fileConfigs = true
                         }}>Config Table</button
                     >
-                    <button
+                    <!-- <button
                         class="button is-link"
                         on:click={() => {
                             show_numberDensity = true
                         }}>Open number density model</button
-                    >
+                    > -->
                 </Panel>
 
                 <RateInitialise

@@ -1,99 +1,42 @@
 <script lang="ts">
+    import {
+        tube_diameter,
+        room_temperature,
+        number_density_std,
+        TakaishiSensuiConstants,
+        calibration_factor as C_factor
+    } from '$src/Pages/misc/numberDensity/utils'
+    import {compute_number_density} from '$src/Pages/misc/numberDensity/'
     import { Textfield, Switch } from '$src/components';
-    import computePy_func from '$lib/pyserver/computePy'
 
-    export const set_config = (config: NumberDensityConfigType) => {
-        ;({trap_temperature, background_pressure, added_pressure, calibration_factor, srgMode, tube_diameter} = config)
-        ;([rt, rt_std_dev] = config["room_temperature"])
-        const {A, B, C} = config.TakaishiSensuiConstants
-
-        TakaishiSensuiConstants.A.value = A
-        TakaishiSensuiConstants.B.value = B
-        TakaishiSensuiConstants.C.value = C
-
-        if(config.X) X = config.X
-        if(config.F) F = config.F
-    }
-
-    export const set_minimal_config = (config) => {
-        trap_temperature[0] = config.temp
-        background_pressure[0] = config.pbefore
-        added_pressure[0] = config.pafter
-        calibration_factor[0] = config.C_factor
-        srgMode = config.srgMode
-    }
+    let includeTranspiration = true
     
-    export const updateCurrentConfig = async (config) => {
-        if(!config || Object.keys(config).length === 0) return
-        set_config(config)
-        return await computeNumberDensity(null, true)
-    }
-
-    export let includeTranspiration = true
-
-    interface DataFromPython {
-        F: string
-        X: string
-        nHe: string
-        nHe_transpiration: string
-    }
-    // let datafromPython: DataFromPython
-    let rt = localStorage.getItem('RT') || 300
-    let trap_temperature = [4, 0.3]
-    let background_pressure = ["1e-8", 0]
-    let added_pressure = ["5e-6", 10]
-    
-    let TakaishiSensuiConstants = {
-        A: {value: [6.11, 0], unit: "(K / mm.Pa)^2"},
-        B: {value: [4.26, 0], unit: "K / mm.Pa"},
-        C: {value: [0.52, 0], unit: "(K / mm.Pa)^0.5"}
-    }
-    let tube_diameter = [3, 0.1]
+    let X: string = ''
+    let F: string = ''
     let srgMode = false;
-    let calibration_factor = [localStorage.getItem('calibration_factor') ?? 200, 10]
-    let rt_std_dev = 1
-    $: localStorage.setItem('calibration_factor',  Number(calibration_factor[0]))
-    
-    let numberDensity = null
-    let [X, F] = [null, null];
+    let added_pressure: string | number = "5e-6"
+    let trap_temperature: string | number = 4.7
+    let background_pressure: string | number = "1e-8"
+    let calibration_factor: string | number = $C_factor
+    let numberDensity: {nHe: string, nHe_transpiration: string} = null
+
 
     export const computeNumberDensity = async (e?: Event, get_data=false) => {
-        // datafromPython = null
-        // args = null
         numberDensity = null
-        const room_temperature = [rt, rt_std_dev]
-        
-        if(Number(trap_temperature[0]) <= 0) return window.createToast("Invalid temperature", "danger")
-        
-        const changeInPressure = Number(added_pressure[0]) - Number(background_pressure[0])
-        if(changeInPressure < 0) return window.createToast("Negative pressure! correct background pressure!!", "danger")
-        if(!changeInPressure) return window.createToast("Invalid pressures", "danger")
-        const TkConstants = {
-            A: TakaishiSensuiConstants.A.value.map(Number),
-            B: TakaishiSensuiConstants.B.value.map(Number),
-            C: TakaishiSensuiConstants.C.value.map(Number),
-        }
-        await tick()
         
         const args = {
             srgMode,
-            tube_diameter, 
             added_pressure,
-            room_temperature,
             trap_temperature,
             background_pressure,
-            TakaishiSensuiConstants: TkConstants,
             calibration_factor,
         }
 
-        const datafromPython: DataFromPython = await computePy_func(
-            {e, pyfile: 'numberDensity', args}
-        )
-        
-        if(!datafromPython) return Promise.reject('Computation failed')
+        const [_err, datafromPython] = await oO(compute_number_density(e, args))
 
-        numberDensity = {nHe: datafromPython.nHe, nHe_transpiration: datafromPython.nHe_transpiration}
-        ;({X, F} = datafromPython)
+        if(_err || !datafromPython) return Promise.reject('Computation failed')
+        ;({numberDensity, X, F} = datafromPython)
+
         dispatch_current_numberdensity()
         if(get_data) return Promise.resolve(structuredClone({...args, ...datafromPython }))
         return Promise.resolve(dispatch_current_numberdensity(structuredClone({...args, ...datafromPython })))
@@ -113,8 +56,7 @@
 
     <slot name="header" />
     
-    <Switch on:change={async ({detail: {selected}})=>{
-        calibration_factor = selected ? [1, 0] : [200, 10]
+    <Switch on:change={async ()=>{
         return await computeNumberDensity()
     }}
         tooltip="Spinning Rotor Gauge"
@@ -142,31 +84,31 @@
 
             <div class="border__div">
                 <Textfield
-                    bind:value={trap_temperature[0]}
+                    bind:value={trap_temperature}
                     label={'trap_temperature [K]'}
                 />
                 <Textfield
-                    bind:value={trap_temperature[1]}
+                    bind:value={$number_density_std.trap_temperature}
                     label="std. dev."
                 />
             </div>
             <div class="border__div">
                 <Textfield
-                    bind:value={background_pressure[0]}
+                    bind:value={background_pressure}
                     label={'background_pressure [mbar]'}
                 />
                 <Textfield
-                    bind:value={background_pressure[1]}
+                    bind:value={$number_density_std.background_pressure}
                     label="std. dev. (%)"
                 />
             </div>
             <div class="border__div">
                 <Textfield
-                    bind:value={added_pressure[0]}
+                    bind:value={added_pressure}
                     label={'added_pressure [mbar]'}
                 />
                 <Textfield
-                    bind:value={added_pressure[1]}
+                    bind:value={$number_density_std.added_pressure}
                     label="std. dev. (%)"
                 />
             </div>
@@ -180,12 +122,12 @@
 
             <div class="border__div">
                 <Textfield disabled={srgMode}
-                    bind:value={calibration_factor[0]}
+                    bind:value={calibration_factor}
                     label="Calibration Factor"
                 />
 
                 <Textfield disabled={srgMode}
-                    bind:value={calibration_factor[1]}
+                    bind:value={$number_density_std.calibration_factor}
                     label="std.dev."
                 />
             </div>
@@ -193,12 +135,12 @@
             <div class="border__div">
 
                 <Textfield
-                    bind:value={rt}
+                    bind:value={$room_temperature}
                     label="Room temperature (K)"
                 />
 
                 <Textfield
-                    bind:value={rt_std_dev}
+                    bind:value={$number_density_std.room_temperature}
                     label="std.dev."
                 />
             </div>
@@ -209,16 +151,16 @@
             <br>
             
             <div class="border__div">
-                {#each Object.keys(TakaishiSensuiConstants) as key (key)}
+                {#each Object.keys($TakaishiSensuiConstants) as key (key)}
                     
                 <div class='align h-center'>
 
                     <Textfield style='width: 7em;'
-                        bind:value={TakaishiSensuiConstants[key].value[0]}
-                        label={`${key} [${TakaishiSensuiConstants[key].unit}]`}
+                        bind:value={$TakaishiSensuiConstants[key].value[0]}
+                        label={`${key} [${$TakaishiSensuiConstants[key].unit}]`}
                         />
                     <Textfield style='width: 7em;'
-                        bind:value={TakaishiSensuiConstants[key].value[1]}
+                        bind:value={$TakaishiSensuiConstants[key].value[1]}
                         label="std. dev."
                         />
                 </div>
@@ -230,21 +172,23 @@
                     input$min="0"
                     input$step="0.1"
                     type="number"
-                    bind:value={tube_diameter[0]}
+                    bind:value={$tube_diameter}
                     label="connecting tube diameter [mm]"
                 />
                 <Textfield
-                    bind:value={tube_diameter[1]}
+                    bind:value={$number_density_std.tube_diameter}
                     label="std. dev."
                 />
             </div>
 
             <div class="border__div">
+
                 <Textfield
                     disabled
                     value={X || ''}
                     label="X [mm.Pa / K]"
                 />
+                
                 <Textfield
                     disabled
                     value={F || ''}
