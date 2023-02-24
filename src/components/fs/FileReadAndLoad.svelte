@@ -1,29 +1,43 @@
 <script lang="ts">
     import { isEmpty, uniqBy } from 'lodash-es'
-    import { Textfield, TextAndSelectOptsToggler } from '$src/components'
-    import MenuSurface from '@smui/menu-surface'
-    import type { MenuSurfaceComponentDev } from '@smui/menu-surface'
+    import { TextAndSelectOptsToggler } from '$src/components'
+
     export let configDir: string = ''
     export let selectedFile: string = ''
     export let options_filter: string = '.json'
     export let useTaggedFile: boolean = false
     export let useParamsFile: boolean = false
     export let tagFile: string = ''
-    export let filename = ''
+    export let filename = 'data'
     export let data_loaded = false
-    export let dataToSave
+
+    export let dataToSave = []
     export let singleFilemode = false
     export let singleFilemode_ObjectKey = null
     export let uniqFilter = null
+    export let style = ''
+    // export let use_custom_functions = false
+    export let custom_load_save_fuctions: {
+        save: () => Promise<void> | void
+        load: () => Promise<void> | void
+    } = {
+        save: null,
+        load: null,
+    }
 
-    let surface: MenuSurfaceComponentDev
+    let className = ''
+    export { className as class }
+
+    const { save: custom_save_data, load: custom_load_data } = custom_load_save_fuctions
+
+    // let surface: MenuSurfaceComponentDev
 
     // console.log({ filename, configDir })
     const toastOpts = {
         target: 'left',
     }
 
-    const save_data = async () => {
+    export let save_data = async () => {
         if (isEmpty(dataToSave)) {
             window.createToast('No data to save', 'danger', toastOpts)
             return
@@ -91,7 +105,7 @@
         window.createToast(`${filename} ${info} for ${selectedFile}`, 'success', toastOpts)
     }
 
-    export const load_data = async (toast = true) => {
+    export let load_data = async (toast = true) => {
         // await tick()
 
         data_loaded = false
@@ -160,12 +174,23 @@
     }
 
     $: if (!singleFilemode && selectedFile && (useParamsFile || useTaggedFile)) {
-        load_data(false)
+        custom_load_data ? custom_load_data() : load_data(false)
     }
+
+    onMount(() => {
+        if (filename && !filename.endsWith(options_filter)) {
+            filename = `${filename}${options_filter}`
+        }
+    })
 </script>
 
-<div class="container mb-5">
-    <button class="button is-warning" on:click={async () => await load_data()}>Load</button>
+<div class="container mb-5 {className}" {style}>
+    {#if custom_load_data}
+        <button class="button is-warning" on:click={custom_load_data}>Load</button>
+    {:else}
+        <button class="button is-warning" on:click={async () => await load_data()}>Load</button>
+    {/if}
+
     <TextAndSelectOptsToggler
         bind:value={filename}
         label={`config file (*${options_filter})`}
@@ -173,19 +198,18 @@
         lookIn={configDir}
         auto_init={true}
     />
-    <button class="button is-link" on:click={save_data}>Save</button>
-    <MenuSurface
-        style="background: #9666db;"
-        bind:this={surface}
-        anchorCorner="BOTTOM_START"
-        anchorMargin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-    >
-        <div class="align p-5">
-            <Textfield bind:value={configDir} label="save location" />
-        </div>
-    </MenuSurface>
-    <!-- <button class="i-mdi-help text-xl" on:click={() => surface.setOpen(true)} /> -->
-    <button class="i-material-symbols-help-outline-sharp text-xl" on:click={() => surface.setOpen(true)} />
+
+    {#if custom_save_data}
+        <button class="button is-link" on:click={custom_save_data}>Save</button>
+    {:else}
+        <button class="button is-link" on:click={save_data}>Save</button>
+    {/if}
+    <button
+        class="i-material-symbols-help-outline-sharp text-xl"
+        on:click={async () => {
+            await dialog.message('File save location is given below\n\n' + configDir, { title: 'Info' })
+        }}
+    />
 </div>
 
 <style>

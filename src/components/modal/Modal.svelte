@@ -8,7 +8,6 @@
     export let id = window.getID()
 
     const dispatch = createEventDispatcher()
-
     const mount = (node) => {
         dispatch('mount', { node })
 
@@ -65,6 +64,10 @@
         overflow-y: hidden;
     }
     .modal-card-body {
+        display: grid;
+        /* grid-template-rows: auto 1fr; */
+        grid-template-rows: auto;
+        align-items: flex-start;
         color: black;
         background-color: #634e96;
     }

@@ -40,7 +40,8 @@
         height: 100%;
         gap: 0.5em;
         padding: 0;
-        overflow-y: auto;
+        // overflow-y: auto;
+        overflow: hidden;
         width: 100%;
         .header_content {
             display: grid;

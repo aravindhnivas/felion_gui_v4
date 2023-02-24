@@ -34,6 +34,10 @@
             }
         }
         mounted = true
+
+        // if (!filename.endsWith(options_filter)) {
+        //     filename = `${filename}${options_filter}`
+        // }
     })
 
     let sortToggle: { [key: string]: boolean } = {}
@@ -49,6 +53,7 @@
     <div class="align">
         {#if configDir}
             <FileReadAndLoad
+                style="justify-content: flex-end;"
                 bind:dataToSave={rows}
                 {configDir}
                 singleFilemode={true}

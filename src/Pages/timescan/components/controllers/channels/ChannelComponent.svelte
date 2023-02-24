@@ -3,12 +3,14 @@
     export let item: Timescan.LossChannel
     export let rateConstantMode = false
     export let ions_lists: string[] = []
+    export let ind: number = 0
 
     const dispatch = createEventDispatcher()
 </script>
 
 <div class="channel_div">
-    <button class="i-mdi-menu text-2xl" style="cursor: move;" />
+    <!-- <button class="i-mdi-menu text-2xl" style="cursor: move;" /> -->
+    <span class="channel_counter">{ind + 1}</span>
     <Select bind:value={item.type} label="type" options={['forwards', 'backwards']} />
     <Textfield bind:value={item.name} label="name" />
     <Select bind:value={item.lossFrom} label="lossFrom" options={['<resp. ion>', ...ions_lists]} />
@@ -37,5 +39,15 @@
         justify-content: space-evenly;
         align-items: flex-end;
         gap: 1em;
+    }
+
+    .channel_counter {
+        border: solid 1px;
+        padding: 0.3em;
+        border-radius: 1em;
+        width: 2em;
+        height: 2em;
+        display: flex;
+        justify-content: center;
     }
 </style>

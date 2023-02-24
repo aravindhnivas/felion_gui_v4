@@ -2,14 +2,15 @@
     import { persistentWritable } from '$src/js/persistentStore'
     import { onMount } from 'svelte'
     import {
-        Textfield,
-        TextSwitch,
+        Panel,
         Select,
         Checkbox,
-        TextAndSelectOptsToggler,
-        Panel,
-        BrowseTextfield,
+        Textfield,
+        TextSwitch,
         ButtonBadge,
+        BrowseTextfield,
+        FileReadAndLoad,
+        TextAndSelectOptsToggler,
     } from '$src/components'
     import LayoutDiv from '$src/layout/misc/LayoutDiv.svelte'
     import computePy_func from '$lib/pyserver/computePy'
@@ -437,19 +438,23 @@
                             />
                             <Textfield bind:value={molecule} label="Molecule" />
                             <Textfield bind:value={tag} label="tag" />
-                            <div class="parm_save__div">
-                                <button class="button is-warning" on:click={() => computeOtherParameters()}>load</button
-                                >
-                                <TextAndSelectOptsToggler
-                                    bind:value={$kinetics_params_file}
-                                    label="fit-config file (*.params.json)"
-                                    lookFor=".params.json"
-                                    lookIn={configDir}
-                                />
-                                <button class="button is-link" on:click={async () => await updateParamsFile()}
-                                    >save</button
-                                >
-                            </div>
+
+                            <FileReadAndLoad
+                                style="justify-content: flex-end;"
+                                bind:filename={$kinetics_params_file}
+                                options_filter=".params.json"
+                                custom_load_save_fuctions={{
+                                    save: updateParamsFile,
+                                    load: computeOtherParameters,
+                                }}
+                                {...{
+                                    configDir,
+                                    selectedFile,
+                                    tagFile,
+                                    useTaggedFile,
+                                    useParamsFile,
+                                }}
+                            />
                         </div>
                     </svelte:fragment>
                     <svelte:fragment slot="rate-constants">
@@ -519,7 +524,7 @@
     }
 
     .parm_save__div {
-        align-items: flex-end;
+        align-items: center;
         justify-content: flex-end;
         display: flex;
         gap: 1em;

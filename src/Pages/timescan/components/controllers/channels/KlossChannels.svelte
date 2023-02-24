@@ -102,6 +102,7 @@
 
 <CustomPanel loaded={loss_channels.length > 0} label="Channels" style="display: flex; flex-direction: column;">
     <FileReadAndLoad
+        style="justify-content: flex-end;"
         bind:filename={channels_file}
         bind:dataToSave={loss_channels}
         bind:load_data
@@ -133,11 +134,12 @@
     </div>
 
     <div class="channels_div mb-5">
-        {#each loss_channels as item (item.id)}
+        {#each loss_channels as item, ind (item.id)}
             <ChannelComponent
                 {item}
                 {rateConstantMode}
                 {ions_lists}
+                {ind}
                 on:remove={(e) => {
                     const { id } = e.detail
                     loss_channels = loss_channels.filter((c) => c.id !== id)
