@@ -211,7 +211,7 @@
     <button
         class="i-material-symbols-help-outline-sharp text-xl"
         on:click={async () => {
-            await dialog.message('File save location is given below\n\n' + configDir, { title: 'Info' })
+            await dialog.message(configDir, { title: 'save location' })
         }}
     />
 </div>
