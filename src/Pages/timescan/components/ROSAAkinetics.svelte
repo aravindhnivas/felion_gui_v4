@@ -532,12 +532,4 @@
         grid-row-gap: 1em;
         padding-right: 1em;
     }
-
-    .parm_save__div {
-        align-items: center;
-        justify-content: flex-end;
-        display: flex;
-        gap: 1em;
-        margin-left: auto;
-    }
 </style>
