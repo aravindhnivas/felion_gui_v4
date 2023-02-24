@@ -209,9 +209,10 @@
         <button class="button is-link" on:click={save_data}>Save</button>
     {/if}
     <button
-        class="i-material-symbols-help-outline-sharp text-xl"
+        class="i-material-symbols-folder-open-outline text-xl"
         on:click={async () => {
-            await dialog.message(configDir, { title: 'save location' })
+            // await dialog.message(configDir, { title: 'save location' })
+            await shell.open(configDir)
         }}
     />
 </div>
