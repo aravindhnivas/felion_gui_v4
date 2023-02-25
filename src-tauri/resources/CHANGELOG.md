@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.5.1
+
+- BUG FIX: felionpy min-version download
+
 ## v4.5.0
 
 - Kinetics code improvements
