@@ -118,7 +118,7 @@ export class computeKineticCodeScipy {
 
             let loss_reaction
 
-            if (this.rateConstantMode && numberDensity) {
+            if (this.rateConstantMode && numberDensity && numberDensity !== '0') {
                 // loss_reaction = `(${name} * ${numberDensity.replace('^1', '').replace('^', '**')} * ${lossFrom})`
                 if (numberDensity === '1') {
                     loss_reaction = `(${name} * ${this.ND_name.trim()} * ${lossFrom})`
