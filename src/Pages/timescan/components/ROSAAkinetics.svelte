@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { persistentWritable } from '$src/js/persistentStore'
+    import { kinetics_params_file, fit_config_filename } from '$src/Pages/timescan/stores'
     import { onMount } from 'svelte'
     import {
         Panel,
@@ -20,7 +20,7 @@
     import RateConstants from './controllers/RateConstants.svelte'
     import RateInitialise from './controllers/RateInitialise.svelte'
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
-    // import KineticsNumberDensity from './controllers/KineticsNumberDensity.svelte'
+    import KineticsPlot from './KineticsPlot.svelte'
     import Accordion from '@smui-extra/accordion'
 
     const currentLocation = persistentWritable('kinetics_location', '')
@@ -123,8 +123,6 @@
         computeOtherParameters()
     }
     let useParamsFile = false
-
-    const kinetics_params_file = persistentWritable('kinetics_params_file', 'kinetics.params.json')
 
     const update_file = async (_loc: string, _file: string) => {
         paramsFile = await path.join(_loc, _file || '')
@@ -367,7 +365,7 @@
     let kineticfile = ''
     let reportRead = false
     let reportSaved = false
-    const fit_config_filename = persistentWritable('kinetics_fitted_values', 'kinetics.fit.json')
+
     let loss_channels: Timescan.LossChannel[] = []
     let rateConstantMode = false
     onMount(() => {
@@ -388,29 +386,20 @@
     $: if (useParamsFile && selectedFile) {
         const ind = numberDensityData.findIndex((d) => d.filename === selectedFile)
         nHe = numberDensityData?.[ind]?.ND ?? ''
-        // console.log(numberDensityData, numberDensityData?.[ind], { nHe })
     }
 
     let ND_name = 'He'
+    let open_plot_modal = false
 </script>
 
 <MatplotlibDialog bind:open={kinetic_plot_adjust_dialog_active} bind:value={$kinetic_plot_adjust_configs} />
-
-<!-- <KineticsNumberDensity
-    bind:active={show_numberDensity}
-    bind:nHe
-    {selectedFile}
-    {fileCollections}
-    {configDir}
-    {useParamsFile}
-/> -->
-
 <KineticConfigTable
     bind:config_datas={numberDensityData}
     bind:active={show_fileConfigs}
     {configDir}
     {fileCollections}
 />
+<KineticsPlot bind:active={open_plot_modal} {configDir} />
 
 <LayoutDiv id="ROSAA-kinetics">
     <svelte:fragment slot="header_content__slot">
@@ -434,12 +423,6 @@
                             show_fileConfigs = true
                         }}>Config Table</button
                     >
-                    <!-- <button
-                        class="button is-link"
-                        on:click={() => {
-                            show_numberDensity = true
-                        }}>Open number density model</button
-                    > -->
                 </Panel>
 
                 <RateInitialise
@@ -482,12 +465,7 @@
                         </div>
                     </svelte:fragment>
                     <svelte:fragment slot="rate-constants">
-                        <RateConstants
-                            {configDir}
-                            bind:defaultInitialValues
-                            bind:initialValues
-                            bind:kinetics_fitfile={$fit_config_filename}
-                        />
+                        <RateConstants {configDir} bind:defaultInitialValues bind:initialValues />
                     </svelte:fragment>
                 </RateInitialise>
 
@@ -526,6 +504,7 @@
         <Checkbox on:change={async () => await computeParameters()} bind:value={useParamsFile} label="useParams" />
         <Checkbox bind:value={useTaggedFile} label="useTag" />
         <TextAndSelectOptsToggler
+            style="width: 7em;"
             tooltip_dir="top"
             bind:value={tagFile}
             options={tagOptions}
@@ -536,6 +515,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="footer_content__slot">
+        <button class="button is-link" on:click={() => (open_plot_modal = true)}>plots</button>
         <Select bind:value={selectedFile} label="Filename" options={fileCollections} />
         <button class="button is-link" on:click={async () => await computeParameters()}>compute</button>
         <button class="i-mdi-settings text-2xl" on:click={() => (kinetic_plot_adjust_dialog_active = true)} />

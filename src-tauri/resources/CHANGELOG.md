@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.5.2
+
+- BUG FIX: kinetocs rate constant fitting
+  
 ## v4.5.1
 
 - BUG FIX: felionpy min-version download

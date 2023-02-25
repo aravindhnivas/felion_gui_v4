@@ -51,7 +51,7 @@
         if (!graphMode) return
         await tick()
         if (ms > 0) await window.sleep(ms)
-        // console.log('changeGraphDivWidth', graphDivs)
+        console.log('changeGraphDivWidth', graphDivs)
         graphDivs.forEach((id) => {
             if (id.data) {
                 relayout(id, { width: id.clientWidth })
@@ -91,12 +91,13 @@
     <div class="main_content" style={mainContent$style}>
         <slot name="main_content__slot" {changeGraphDivWidth} />
     </div>
-    {#if autoHide && !$$slots.footer_content__slot}
+
+    <!-- {#if autoHide && !$$slots.footer_content__slot} -->
         <div class="footer_content">
-            <div class="container left align"><slot name="left_footer_content__slot" /></div>
-            <div class="container right align"><slot name="footer_content__slot" /></div>
+            <div class="container left align"><slot name="left_footer_content__slot" {changeGraphDivWidth} /></div>
+            <div class="container right align"><slot name="footer_content__slot" {changeGraphDivWidth} /></div>
         </div>
-    {/if}
+    <!-- {/if} -->
 </div>
 
 <style lang="scss">

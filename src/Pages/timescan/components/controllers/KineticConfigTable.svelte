@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { persistentWritable } from '$src/js/persistentStore'
+    import { config_filename } from '$src/Pages/timescan/stores'
     import { Checkbox, Modal, Select, STable, Textfield } from '$src/components'
     import { compute_number_density } from '$src/Pages/misc/numberDensity'
 
@@ -27,8 +27,6 @@
     }
 
     let srgMode = true
-
-    const config_filename = persistentWritable('kinetics_config_filename', 'kinetics.configs.json')
 
     const rowKeyCheck = () => {
         const pafterNullLists = config_datas.filter((d) => !d.pafter)

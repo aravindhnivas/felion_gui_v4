@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { channels_file } from '$src/Pages/timescan/stores'
     import ChannelComponent from './ChannelComponent.svelte'
     import { differenceBy, find } from 'lodash-es'
     import { Textfield, Switch, FileReadAndLoad } from '$src/components'
@@ -74,7 +75,6 @@
     const trigger_rateConstantMode_change = () => {
         console.log('trigger_rateConstantMode_change')
         loss_channels = loss_channels.map((channel) => {
-            // const number_density_exponent = parseInt(channel?.numberDensity?.split('^')[1])
             const number_density_exponent = parseInt(channel?.numberDensity)
             if (!isNaN(number_density_exponent)) {
                 if (rateConstantMode) {
@@ -86,8 +86,6 @@
             return channel
         })
     }
-
-    const channels_file = persistentWritable('channels_file', 'kinetics.channels.json')
 
     const updateGuessMaxValues = () => {
         loss_channels = loss_channels.map((channel) => {
