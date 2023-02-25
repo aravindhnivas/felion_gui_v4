@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v4.5.2
+## v4.6.0
 
 - Feature: kinetics plot (plotly) added
 - BUG FIX: kinetocs rate constant fitting
