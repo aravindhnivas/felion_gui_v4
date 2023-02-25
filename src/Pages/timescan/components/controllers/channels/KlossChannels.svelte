@@ -14,6 +14,7 @@
     export let tagFile: string = ''
     export let selectedFile: string = ''
     export let load_data
+    export let ND_name = 'He'
 
     let channelCounter = 0
     let maxGuess = '0.5'
@@ -52,10 +53,6 @@
         loss_channels = [ktrap_loss_channel, ...loss_channels]
     }
 
-    // $: if (loss_channels?.length === 0) {
-    //     channelCounter = 0
-    // }
-
     let defaultMode = false
 
     $: nameOfReactantsArr = nameOfReactants.split(',').map((n) => n.trim())
@@ -69,16 +66,16 @@
         defaultChannelsArr = default_channels(nameOfReactantsArr, rateConstantMode, maxGuess)
         loss_channels = [...loss_channels, ...defaultChannelsArr]
     }
-
     onMount(() => {
         loss_channels = []
-
         make_default_channels()
     })
 
     const trigger_rateConstantMode_change = () => {
+        console.log('trigger_rateConstantMode_change')
         loss_channels = loss_channels.map((channel) => {
-            const number_density_exponent = parseInt(channel?.numberDensity?.split('^')[1])
+            // const number_density_exponent = parseInt(channel?.numberDensity?.split('^')[1])
+            const number_density_exponent = parseInt(channel?.numberDensity)
             if (!isNaN(number_density_exponent)) {
                 if (rateConstantMode) {
                     channel.sliderController = get_slider_controller(number_density_exponent)
@@ -90,7 +87,7 @@
         })
     }
 
-    let channels_file = 'kinetics.channels.json'
+    const channels_file = persistentWritable('channels_file', 'kinetics.channels.json')
 
     const updateGuessMaxValues = () => {
         loss_channels = loss_channels.map((channel) => {
@@ -103,7 +100,7 @@
 <CustomPanel loaded={loss_channels.length > 0} label="Channels" style="display: flex; flex-direction: column;">
     <FileReadAndLoad
         style="justify-content: flex-end;"
-        bind:filename={channels_file}
+        bind:filename={$channels_file}
         bind:dataToSave={loss_channels}
         bind:load_data
         options_filter=".channels.json"
@@ -124,6 +121,9 @@
             label="rateConstant mode"
             on:change={trigger_rateConstantMode_change}
         />
+        {#if rateConstantMode}
+            <Textfield bind:value={ND_name} label="ND_name" />
+        {/if}
     </div>
 
     <div class="align h-center mb-5">

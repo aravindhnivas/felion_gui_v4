@@ -1,7 +1,6 @@
 <script lang="ts">
     import Editor from '$lib/Editor.svelte'
     import { computeKineticCodeScipy } from '../functions/computeKineticCode'
-
     export let location = ''
     export let savefilename = ''
     export let reportRead = false
@@ -10,6 +9,7 @@
     export let loss_channels: Timescan.LossChannel[] = []
     export let selectedFile = ''
     export let rateConstantMode = false
+    export let ND_name = 'He'
 
     let editor
     let computedCode: computeKineticCodeScipy
@@ -18,6 +18,7 @@
         nameOfReactants,
         loss_channels,
         rateConstantMode,
+        ND_name,
     }
     const computeSliders = () => {
         const computedCode_new = new computeKineticCodeScipy(maindata)

@@ -29,7 +29,6 @@
     let srgMode = true
 
     const config_filename = persistentWritable('kinetics_config_filename', 'kinetics.configs.json')
-    // let config_datas = []
 
     const rowKeyCheck = () => {
         const pafterNullLists = config_datas.filter((d) => !d.pafter)
@@ -42,12 +41,6 @@
         }
         return status
     }
-
-    // $: if (selectedFile) {
-    //     const ind = config_datas.findIndex((d) => d.filename === selectedFile)
-    //     nHe = config_datas?.[ind]?.ND ?? ''
-    //     console.log(config_datas, config_datas?.[ind], { nHe })
-    // }
 
     const addRow = async () => {
         if (!selectedFile)

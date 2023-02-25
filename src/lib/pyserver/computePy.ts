@@ -3,7 +3,7 @@ import computefromSubprocess from './computefromSubprocess'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
 // import { startServer } from './felionpyServer'
 // import { confirm } from '@tauri-apps/api/dialog'
-import { python_asset_ready } from '$src/Pages/settings/utils/stores'
+// import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 interface Type {
     pyfile: string
     args: Object

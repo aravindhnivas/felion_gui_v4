@@ -1,6 +1,7 @@
 import { pyProgram, pythonscript, get, pyVersion, pyServerReady, developerMode } from './stores'
 import { running_processes } from '$src/sveltewritables'
 import { path, fs, shell } from '@tauri-apps/api'
+import { LOGGER } from '$src/Pages/settings/utils/stores'
 export const dispatchEvent = (target: HTMLButtonElement | null | undefined, detail: Object, eventName: string) => {
     if (!target) return console.warn('No target to dispatch event')
     const event = new CustomEvent(eventName, { bubbles: false, detail })
@@ -149,6 +150,7 @@ export default async function ({
             }
             dispatchEvent(target, { py, pyfile, error }, 'pyEventStderr')
             // console.log(`Output from python: ${errorString}`)
+            LOGGER.error(errorString)
         })
 
         py.stdout.on('data', (dataString) => {
@@ -159,6 +161,7 @@ export default async function ({
             } else {
                 dataReceived += dataString
             }
+            LOGGER.info(dataString)
             // console.log(dataString.trim())
             dispatchEvent(target, { py, pyfile, dataReceived, stdout: dataString }, 'pyEventData')
         })

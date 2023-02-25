@@ -7,18 +7,8 @@
     export let style: string = ''
     export let autoHide: boolean = false
     export let active: boolean = false
-
     let className: string = ''
     export { className as class }
-
-    // onMount(() => {
-    //     console.warn('OutputBox mounted')
-    //     console.log({ output })
-    // })
-    $: if (active) {
-        console.log('OutputBox active', heading)
-        console.log({ output })
-    }
 </script>
 
 <SeparateWindow

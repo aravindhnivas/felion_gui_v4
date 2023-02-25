@@ -23,7 +23,7 @@
         <Textfield bind:value={item.sliderController} label="(min, max, step)" style="width: 10em;" />
     {/if}
     {#if item?.numberDensity && rateConstantMode}
-        <Textfield bind:value={item.numberDensity} label="He^n" style="width: 7em;" />
+        <Textfield bind:value={item.numberDensity} label="ND^n" style="width: 7em;" />
     {/if}
     <button
         class="button is-danger"

@@ -390,6 +390,8 @@
         nHe = numberDensityData?.[ind]?.ND ?? ''
         // console.log(numberDensityData, numberDensityData?.[ind], { nHe })
     }
+
+    let ND_name = 'He'
 </script>
 
 <MatplotlibDialog bind:open={kinetic_plot_adjust_dialog_active} bind:value={$kinetic_plot_adjust_configs} />
@@ -492,6 +494,7 @@
                 <KlossChannels
                     bind:load_data={load_data_loss_channels}
                     bind:loss_channels
+                    bind:ND_name
                     {nameOfReactants}
                     bind:rateConstantMode
                     {...{
@@ -509,6 +512,7 @@
                     loss_channels,
                     selectedFile,
                     rateConstantMode,
+                    ND_name,
                 }}
                 bind:location={$currentLocation}
                 bind:savefilename={kineticEditorFilename}
