@@ -203,7 +203,7 @@
                 on:click={async ({ currentTarget }) => {
                     if (!window.navigator.onLine) return outputbox.warn('No internet connection')
                     toggle_loading(currentTarget)
-                    const [_err] = await oO(check_assets_update())
+                    const [_err] = await oO(check_assets_update({ download_request: true }))
                     toggle_loading(currentTarget)
                 }}>Check assets update</button
             >

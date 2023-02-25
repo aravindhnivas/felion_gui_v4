@@ -208,14 +208,14 @@ const get_assets_url = async () => {
     return true
 }
 
-const fn_asset_download_required = async ({ installation_request }) => {
+const fn_asset_download_required = async ({ installation_request, download_request }) => {
     outputbox.warn(`Download required`)
     asset_download_required.set(true)
-    await auto_download_and_install_assets({ installation_request })
+    await auto_download_and_install_assets({ installation_request, download_request })
     return
 }
 
-export const check_assets_update = async ({ installation_request = true } = {}) => {
+export const check_assets_update = async ({ installation_request = true, download_request = false } = {}) => {
     if (!window.navigator.onLine) return
     if (get(python_asset_ready_to_install)) {
         return outputbox.warn('assets updates are ready to install')
@@ -232,13 +232,15 @@ export const check_assets_update = async ({ installation_request = true } = {}) 
     outputbox.info(`Current version: v${get(felionlibVersion)}`)
 
     if (`v${get(felionlibVersion)}` < get(assets_version_available)) {
-        await fn_asset_download_required({ installation_request })
+        await fn_asset_download_required({ installation_request, download_request })
         return
     }
-    if (get(felionlibVersion) <= import.meta.env.VITE_FELIONPY_MIN_VERSION) {
-        await fn_asset_download_required({ installation_request })
+
+    if (get(felionlibVersion) < import.meta.env.VITE_FELIONPY_MIN_VERSION) {
+        await fn_asset_download_required({ installation_request, download_request })
         return
     }
+
     outputbox.warn(`Download not required`)
     asset_download_required.set(false)
 }

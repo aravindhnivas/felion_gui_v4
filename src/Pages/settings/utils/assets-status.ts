@@ -22,11 +22,17 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
     }
 }
 
-export const auto_download_and_install_assets = async ({ installation_request = false } = {}) => {
+export const auto_download_and_install_assets = async ({
+    installation_request = false,
+    download_request = false,
+} = {}) => {
     downloadoverrideURL.set(false)
     outputbox.warn('Starting auto download python assets')
 
     if (!(await fs.exists(`${asset_name_prefix}-${await platform()}.zip`, { dir: fs.BaseDirectory.AppLocalData }))) {
+        if (download_request) {
+            if (!(await dialog.confirm('Download python assets now ?', { title: 'update available' }))) return
+        }
         await download_assets()
     } else {
         outputbox.warn('assets already downloaded')
