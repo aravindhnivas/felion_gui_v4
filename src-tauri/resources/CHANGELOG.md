@@ -2,6 +2,7 @@
 
 ## v4.5.2
 
+- Feature: kinetics plot (plotly) added
 - BUG FIX: kinetocs rate constant fitting
   
 ## v4.5.1
