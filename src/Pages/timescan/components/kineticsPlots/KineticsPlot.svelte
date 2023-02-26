@@ -412,8 +412,12 @@
                     <hr />
                     <div class="align">
                         <h3>Rate constant</h3>
-                        <Textfield disabled value={rate_constant.weighted_mean} label="weighted mean" />
-                        <Textfield disabled value={rate_constant.mean} label="mean" />
+                        <Textfield
+                            disabled
+                            value={rate_constant[temperature]?.weighted_mean || ''}
+                            label="weighted mean"
+                        />
+                        <Textfield disabled value={rate_constant[temperature]?.mean || ''} label="mean" />
                         <TextAndSelectOptsToggler
                             bind:value={processed_rateConstants_filename}
                             label={`*.rateConstants.processed.json`}
