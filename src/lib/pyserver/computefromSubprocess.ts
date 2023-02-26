@@ -149,7 +149,7 @@ export default async function ({
                 error += errorString
             }
             dispatchEvent(target, { py, pyfile, error }, 'pyEventStderr')
-            // console.log(`Output from python: ${errorString}`)
+            console.log(`Output from python: ${errorString}`)
             LOGGER.error(errorString)
         })
 
@@ -162,7 +162,7 @@ export default async function ({
                 dataReceived += dataString
             }
             LOGGER.info(dataString)
-            // console.log(dataString.trim())
+            console.log(dataString.trim())
             dispatchEvent(target, { py, pyfile, dataReceived, stdout: dataString }, 'pyEventData')
         })
 
