@@ -1,10 +1,11 @@
 <script lang="ts">
     import { kinetics_filenames } from '$src/Pages/timescan/stores'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
-    import { Textfield, SeparateWindow, Select } from '$src/components'
+    import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import { isEmpty } from 'lodash-es'
-
+    import computePy_func from '$lib/pyserver/computePy'
+    import Colors from '$lib/misc/colors'
     export let active = false
     export let configDir: string = ''
 
@@ -22,12 +23,18 @@
     }
     $: update_dir(configDir)
 
-    const plot_number_density = (number_densities, fitted_values) => {
+    let number_densities = { val: [], std: [] }
+    let fitted_values = { val: [], std: [] }
+
+    const f_ND_plot_ID = 'kinetic_plot_f_ND_rate'
+
+    const plot_number_density = () => {
         graph_plotted.number_densities = false
         const data_rate: Plotly.Data[] = [
             {
                 x: number_densities.val,
                 y: fitted_values.val,
+                'marker.color': `rgb${Colors[0]}`,
                 error_y: {
                     type: 'data',
                     array: fitted_values.std,
@@ -52,7 +59,7 @@
             // width: graphWidth,
         }
 
-        react('kinetic_plot_f_ND_rate', data_rate, layout_rate)
+        react(f_ND_plot_ID, data_rate, layout_rate)
         graph_plotted.number_densities = true
     }
 
@@ -137,34 +144,37 @@
 
     const plot = () => {
         if (!data_loaded) return
-
+        added_traces = 0
         const current_data = full_data[temperature]
         const ND_keys = Object.keys(current_data)
-
-        let number_densities = { val: [], std: [] }
-        let fitted_values = { val: [], std: [] }
+        const Number_densities = { val: [], std: [] }
+        const Fitted_values = { val: [], std: [] }
 
         ND_keys.forEach((nd) => {
             if (!current_data[nd][rate_coefficient]) return
             const ND_val = get_nominal_value(nd)
             const ND_std = get_std_value(nd)
-            number_densities.val = [...number_densities.val, ND_val]
-            number_densities.std = [...number_densities.std, ND_std]
+            Number_densities.val = [...Number_densities.val, ND_val]
+            Number_densities.std = [...Number_densities.std, ND_std]
 
-            fitted_values.val = [...fitted_values.val, current_data[nd][rate_coefficient].val]
-            fitted_values.std = [...fitted_values.std, current_data[nd][rate_coefficient].std]
+            Fitted_values.val = [...Fitted_values.val, current_data[nd][rate_coefficient].val]
+            Fitted_values.std = [...Fitted_values.std, current_data[nd][rate_coefficient].std]
         })
-        const sorted = number_densities.val.map((val, index) => [val, index]).sort((a, b) => a[0] - b[0])
+        const sorted = Number_densities.val.map((val, index) => [val, index]).sort((a, b) => a[0] - b[0])
         const sorted_indices = sorted.map((val) => val[1])
 
-        number_densities.val = sorted_indices.map((index) => number_densities.val[index])
-        number_densities.std = sorted_indices.map((index) => number_densities.std[index])
-        fitted_values.val = sorted_indices.map((index) => fitted_values.val[index])
-        fitted_values.std = sorted_indices.map((index) => fitted_values.std[index])
-        // console.log({ number_densities, fitted_values })
-        if (!fitted_values.val.length) return
+        Number_densities.val = sorted_indices.map((index) => Number_densities.val[index])
+        Number_densities.std = sorted_indices.map((index) => Number_densities.std[index])
+        Fitted_values.val = sorted_indices.map((index) => Fitted_values.val[index])
+        Fitted_values.std = sorted_indices.map((index) => Fitted_values.std[index])
 
-        plot_number_density(number_densities, fitted_values)
+        // console.log({ Number_densities, Fitted_values })
+        if (!Fitted_values.val.length) return
+
+        number_densities = structuredClone(Number_densities)
+        fitted_values = structuredClone(Fitted_values)
+        plot_number_density()
+
         // fixWidth()
     }
 
@@ -193,7 +203,7 @@
     $: saved_filenames = Object.keys($kinetics_filenames).filter((key) => key !== 'channels')
 
     const fixWidth = () => {
-        if (graph_plotted.number_densities) relayout('kinetic_plot_f_ND_rate', { width: graphWidth })
+        if (graph_plotted.number_densities) relayout(f_ND_plot_ID, { width: graphWidth })
     }
 
     const save_data = async () => {
@@ -212,7 +222,67 @@
 
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
     }
+
     let hide_header = false
+    let addIntercept = true
+    let polyOrder = 2
+
+    let added_traces = 0
+    let fitted_intercept = ''
+    let fitted_slope = ''
+
+    const intercept_guess = persistentWritable('kinetics_intercept_guess', 0)
+    const rate_constant_guess = persistentWritable('kinetics_rate_constant_guess', 1e-30)
+
+    async function derive_rate_constant(e: Event) {
+        if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
+        if (!fitted_values.val.length) return await dialog.message('No data to fit', { type: 'error' })
+        if (added_traces > 0) {
+            deleteTraces(f_ND_plot_ID, -1)
+            added_traces--
+        }
+
+        const pyfile = 'kineticsCode.derive_rate_constants'
+
+        const args = {
+            polyOrder,
+            addIntercept,
+            fitted_values,
+            number_densities,
+            $intercept_guess,
+            $rate_constant_guess,
+        }
+
+        const dataFromPython: void | {
+            fitted_intercept: string
+            fitted_slope: string
+            fitY: { val: number[]; std: number[]; name: string }
+        } = await computePy_func({ e, pyfile, args })
+
+        if (!dataFromPython) return
+
+        const { fitY } = dataFromPython
+
+        ;({ fitted_intercept, fitted_slope } = dataFromPython)
+        addTraces(f_ND_plot_ID, [
+            {
+                x: number_densities.val,
+                y: fitY.val,
+                // name: fitY.name,
+                name: 'fit',
+                mode: 'lines',
+                line: { color: `rgb${Colors[0]}` },
+                error_y: {
+                    type: 'data',
+                    array: fitY.std,
+                    visible: true,
+                    color: `rgb${Colors[0]}`,
+                },
+            },
+        ])
+        added_traces++
+        // console.log({ dataFromPython })
+    }
 </script>
 
 <SeparateWindow
@@ -285,10 +355,29 @@
             <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
                 <div class="graph">
                     <h2>Function of number density</h2>
-                    <div class="graph__div" id="kinetic_plot_f_ND_rate" />
+                    <div class="graph__div" id={f_ND_plot_ID} />
                 </div>
+
                 <hr />
 
+                <div class="flex flex-col items-start">
+                    <h2>Derive rate constant</h2>
+                    <div class="align">
+                        <Checkbox bind:value={addIntercept} label="add intercept" />
+                        <Textfield style="width: 7em;" bind:value={polyOrder} label="poly-order" />
+                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rate constant guess" />
+                        <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
+                        <button class="button is-link" on:click={derive_rate_constant}>derive</button>
+                    </div>
+
+                    <h3>Fitted parameters</h3>
+                    <div class="align">
+                        <Textfield bind:value={fitted_slope} label="slope (cm^{3 * polyOrder}.s-1)" disabled />
+                        <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
+                    </div>
+                </div>
+
+                <hr />
                 <div class="graph">
                     <h2>Function of temperature</h2>
                     <div class="graph__div" id="kinetic_plot_f_temp_rate" />
