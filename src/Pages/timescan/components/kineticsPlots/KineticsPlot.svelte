@@ -397,7 +397,7 @@
             rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
             rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
         })
-        console.log({ temperatures, rate_constants_values })
+        // console.log({ temperatures, rate_constants_values })
 
         const dataToPlot = {
             x: temperatures,
@@ -412,11 +412,11 @@
                 color: `rgb${Colors[0]}`,
             },
         }
-
+        const { ylabel_units } = temp_rate_constants[temperatures[0]][rate_coefficient]
         const layout = {
-            title: 'Rate constants vs Temperature',
+            title: 'Rate constant vs Temperature',
             xaxis: { title: 'Temperature (K)' },
-            yaxis: { title: 'Rate constant (s-1)', tickformat: '.0e' },
+            yaxis: { title: `${rate_coefficient} [${ylabel_units}]`, tickformat: '.0e' },
         }
 
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
@@ -501,7 +501,6 @@
 
                     <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
                     <hr />
-
                     <h2>Function of temperature</h2>
                     <div class="align">
                         <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
@@ -511,6 +510,7 @@
                             options={['weighted_mean', 'mean']}
                             label="value"
                         />
+                        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
                     </div>
                     <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
                 </div>
@@ -574,7 +574,7 @@
     <svelte:fragment slot="footer_content__slot">
         <button class="button is-warning" on:click={fixWidth}>full-width</button>
         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" />
-        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+        <!-- <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" /> -->
     </svelte:fragment>
 </SeparateWindow>
 
