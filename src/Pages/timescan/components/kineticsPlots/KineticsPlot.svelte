@@ -14,13 +14,16 @@
 
     let data_loaded = false
     let parameters = []
+    let temperature_values = []
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
     let processed_params_filename = 'kinetics.params.processed.json'
     let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
 
     let rate_constant: {
-        [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
+        [key: string]: {
+            [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
+        }
     } = {}
 
     const update_dir = async (dir: string) => {
@@ -79,17 +82,19 @@
         graph_plotted.number_densities = true
 
         if (!dataFromPython) return
-        rate_constant[temperature] = dataFromPython.rate_constant
+        if (!rate_constant[temperature]) rate_constant[temperature] = {}
 
-        // const { weighted_mean, mean } = rate_constant
+        const current_temp_rate_constants = dataFromPython.rate_constant
+        rate_constant[temperature][rate_coefficient] = current_temp_rate_constants
+
         const data_rate_constant: Partial<Plotly.PlotData> = {
             ...data_rate,
-            y: rate_constant[temperature].val,
+            y: current_temp_rate_constants.val,
             name: `${temperature} K`,
             showlegend: true,
             error_y: {
                 type: 'data',
-                array: rate_constant[temperature].std,
+                array: current_temp_rate_constants.std,
                 visible: true,
             },
         }
@@ -113,7 +118,7 @@
         const [_err1, data] = await oO(fs.readTextFile(processed_file))
         if (_err1) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         full_data = JSON.parse(data)
-
+        temperature_values = Object.keys(full_data)
         window.createToast(`${processed_filename} loaded`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
@@ -126,14 +131,14 @@
         window.createToast(`${processed_params_filename} loaded`, 'success')
 
         data_loaded = true
-        plot()
+        // plot()
     }
 
     const process_data = async (e: Event) => {
         if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
-        const fit_data = await parse_file($kinetics_filenames.fit)
-        const config_data = await parse_file($kinetics_filenames.configs)
+        const fit_data = await parse_file({ filename: $kinetics_filenames.fit })
+        const config_data = await parse_file({ filename: $kinetics_filenames.configs })
         let rate_paramters = { forwards: [], backwards: [] }
 
         for (const filename in fit_data) {
@@ -226,9 +231,12 @@
         return value_std.split('+/-')[1].replace(')', '') + 'e' + power
     }
 
-    const parse_file = async (filename: string) => {
-        const fullpath = await path.join(configDir, filename)
-        if (!(await fs.exists(fullpath))) return await dialog.message(`File ${filename} does not exist in ${configDir}`)
+    const parse_file = async ({ filename, loc = null, toast = true }) => {
+        const fullpath = await path.join(loc ?? configDir, filename)
+        if (!(await fs.exists(fullpath))) {
+            if (toast) await dialog.message(`File ${filename} does not exist in ${configDir}`)
+            return {}
+        }
         const filename_data = await fs.readTextFile(fullpath)
         const filename_json = JSON.parse(filename_data)
         return filename_json
@@ -246,14 +254,12 @@
     })
 
     const fixWidth = () => {
-        if (graph_plotted.number_densities) {
-            console.log('fixing width', graphDivs)
-            graphDivs.forEach((div) => {
-                // console.log({ div })
-                if (!div.data) return
-                relayout(div.id, { width: graphWidth })
-            })
-        }
+        console.log('fixing width', graphDivs)
+        graphDivs.forEach((div) => {
+            console.log({ div })
+            if (!div.data) return
+            relayout(div.id, { width: graphWidth })
+        })
     }
 
     const save_data = async () => {
@@ -269,10 +275,10 @@
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters)))
         if (err2) return await dialog.message(`Error saving file ${processed_params_filename}`)
-
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
     }
 
+    let rate_constant_mean_value_type = 'weighted_mean'
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
@@ -335,13 +341,85 @@
 
     const save_rate_constants = async () => {
         if (isEmpty(rate_constant)) return await dialog.message('No data to save', { type: 'error' })
+        let current_rate_constants = {}
+
+        const current_file = await path.join(processed_dir, processed_rateConstants_filename)
+        if (await fs.exists(current_file)) {
+            current_rate_constants = await parse_file({
+                filename: processed_rateConstants_filename,
+                loc: processed_dir,
+            })
+        }
+
+        current_rate_constants = { ...current_rate_constants, ...rate_constant }
         if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
 
         const processed_file = await path.join(processed_dir, processed_rateConstants_filename)
-        const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(rate_constant, null, 4)))
+        const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(current_rate_constants, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
         window.createToast(`Saved file ${processed_rateConstants_filename}`, 'success')
+    }
+
+    let temp_rate_constants = {}
+
+    const load_temp_rate_constants = async () => {
+        const processed_file = await path.join(processed_dir, processed_rateConstants_filename)
+
+        if (!(await fs.exists(processed_file))) {
+            return await dialog.message(`${processed_rateConstants_filename} file doesn't exists`, { type: 'error' })
+        }
+
+        const [err, content] = await oO(fs.readTextFile(processed_file))
+
+        if (err) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
+        temp_rate_constants = JSON.parse(content)
+
+        temperature_values = Object.keys(temp_rate_constants)
+        parameters = Object.keys(temp_rate_constants[temperature])
+
+        if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
+        window.createToast(`Loaded file ${processed_rateConstants_filename}`, 'success')
+    }
+
+    const plot_fn_temp = async () => {
+        if (isEmpty(temp_rate_constants)) return await dialog.message('No data to plot', { type: 'error' })
+
+        let temperatures = []
+        for (const temp in temp_rate_constants) {
+            if (!temp_rate_constants[temp][rate_coefficient]) continue
+            temperatures = [...temperatures, temp]
+        }
+
+        const rate_constants_values = { val: [], std: [] }
+        temperatures.map((t) => {
+            const val_std = temp_rate_constants[t][rate_coefficient][rate_constant_mean_value_type]
+            rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
+            rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
+        })
+        console.log({ temperatures, rate_constants_values })
+
+        const dataToPlot = {
+            x: temperatures,
+            y: rate_constants_values.val,
+            name: 'rate constants',
+            mode: 'markers',
+            line: { color: `rgb${Colors[0]}` },
+            error_y: {
+                type: 'data',
+                array: rate_constants_values.std,
+                visible: true,
+                color: `rgb${Colors[0]}`,
+            },
+        }
+
+        const layout = {
+            title: 'Rate constants vs Temperature',
+            xaxis: { title: 'Temperature (K)' },
+            yaxis: { title: 'Rate constant (s-1)', tickformat: '.0e' },
+        }
+
+        react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
 </script>
 
@@ -393,31 +471,25 @@
 
     <svelte:fragment slot="main_content__slot">
         <div class="main_container px-10">
-            <div class="align">
-                <Select
-                    on:change={plot}
-                    bind:value={temperature}
-                    options={Object.keys(full_data)}
-                    label="temperature"
-                />
-                <Select on:change={plot} bind:value={rate_coefficient} options={parameters} label="rate coefficient" />
-                <Textfield bind:value={polyOrder} label="rate constant polyorder" />
-            </div>
-
             <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
                 <div class="graph">
                     <h2>Function of number density</h2>
                     <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
 
                     <hr />
+
                     <div class="align">
                         <h3>Rate constant</h3>
                         <Textfield
                             disabled
-                            value={rate_constant[temperature]?.weighted_mean || ''}
+                            value={rate_constant[temperature]?.[rate_coefficient]?.weighted_mean || ''}
                             label="weighted mean"
                         />
-                        <Textfield disabled value={rate_constant[temperature]?.mean || ''} label="mean" />
+                        <Textfield
+                            disabled
+                            value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''}
+                            label="mean"
+                        />
                         <TextAndSelectOptsToggler
                             bind:value={processed_rateConstants_filename}
                             label={`*.rateConstants.processed.json`}
@@ -429,6 +501,18 @@
 
                     <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
                     <hr />
+
+                    <h2>Function of temperature</h2>
+                    <div class="align">
+                        <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
+                        <Select
+                            on:change={plot_fn_temp}
+                            bind:value={rate_constant_mean_value_type}
+                            options={['weighted_mean', 'mean']}
+                            label="value"
+                        />
+                    </div>
+                    <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
                 </div>
 
                 <hr />
@@ -453,12 +537,6 @@
                         <Textfield bind:value={fitted_slope} label="slope (cm^{3 * polyOrder}.s-1)" disabled />
                         <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
                     </div>
-                </div>
-
-                <hr />
-                <div class="graph">
-                    <h2>Function of temperature</h2>
-                    <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
                 </div>
             </div>
         </div>
@@ -485,11 +563,18 @@
                 />
             {/if}
         </div>
+
+        <div class="flex">
+            <Select on:change={plot} bind:value={temperature} options={temperature_values} label="temperature" />
+            <Select on:change={plot} bind:value={rate_coefficient} options={parameters} label="rate constant" />
+            <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+        </div>
     </svelte:fragment>
 
     <svelte:fragment slot="footer_content__slot">
         <button class="button is-warning" on:click={fixWidth}>full-width</button>
-        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="PLOT" />
+        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" />
+        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
     </svelte:fragment>
 </SeparateWindow>
 
