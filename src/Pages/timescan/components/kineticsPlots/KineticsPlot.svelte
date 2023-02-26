@@ -49,6 +49,7 @@
             title: `${rate_coefficient} as a function of number density`,
             xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
             yaxis: { title: `${rate_coefficient} [s <sup>-1</sup>]` },
+            // width: graphWidth,
         }
 
         react('kinetic_plot_f_ND_rate', data_rate, layout_rate)
@@ -161,10 +162,10 @@
         fitted_values.val = sorted_indices.map((index) => fitted_values.val[index])
         fitted_values.std = sorted_indices.map((index) => fitted_values.std[index])
         // console.log({ number_densities, fitted_values })
-
         if (!fitted_values.val.length) return
+
         plot_number_density(number_densities, fitted_values)
-        fixWidth()
+        // fixWidth()
     }
 
     const get_nominal_value = (value: string) => {
@@ -188,7 +189,9 @@
     let temperature = '4.7'
     let rate_coefficient = 'k31'
     let graphWidth: number
+
     $: saved_filenames = Object.keys($kinetics_filenames).filter((key) => key !== 'channels')
+
     const fixWidth = () => {
         if (graph_plotted.number_densities) relayout('kinetic_plot_f_ND_rate', { width: graphWidth })
     }
@@ -209,6 +212,7 @@
 
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
     }
+    let hide_header = false
 </script>
 
 <SeparateWindow
@@ -216,11 +220,11 @@
     title="Kinetics Plot"
     graphMode={true}
     autoHide={true}
-    maximize={false}
+    maximize={true}
     mainContent$style="display: grid; overflow:hidden;"
 >
     <svelte:fragment slot="header_content__slot">
-        <div class="flex">
+        <div class="flex" class:hide={hide_header}>
             <Textfield style="width: 100%;" value={configDir} label="config directory" disabled />
             <button
                 class="i-material-symbols-folder-open-outline text-xl"
@@ -229,7 +233,8 @@
                 }}
             />
         </div>
-        <div class="flex">
+
+        <div class="flex" class:hide={hide_header}>
             <TextAndSelectOptsToggler
                 bind:value={processed_filename}
                 label={`*.processed.json`}
@@ -244,7 +249,8 @@
             />
             <button class="button is-warning" on:click={load_data}>load</button>
         </div>
-        <div class="flex">
+
+        <div class="flex" class:hide={hide_header}>
             <div class="flex w-full justify-end gap-1">
                 {#each saved_filenames as filename}
                     <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
@@ -256,14 +262,37 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
-        <div class="align px-5 overflow-auto items-baseline">
+        <div class="main_container px-10">
             <div class="align">
-                <Select bind:value={temperature} options={Object.keys(full_data)} label="temperature" />
-                <Select bind:value={rate_coefficient} options={parameters} label="rate coefficient" />
+                <Select
+                    on:change={() => {
+                        plot()
+                    }}
+                    bind:value={temperature}
+                    options={Object.keys(full_data)}
+                    label="temperature"
+                />
+                <Select
+                    on:change={() => {
+                        plot()
+                    }}
+                    bind:value={rate_coefficient}
+                    options={parameters}
+                    label="rate coefficient"
+                />
             </div>
 
-            <div class="align mt-5" bind:clientWidth={graphWidth}>
-                <div class="graph__div w-full" id="kinetic_plot_f_ND_rate" />
+            <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
+                <div class="graph">
+                    <h2>Function of number density</h2>
+                    <div class="graph__div" id="kinetic_plot_f_ND_rate" />
+                </div>
+                <hr />
+
+                <div class="graph">
+                    <h2>Function of temperature</h2>
+                    <div class="graph__div" id="kinetic_plot_f_temp_rate" />
+                </div>
             </div>
         </div>
     </svelte:fragment>
@@ -276,6 +305,19 @@
             <i class="i-carbon-close-outline" />
             <div class="tag is-danger">no data</div>
         {/if}
+        <div aria-label="hide header" data-cooltipz-dir="top">
+            {#if hide_header}
+                <button
+                    on:click={() => (hide_header = !hide_header)}
+                    class="i-material-symbols-visibility-off-rounded text-2xl"
+                />
+            {:else}
+                <button
+                    on:click={() => (hide_header = !hide_header)}
+                    class="i-material-symbols-visibility-rounded text-2xl"
+                />
+            {/if}
+        </div>
     </svelte:fragment>
 
     <svelte:fragment slot="footer_content__slot">
@@ -283,3 +325,19 @@
         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="PLOT" />
     </svelte:fragment>
 </SeparateWindow>
+
+<style>
+    .main_container {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-gap: 0.5rem;
+        align-items: baseline;
+        overflow-y: auto;
+    }
+    .graph {
+        display: grid;
+        width: 100%;
+        grid-template-rows: auto 1fr;
+        gap: 0.5em;
+    }
+</style>
