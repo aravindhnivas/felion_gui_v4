@@ -17,9 +17,15 @@
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
     let processed_params_filename = 'kinetics.params.processed.json'
+    let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
+
+    let rate_constant: {
+        [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
+    } = {}
 
     const update_dir = async (dir: string) => {
         processed_dir = await path.join(dir, 'processed')
+        // if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
     }
     $: update_dir(configDir)
 
@@ -28,29 +34,27 @@
 
     const f_ND_plot_ID = 'kinetic_plot_f_ND_rate'
 
-    const plot_number_density = () => {
+    const plot_number_density = async () => {
         graph_plotted.number_densities = false
-        const data_rate: Partial<Plotly.PlotData>[] = [
-            {
-                x: number_densities.val,
-                y: fitted_values.val,
-                'marker.color': `rgb${Colors[0]}`,
-                error_y: {
-                    type: 'data',
-                    array: fitted_values.std,
-                    visible: true,
-                },
-                error_x: {
-                    type: 'data',
-                    array: number_densities.std,
-                    visible: true,
-                },
-                type: 'scatter',
-                mode: 'markers',
-                name: `${temperature} K`,
-                showlegend: true,
+        const data_rate: Partial<Plotly.PlotData> = {
+            x: number_densities.val,
+            y: fitted_values.val,
+            'marker.color': `rgb${Colors[0]}`,
+            error_y: {
+                type: 'data',
+                array: fitted_values.std,
+                visible: true,
             },
-        ]
+            error_x: {
+                type: 'data',
+                array: number_densities.std,
+                visible: true,
+            },
+            type: 'scatter',
+            mode: 'markers',
+            name: `${temperature} K`,
+            showlegend: true,
+        }
 
         const layout_rate: Partial<Plotly.Layout> = {
             title: `${rate_coefficient} as a function of number density`,
@@ -58,23 +62,45 @@
             yaxis: { title: `${rate_coefficient} [s <sup>-1</sup>]` },
         }
 
-        react(f_ND_plot_ID, data_rate, layout_rate)
+        react(f_ND_plot_ID, [data_rate], layout_rate)
 
-        const data_rate_constant = structuredClone(data_rate).map((d) => {
-            d.y = d.x.map((x, i) => d.y[i] / x ** polyOrder)
-            d.error_y = null
-            return d
+        const dataFromPython: void | {
+            rate_constant: { val: number[]; std: number[]; mean: string; weighted_mean: string }
+        } = await computePy_func({
+            pyfile: 'kineticsCode.fit_rates',
+            args: {
+                fit: false,
+                polyOrder,
+                fitted_values,
+                number_densities,
+            },
         })
 
-        console.log(data_rate_constant)
+        graph_plotted.number_densities = true
+
+        if (!dataFromPython) return
+        rate_constant[temperature] = dataFromPython.rate_constant
+
+        // const { weighted_mean, mean } = rate_constant
+        const data_rate_constant: Partial<Plotly.PlotData> = {
+            ...data_rate,
+            y: rate_constant[temperature].val,
+            name: `${temperature} K`,
+            showlegend: true,
+            error_y: {
+                type: 'data',
+                array: rate_constant[temperature].std,
+                visible: true,
+            },
+        }
+
+        // console.log(rate_constant)
         const layout_rate_constant = {
             ...layout_rate,
             title: `${rate_coefficient} as a function of number density (constant)`,
             yaxis: { title: `${rate_coefficient} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`, tickformat: '.0e' },
         }
-
-        react(`${f_ND_plot_ID}_rateconstant`, data_rate_constant, layout_rate_constant)
-        graph_plotted.number_densities = true
+        react(`${f_ND_plot_ID}_rateconstant`, [data_rate_constant], layout_rate_constant)
     }
 
     const load_data = async () => {
@@ -182,13 +208,11 @@
         Fitted_values.val = sorted_indices.map((index) => Fitted_values.val[index])
         Fitted_values.std = sorted_indices.map((index) => Fitted_values.std[index])
 
-        // console.log({ Number_densities, Fitted_values })
         if (!Fitted_values.val.length) return
 
-        number_densities = structuredClone(Number_densities)
-        fitted_values = structuredClone(Fitted_values)
+        number_densities = Number_densities
+        fitted_values = Fitted_values
         plot_number_density()
-
         // fixWidth()
     }
 
@@ -214,13 +238,13 @@
     let rate_coefficient = 'k31'
     let graphWidth: number
 
-    $: saved_filenames = Object.keys($kinetics_filenames).filter((key) => key !== 'channels')
+    const saved_filenames = ['configs', 'fit']
 
     let graphDivs: HTMLDivElement[] = []
     onMount(async () => {
         graphDivs = Array.from(document.querySelectorAll<HTMLDivElement>('.kinetics_graph'))
-        // console.log({ graphDivs })
     })
+
     const fixWidth = () => {
         if (graph_plotted.number_densities) {
             console.log('fixing width', graphDivs)
@@ -252,7 +276,7 @@
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
-
+    let polyOrderRateConstant = 2
     let added_traces = 0
     let fitted_intercept = ''
     let fitted_slope = ''
@@ -268,10 +292,10 @@
             added_traces--
         }
 
-        const pyfile = 'kineticsCode.derive_rate_constants'
-
+        const pyfile = 'kineticsCode.fit_rates'
         const args = {
-            polyOrder,
+            fit: true,
+            polyOrder: polyOrderRateConstant,
             addIntercept,
             fitted_values,
             number_densities,
@@ -307,7 +331,17 @@
             },
         ])
         added_traces++
-        // console.log({ dataFromPython })
+    }
+
+    const save_rate_constants = async () => {
+        if (isEmpty(rate_constant)) return await dialog.message('No data to save', { type: 'error' })
+        if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
+
+        const processed_file = await path.join(processed_dir, processed_rateConstants_filename)
+        const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(rate_constant, null, 4)))
+        if (err1) return await dialog.message(`Error saving file ${processed_file}`)
+
+        window.createToast(`Saved file ${processed_rateConstants_filename}`, 'success')
     }
 </script>
 
@@ -374,7 +408,23 @@
                 <div class="graph">
                     <h2>Function of number density</h2>
                     <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
+
+                    <hr />
+                    <div class="align">
+                        <h3>Rate constant</h3>
+                        <Textfield disabled value={rate_constant.weighted_mean} label="weighted mean" />
+                        <Textfield disabled value={rate_constant.mean} label="mean" />
+                        <TextAndSelectOptsToggler
+                            bind:value={processed_rateConstants_filename}
+                            label={`*.rateConstants.processed.json`}
+                            lookFor={'.rateConstants.processed.json'}
+                            lookIn={processed_dir}
+                        />
+                        <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+                    </div>
+
                     <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
+                    <hr />
                 </div>
 
                 <hr />
@@ -386,7 +436,7 @@
                     </h2>
                     <div class="align">
                         <Checkbox bind:value={addIntercept} label="add intercept" />
-                        <!-- <Textfield style="width: 7em;" bind:value={polyOrder} label="poly-order" /> -->
+                        <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="poly-order" />
                         <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="slope guess" />
                         {#if addIntercept}
                             <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
