@@ -20,7 +20,7 @@
     import RateConstants from './controllers/RateConstants.svelte'
     import RateInitialise from './controllers/RateInitialise.svelte'
     import KlossChannels from './controllers/channels/KlossChannels.svelte'
-    import KineticsPlot from './KineticsPlot.svelte'
+    import KineticsPlot from './kineticsPlots/KineticsPlot.svelte'
     import Accordion from '@smui-extra/accordion'
 
     const currentLocation = persistentWritable('kinetics_location', '')

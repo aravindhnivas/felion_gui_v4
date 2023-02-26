@@ -106,7 +106,7 @@
         max-height: 100%;
         grid-template-rows: auto 1fr auto;
         height: 100%;
-        gap: 1em;
+        gap: 0.5em;
         padding: 0;
         width: 100%;
         .header_content {
