@@ -30,7 +30,7 @@
 
     const plot_number_density = () => {
         graph_plotted.number_densities = false
-        const data_rate: Plotly.Data[] = [
+        const data_rate: Partial<Plotly.PlotData>[] = [
             {
                 x: number_densities.val,
                 y: fitted_values.val,
@@ -56,10 +56,24 @@
             title: `${rate_coefficient} as a function of number density`,
             xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
             yaxis: { title: `${rate_coefficient} [s <sup>-1</sup>]` },
-            // width: graphWidth,
         }
 
         react(f_ND_plot_ID, data_rate, layout_rate)
+
+        const data_rate_constant = structuredClone(data_rate).map((d) => {
+            d.y = d.x.map((x, i) => d.y[i] / x ** polyOrder)
+            d.error_y = null
+            return d
+        })
+
+        console.log(data_rate_constant)
+        const layout_rate_constant = {
+            ...layout_rate,
+            title: `${rate_coefficient} as a function of number density (constant)`,
+            yaxis: { title: `${rate_coefficient} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`, tickformat: '.0e' },
+        }
+
+        react(`${f_ND_plot_ID}_rateconstant`, data_rate_constant, layout_rate_constant)
         graph_plotted.number_densities = true
     }
 
@@ -202,8 +216,20 @@
 
     $: saved_filenames = Object.keys($kinetics_filenames).filter((key) => key !== 'channels')
 
+    let graphDivs: HTMLDivElement[] = []
+    onMount(async () => {
+        graphDivs = Array.from(document.querySelectorAll<HTMLDivElement>('.kinetics_graph'))
+        // console.log({ graphDivs })
+    })
     const fixWidth = () => {
-        if (graph_plotted.number_densities) relayout(f_ND_plot_ID, { width: graphWidth })
+        if (graph_plotted.number_densities) {
+            console.log('fixing width', graphDivs)
+            graphDivs.forEach((div) => {
+                // console.log({ div })
+                if (!div.data) return
+                relayout(div.id, { width: graphWidth })
+            })
+        }
     }
 
     const save_data = async () => {
@@ -335,39 +361,37 @@
         <div class="main_container px-10">
             <div class="align">
                 <Select
-                    on:change={() => {
-                        plot()
-                    }}
+                    on:change={plot}
                     bind:value={temperature}
                     options={Object.keys(full_data)}
                     label="temperature"
                 />
-                <Select
-                    on:change={() => {
-                        plot()
-                    }}
-                    bind:value={rate_coefficient}
-                    options={parameters}
-                    label="rate coefficient"
-                />
+                <Select on:change={plot} bind:value={rate_coefficient} options={parameters} label="rate coefficient" />
+                <Textfield bind:value={polyOrder} label="rate constant polyorder" />
             </div>
 
             <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
                 <div class="graph">
                     <h2>Function of number density</h2>
-                    <div class="graph__div" id={f_ND_plot_ID} />
+                    <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
+                    <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
                 </div>
 
                 <hr />
 
                 <div class="flex flex-col items-start">
-                    <h2>Derive rate constant</h2>
+                    <h2>
+                        Fit rate vs f(ND): rate = slope * ND <sup>{polyOrder}</sup>
+                        {addIntercept ? ' + intercept' : ''}
+                    </h2>
                     <div class="align">
                         <Checkbox bind:value={addIntercept} label="add intercept" />
-                        <Textfield style="width: 7em;" bind:value={polyOrder} label="poly-order" />
-                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rate constant guess" />
-                        <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
-                        <button class="button is-link" on:click={derive_rate_constant}>derive</button>
+                        <!-- <Textfield style="width: 7em;" bind:value={polyOrder} label="poly-order" /> -->
+                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="slope guess" />
+                        {#if addIntercept}
+                            <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
+                        {/if}
+                        <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
                     </div>
 
                     <h3>Fitted parameters</h3>
@@ -380,7 +404,7 @@
                 <hr />
                 <div class="graph">
                     <h2>Function of temperature</h2>
-                    <div class="graph__div" id="kinetic_plot_f_temp_rate" />
+                    <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
                 </div>
             </div>
         </div>
@@ -410,7 +434,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="footer_content__slot">
-        <button class="button is-warning" on:click={fixWidth}>FIX-width</button>
+        <button class="button is-warning" on:click={fixWidth}>full-width</button>
         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="PLOT" />
     </svelte:fragment>
 </SeparateWindow>
