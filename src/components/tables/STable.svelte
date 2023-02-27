@@ -66,7 +66,7 @@
             <Head>
                 <Row>
                     {#if includeIndex}
-                        <Cell style="width: 0.5em;"># {rows.length}</Cell>
+                        <Cell style="width: 4em;"># {rows.length}</Cell>
                     {/if}
                     {#each headKeys as key, i (key)}
                         <Cell on:click={() => sortTable(rowKeys[i])}>

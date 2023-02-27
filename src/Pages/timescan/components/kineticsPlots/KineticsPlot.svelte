@@ -397,7 +397,6 @@
             rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
             rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
         })
-        // console.log({ temperatures, rate_constants_values })
 
         const dataToPlot = {
             x: temperatures,
@@ -418,7 +417,6 @@
             xaxis: { title: 'Temperature (K)' },
             yaxis: { title: `${rate_coefficient} [${ylabel_units}]`, tickformat: '.0e' },
         }
-
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
 </script>
@@ -433,14 +431,17 @@
 >
     <svelte:fragment slot="header_content__slot">
         <div class="flex" class:hide={hide_header}>
-            <Textfield style="width: 100%;" value={configDir} label="config directory" disabled />
-            <button
-                class="i-material-symbols-folder-open-outline text-xl"
-                on:click={async () => {
-                    await oO(shell.open(configDir))
-                }}
-            />
+            <div class="flex w-full justify-end gap-1">
+                {#each saved_filenames as filename}
+                    <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
+                {/each}
+                <button class="button is-warning" on:click={process_data}>process data</button>
+                <div data-cooltipz-dir="left" aria-label="save *.processed.json">
+                    <button class="i-material-symbols-save-rounded text-2xl" on:click={save_data} />
+                </div>
+            </div>
         </div>
+        <h3 class:hide={hide_header}>Processed files</h3>
 
         <div class="flex" class:hide={hide_header}>
             <TextAndSelectOptsToggler
@@ -456,21 +457,12 @@
                 lookIn={processed_dir}
             />
             <button class="button is-warning" on:click={load_data}>load</button>
-        </div>
-
-        <div class="flex" class:hide={hide_header}>
-            <div class="flex w-full justify-end gap-1">
-                {#each saved_filenames as filename}
-                    <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
-                {/each}
-                <button class="button is-warning" on:click={process_data}>process data</button>
-                <button class="i-material-symbols-save-rounded text-2xl" on:click={save_data} />
-            </div>
+            <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" />
         </div>
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
-        <div class="main_container px-10">
+        <div class="main_container px-4">
             <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
                 <div class="graph">
                     <h2>Function of number density</h2>
@@ -573,7 +565,7 @@
 
     <svelte:fragment slot="footer_content__slot">
         <button class="button is-warning" on:click={fixWidth}>full-width</button>
-        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" />
+        <!-- <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" /> -->
         <!-- <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" /> -->
     </svelte:fragment>
 </SeparateWindow>

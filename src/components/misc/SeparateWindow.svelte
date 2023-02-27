@@ -111,7 +111,7 @@
         width: 100%;
         .header_content {
             display: grid;
-            grid-row-gap: 1em;
+            grid-row-gap: 0.5em;
             padding: 1em;
             &:empty {
                 display: none;
