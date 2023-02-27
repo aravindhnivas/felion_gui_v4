@@ -1,4 +1,4 @@
-import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
+// import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
 
 const felix_opo_data_from_python = <const>['SA', 'pow', 'base', 'average', 'average_per_photon', 'average_rel']
 declare global {
@@ -32,8 +32,8 @@ declare global {
     type persistentDB<T> = ReturnType<typeof window.persistentDB<T>>
 
     interface Exposed {
-        createToast: typeof import('../src/js/functions').createToast
-        handleError: typeof import('../src/js/functions').handleError
+        createToast: typeof import('../js/functions').createToast
+        handleError: typeof import('../js/functions').handleError
         sleep: (ms: number) => Promise<void>
         tempdirPath: string
         currentPlatform: string

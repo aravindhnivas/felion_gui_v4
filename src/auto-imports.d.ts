@@ -35,6 +35,7 @@ declare global {
   const scale: typeof import('svelte/transition')['scale']
   const setContext: typeof import('svelte')['setContext']
   const shell: typeof import('@tauri-apps/api')['shell']
+  const sleep: typeof import('$src/js/functions')['sleep']
   const slide: typeof import('svelte/transition')['slide']
   const tick: typeof import('svelte')['tick']
   const tryF: typeof import('ts-try')['tryF']

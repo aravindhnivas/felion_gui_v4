@@ -1,7 +1,7 @@
 import { mainPreModal } from '$src/sveltewritables'
 import { writable } from 'svelte/store'
 import { toast } from '@zerodevx/svelte-toast'
-import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
+import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores'
 import bulmaQuickview from 'bulma-extensions/bulma-quickview/dist/js/bulma-quickview'
 import { tempdir, platform } from '@tauri-apps/api/os'
 import { getVersion } from '@tauri-apps/api/app'
@@ -47,7 +47,7 @@ export const createToast = (description: string, type: toastType = 'info', opts:
 }
 
 export const handleError = (error: unknown) => {
-    window.error = error
+    // window.error = error
     if (typeof error === 'string') {
         mainPreModal.error(error)
     } else {
@@ -56,13 +56,14 @@ export const handleError = (error: unknown) => {
 }
 window.createToast = createToast
 window.handleError = handleError
-window.sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+// window.sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 window.addEventListener('DOMContentLoaded', async () => {
     currentVersion.set(await getVersion())
     bulmaQuickview.attach()
     window.tempdirPath = await path.join(await tempdir(), 'com.felion.app')
     window.currentPlatform = await platform()
-
     if (!(await fs.exists(window.tempdirPath))) {
         await fs.createDir(window.tempdirPath)
     }

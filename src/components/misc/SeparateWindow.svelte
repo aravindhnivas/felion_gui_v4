@@ -50,7 +50,7 @@
     const changeGraphDivWidth = async (ms = 0) => {
         if (!graphMode) return
         await tick()
-        if (ms > 0) await window.sleep(ms)
+        if (ms > 0) await sleep(ms)
         console.log('changeGraphDivWidth', graphDivs)
         graphDivs.forEach((id) => {
             if (id.data) {

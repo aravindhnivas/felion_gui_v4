@@ -157,7 +157,7 @@ export function unZIP(installation_request = true) {
                 outputbox.success('UNZIP success')
                 assets_installation_required.set(false)
                 resolve('UNZIP success')
-                await window.sleep(1000)
+                await sleep(1000)
                 await fs.removeFile(asset_name, { dir: fs.BaseDirectory.AppLocalData })
             }
             installing_python_assets.set(false)
@@ -165,7 +165,7 @@ export function unZIP(installation_request = true) {
             outputbox.warn('UNZIP process closed')
             python_asset_ready_to_install.set(false)
 
-            await window.sleep(1000)
+            await sleep(1000)
             const startServerButton = document.getElementById('startServerButton')
             if (startServerButton) {
                 startServerButton.click()
