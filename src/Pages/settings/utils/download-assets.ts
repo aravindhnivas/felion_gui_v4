@@ -10,6 +10,7 @@ import {
     assets_installation_required,
     python_asset_ready_to_install,
     install_update_without_promt,
+    serverInfo,
 } from './stores'
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
@@ -266,4 +267,36 @@ export const download_assets = async () => {
     }
 
     await downloadZIP()
+}
+
+export const install_felionpy_from_zipfile = async () => {
+    try {
+        const result = (await dialog.open({
+            directory: false,
+            filters: [
+                { name: 'zip files', extensions: ['zip'] },
+                { name: 'All files', extensions: ['*.*'] },
+            ],
+            multiple: false,
+        })) as string
+
+        if (!result) return
+
+        serverInfo.warn(result)
+
+        const asset_name = `${asset_name_prefix}-${await platform()}.zip`
+        const localdir = await path.appLocalDataDir()
+        const asset_zipfile = await path.join(localdir, asset_name)
+
+        const [_err] = await oO(fs.copyFile(result, asset_zipfile))
+        if (_err) {
+            serverInfo.error(_err)
+        } else {
+            serverInfo.warn('file copied')
+        }
+        python_asset_ready_to_install.set(true)
+        await oO(unZIP(false))
+    } catch (error) {
+        if (error instanceof Error) window.handleError(error)
+    }
 }

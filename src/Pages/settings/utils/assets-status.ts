@@ -1,6 +1,6 @@
 import { downloadoverrideURL, python_asset_ready, outputbox, python_asset_ready_to_install, serverInfo } from './stores'
-import { asset_name_prefix, check_assets_update, download_assets, unZIP } from './download-assets'
-import { pyServerReady } from '$src/lib/pyserver/stores'
+import { asset_name_prefix, download_assets, unZIP, install_felionpy_from_zipfile } from './download-assets'
+// import { pyServerReady } from '$src/lib/pyserver/stores'
 
 export const check_felionpy_assets_status = async ({ installation_request = false } = {}) => {
     try {
@@ -15,8 +15,15 @@ export const check_felionpy_assets_status = async ({ installation_request = fals
             return
         }
 
-        if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
-        await auto_download_and_install_assets({ installation_request })
+        // if (!(await dialog.confirm('Python assets are missing. Press OK to download.'))) return
+        if (
+            await dialog.confirm('felionpy is missing. Press OK to download or Cancel to select the downloaded file.')
+        ) {
+            await auto_download_and_install_assets({ installation_request })
+        } else {
+            await install_felionpy_from_zipfile()
+            // outputbox.warn('Python assets are missing.')
+        }
     } catch (error) {
         outputbox.error(error)
     }
