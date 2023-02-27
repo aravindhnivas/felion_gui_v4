@@ -11,7 +11,7 @@
         pyServerReady,
         felionlibVersion,
     } from '$lib/pyserver/stores'
-    import { LOGGER, serverInfo, python_asset_ready_to_install, python_asset_ready } from '../utils/stores'
+    import { LOGGER, serverInfo, python_asset_ready } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
@@ -19,15 +19,9 @@
     import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
     import { toggle_loading } from '../utils/misc'
-    import axios from 'axios'
-    // import { check_assets_update } from '../utils/download-assets'
     import { check_felionpy_assets_status } from '../utils/assets-status'
-    import {
-        asset_name_prefix,
-        check_assets_update,
-        unZIP,
-        install_felionpy_from_zipfile,
-    } from '../utils/download-assets'
+    import { install_felionpy_from_zipfile } from '../utils/download-assets'
+    import axios from 'axios'
 
     // let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
@@ -70,6 +64,7 @@
             dispatch_server_status({ closed: true })
             return
         }
+
         await fetchServerROOT(delay)
     }
 
