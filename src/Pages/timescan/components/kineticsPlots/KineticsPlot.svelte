@@ -1,17 +1,18 @@
 <script lang="ts">
-    import { kinetics_filenames } from '$src/Pages/timescan/stores'
+    import { isEmpty } from 'lodash-es'
+    import Colors from '$lib/misc/colors'
+    import computePy_func from '$lib/pyserver/computePy'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
+    import { kinetics_filenames } from '$src/Pages/timescan/stores'
     import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
-    import { isEmpty } from 'lodash-es'
-    import computePy_func from '$lib/pyserver/computePy'
-    import Colors from '$lib/misc/colors'
+    import { toggle_loading } from '$src/Pages/settings/utils/misc'
+
     export let active = false
     export let configDir: string = ''
 
     let graph_plotted = { number_densities: false, temperature: false }
     let full_data = {}
-
     let data_loaded = false
     let parameters = []
     let temperature_values = []
@@ -19,12 +20,12 @@
     let processed_filename = 'kinetics.processed.json'
     let processed_params_filename = 'kinetics.params.processed.json'
     let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
-
     let rate_constant: {
         [key: string]: {
             [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
         }
     } = {}
+    let comupte_rate_constant = false
 
     const update_dir = async (dir: string) => {
         processed_dir = await path.join(dir, 'processed')
@@ -66,7 +67,10 @@
         }
 
         react(f_ND_plot_ID, [data_rate], layout_rate)
+        graph_plotted.number_densities = true
+    }
 
+    const compute_rate_constat_fn = async () => {
         const dataFromPython: void | {
             rate_constant: { val: number[]; std: number[]; mean: string; weighted_mean: string }
         } = await computePy_func({
@@ -79,8 +83,6 @@
             },
         })
 
-        graph_plotted.number_densities = true
-
         if (!dataFromPython) return
         if (!rate_constant[temperature]) rate_constant[temperature] = {}
 
@@ -88,23 +90,30 @@
         rate_constant[temperature][rate_coefficient] = current_temp_rate_constants
 
         const data_rate_constant: Partial<Plotly.PlotData> = {
-            ...data_rate,
+            x: number_densities.val,
             y: current_temp_rate_constants.val,
-            name: `${temperature} K`,
-            showlegend: true,
+            'marker.color': `rgb${Colors[0]}`,
             error_y: {
                 type: 'data',
                 array: current_temp_rate_constants.std,
                 visible: true,
             },
+            error_x: {
+                type: 'data',
+                array: number_densities.std,
+                visible: true,
+            },
+            type: 'scatter',
+            mode: 'markers',
+            name: `${temperature} K`,
+            showlegend: true,
         }
-
-        // console.log(rate_constant)
-        const layout_rate_constant = {
-            ...layout_rate,
+        const layout_rate_constant: Partial<Plotly.Layout> = {
             title: `${rate_coefficient} as a function of number density (constant)`,
+            xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
             yaxis: { title: `${rate_coefficient} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`, tickformat: '.0e' },
         }
+
         react(`${f_ND_plot_ID}_rateconstant`, [data_rate_constant], layout_rate_constant)
     }
 
@@ -249,12 +258,13 @@
     const saved_filenames = ['configs', 'fit']
 
     let graphDivs: HTMLDivElement[] = []
+
     onMount(async () => {
         graphDivs = Array.from(document.querySelectorAll<HTMLDivElement>('.kinetics_graph'))
     })
 
     const fixWidth = () => {
-        console.log('fixing width', graphDivs)
+        // console.log('fixing width', graphDivs)
         graphDivs.forEach((div) => {
             console.log({ div })
             if (!div.data) return
@@ -560,6 +570,17 @@
             <Select on:change={plot} bind:value={temperature} options={temperature_values} label="temperature" />
             <Select on:change={plot} bind:value={rate_coefficient} options={parameters} label="rate constant" />
             <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+            {#if data_loaded}
+                <button
+                    class="button is-link"
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
+                        await oO(compute_rate_constat_fn())
+                        toggle_loading(currentTarget)
+                    }}
+                    >compute
+                </button>
+            {/if}
         </div>
     </svelte:fragment>
 
