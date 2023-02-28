@@ -29,3 +29,13 @@ export const correctObjValue = (obj: ValueLabel) => ({
     ...obj,
     value: Number(obj.value).toExponential(3),
 })
+
+export const get_nominal_value = (value: string) => {
+    const [value_std, power] = value.split('e')
+    return value_std.split('+/-')[0].replace('(', '') + 'e' + power
+}
+
+export const get_std_value = (value: string) => {
+    const [value_std, power] = value.split('e')
+    return value_std.split('+/-')[1].replace(')', '') + 'e' + power
+}

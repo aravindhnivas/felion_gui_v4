@@ -236,49 +236,14 @@
         plot_number_density()
     }
 
-    // const plot = () => {
-    //     // if (!data_loaded) return
-    //     // added_traces = 0
-    //     // const current_data = full_data[temperature]
-    //     // const ND_keys = Object.keys(current_data)
-    //     // const Number_densities = { val: [], std: [] }
-    //     // const Fitted_values = { val: [], std: [] }
-
-    //     // ND_keys.forEach((nd) => {
-    //     //     if (!current_data[nd][rate_coefficient]) return
-    //     //     const ND_val = get_nominal_value(nd)
-    //     //     const ND_std = get_std_value(nd)
-    //     //     Number_densities.val = [...Number_densities.val, ND_val]
-    //     //     Number_densities.std = [...Number_densities.std, ND_std]
-
-    //     //     Fitted_values.val = [...Fitted_values.val, current_data[nd][rate_coefficient].val]
-    //     //     Fitted_values.std = [...Fitted_values.std, current_data[nd][rate_coefficient].std]
-    //     // })
-    //     // const sorted = Number_densities.val.map((val, index) => [val, index]).sort((a, b) => a[0] - b[0])
-    //     // const sorted_indices = sorted.map((val) => val[1])
-
-    //     // Number_densities.val = sorted_indices.map((index) => Number_densities.val[index])
-    //     // Number_densities.std = sorted_indices.map((index) => Number_densities.std[index])
-    //     // Fitted_values.val = sorted_indices.map((index) => Fitted_values.val[index])
-    //     // Fitted_values.std = sorted_indices.map((index) => Fitted_values.std[index])
-
-    //     // if (!Fitted_values.val.length) return
-
-    //     // number_densities = Number_densities
-    //     // fitted_values = Fitted_values
-    //     plot_number_density()
-    //     // fixWidth()
+    // const get_nominal_value = (value: string) => {
+    //     const [value_std, power] = value.split('e')
+    //     return value_std.split('+/-')[0].replace('(', '') + 'e' + power
     // }
-
-    const get_nominal_value = (value: string) => {
-        const [value_std, power] = value.split('e')
-        return value_std.split('+/-')[0].replace('(', '') + 'e' + power
-    }
-
-    const get_std_value = (value: string) => {
-        const [value_std, power] = value.split('e')
-        return value_std.split('+/-')[1].replace(')', '') + 'e' + power
-    }
+    // const get_std_value = (value: string) => {
+    //     const [value_std, power] = value.split('e')
+    //     return value_std.split('+/-')[1].replace(')', '') + 'e' + power
+    // }
 
     const parse_file = async ({ filename, loc = null, toast = true }) => {
         const fullpath = await path.join(loc ?? configDir, filename)
@@ -522,7 +487,7 @@
 
                     <hr />
 
-                    <h3>Rate constant</h3>
+                    <h3>rateConstant = rate / ND<sup>{polyOrder}</sup></h3>
                     <div class="align">
                         <Textfield
                             disabled
@@ -580,10 +545,13 @@
                 <hr />
 
                 <div class="flex flex-col items-start w-full">
-                    <h2>
-                        Fit rate vs f(ND): rate = rateConstant * ND <sup>x</sup>
-                        {addIntercept ? ' + intercept' : ''}
-                    </h2>
+                    <div class="align">
+                        <span class="tag is-warning">Fit</span>
+                        <h2>
+                            rate = rateConstant * ND <sup>x</sup>
+                            {addIntercept ? ' + intercept' : ''}
+                        </h2>
+                    </div>
                     <div class="align">
                         <Checkbox bind:value={addIntercept} label="add intercept" />
                         <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />

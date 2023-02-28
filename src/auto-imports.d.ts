@@ -21,6 +21,8 @@ declare global {
   const get: typeof import('svelte/store')['get']
   const getAllContexts: typeof import('svelte')['getAllContexts']
   const getContext: typeof import('svelte')['getContext']
+  const get_nominal_value: typeof import('$src/js/utils')['get_nominal_value']
+  const get_std_value: typeof import('$src/js/utils')['get_std_value']
   const hasContext: typeof import('svelte')['hasContext']
   const isError: typeof import('ts-try')['isError']
   const oO: typeof import('@zmotivat0r/o0')['oO']
