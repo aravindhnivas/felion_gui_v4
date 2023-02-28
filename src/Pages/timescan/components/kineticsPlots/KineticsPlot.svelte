@@ -25,7 +25,7 @@
             [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
         }
     } = {}
-    let comupte_rate_constant = false
+    // let comupte_rate_constant = false
 
     const update_dir = async (dir: string) => {
         processed_dir = await path.join(dir, 'processed')
