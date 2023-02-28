@@ -6,7 +6,7 @@
     import { kinetics_filenames } from '$src/Pages/timescan/stores'
     import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
-    import { toggle_loading } from '$src/Pages/settings/utils/misc'
+    // import { toggle_loading } from '$src/Pages/settings/utils/misc'
 
     export let active = false
     export let configDir: string = ''

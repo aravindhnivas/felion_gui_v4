@@ -24,7 +24,7 @@
     import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
-    import { toggle_loading } from '../utils/misc'
+    // import { toggle_loading } from '../utils/misc'
     // import { check_felionpy_assets_status } from '../utils/assets-status'
 
     export const check_for_update = async (log = false) => {

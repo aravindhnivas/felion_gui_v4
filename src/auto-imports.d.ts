@@ -38,6 +38,7 @@ declare global {
   const sleep: typeof import('$src/js/functions')['sleep']
   const slide: typeof import('svelte/transition')['slide']
   const tick: typeof import('svelte')['tick']
+  const toggle_loading: typeof import('$src/js/functions')['toggle_loading']
   const tryF: typeof import('ts-try')['tryF']
   const writable: typeof import('svelte/store')['writable']
 }
