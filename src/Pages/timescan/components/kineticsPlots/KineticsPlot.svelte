@@ -22,12 +22,21 @@
 
     let processed_rateConstants_filename = {
         fitted: 'kinetics.rateConstants.fitted.json',
-        default: 'kinetics.rateConstants.processed.json',
+        processed: 'kinetics.rateConstants.processed.json',
     }
-    let rate_constant_filename = processed_rateConstants_filename.default
+    let rate_constant_filename = processed_rateConstants_filename.processed
     let rate_constant: {
         [key: string]: {
-            [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
+            [key: string]: {
+                val: number[]
+                std: number[]
+                mean: string
+                weighted_mean: string
+                number_densities: {
+                    val: number[]
+                    std: number[]
+                }
+            }
         }
     } = {}
     // let comupte_rate_constant = false
@@ -44,7 +53,11 @@
     const f_ND_plot_ID = 'kinetic_plot_f_ND_rate'
 
     const plot_number_density = async () => {
+        const data_set = await set_data()
+        if (!data_set) return
+
         graph_plotted.number_densities = false
+
         const data_rate: Partial<Plotly.PlotData> = {
             x: number_densities.val,
             y: fitted_values.val,
@@ -66,16 +79,23 @@
         }
 
         const layout_rate: Partial<Plotly.Layout> = {
-            title: `${rate_coefficient} as a function of number density`,
+            title: `${rate_coefficient_label} as a function of number density`,
             xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
-            yaxis: { title: `${rate_coefficient} [s <sup>-1</sup>]` },
+            yaxis: { title: `${rate_coefficient_label} [s <sup>-1</sup>]` },
         }
-
         react(f_ND_plot_ID, [data_rate], layout_rate)
         graph_plotted.number_densities = true
+
+        await compute_rate_constant()
+        plot_rate_constant()
     }
 
-    const compute_rate_constat_fn = async () => {
+    let rate_constant_data_loaded = false
+
+    const compute_rate_constant = async () => {
+        if (!graph_plotted.number_densities) return await dialog.message('Please plot the number density first')
+
+        rate_constant_data_loaded = false
         const dataFromPython: void | {
             rate_constant: { val: number[]; std: number[]; mean: string; weighted_mean: string }
         } = await computePy_func({
@@ -90,12 +110,18 @@
 
         if (!dataFromPython) return
         if (!rate_constant[temperature]) rate_constant[temperature] = {}
+        // console.log(dataFromPython)
 
         const current_temp_rate_constants = dataFromPython.rate_constant
-        rate_constant[temperature][rate_coefficient] = current_temp_rate_constants
+        rate_constant[temperature][rate_coefficient_label] = { ...current_temp_rate_constants, number_densities }
+        rate_constant_data_loaded = true
+    }
+
+    const plot_rate_constant = () => {
+        const current_temp_rate_constants = rate_constant[temperature][rate_coefficient_label]
 
         const data_rate_constant: Partial<Plotly.PlotData> = {
-            x: number_densities.val,
+            x: current_temp_rate_constants.number_densities.val,
             y: current_temp_rate_constants.val,
             'marker.color': `rgb${Colors[0]}`,
             error_y: {
@@ -105,7 +131,7 @@
             },
             error_x: {
                 type: 'data',
-                array: number_densities.std,
+                array: current_temp_rate_constants.number_densities.std,
                 visible: true,
             },
             type: 'scatter',
@@ -114,44 +140,62 @@
             showlegend: true,
         }
         const layout_rate_constant: Partial<Plotly.Layout> = {
-            title: `${rate_coefficient} as a function of number density (constant)`,
+            title: `${rate_coefficient_label} as a function of number density (constant)`,
             xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
-            yaxis: { title: `${rate_coefficient} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`, tickformat: '.0e' },
+            yaxis: {
+                title: `${rate_coefficient_label} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`,
+                tickformat: '.0e',
+            },
         }
-
         react(`${f_ND_plot_ID}_rateconstant`, [data_rate_constant], layout_rate_constant)
     }
 
-    const set_data = () => {
-        if (!data_loaded) return
+    const set_data = async () => {
+        if (!data_loaded) return false
         added_traces = 0
-        const current_data = full_data[temperature]
-        const ND_keys = Object.keys(current_data)
-        const Number_densities = { val: [], std: [] }
-        const Fitted_values = { val: [], std: [] }
 
-        ND_keys.forEach((nd) => {
-            if (!current_data[nd][rate_coefficient]) return
-            const ND_val = get_nominal_value(nd)
-            const ND_std = get_std_value(nd)
-            Number_densities.val = [...Number_densities.val, ND_val]
-            Number_densities.std = [...Number_densities.std, ND_std]
+        if (!temperature) {
+            await dialog.message('Invalid temperature.', { type: 'error' })
+            return false
+        }
 
-            Fitted_values.val = [...Fitted_values.val, current_data[nd][rate_coefficient].val]
-            Fitted_values.std = [...Fitted_values.std, current_data[nd][rate_coefficient].std]
-        })
-        const sorted = Number_densities.val.map((val, index) => [val, index]).sort((a, b) => a[0] - b[0])
-        const sorted_indices = sorted.map((val) => val[1])
+        if (!rate_coefficient_label) {
+            await dialog.message('Invalid rate coefficient.', { type: 'error' })
+            return false
+        }
 
-        Number_densities.val = sorted_indices.map((index) => Number_densities.val[index])
-        Number_densities.std = sorted_indices.map((index) => Number_densities.std[index])
-        Fitted_values.val = sorted_indices.map((index) => Fitted_values.val[index])
-        Fitted_values.std = sorted_indices.map((index) => Fitted_values.std[index])
+        try {
+            const current_data = full_data[temperature]
+            const ND_keys = Object.keys(current_data)
+            const Number_densities = { val: [], std: [] }
+            const Fitted_values = { val: [], std: [] }
 
-        if (!Fitted_values.val.length) return
+            ND_keys.forEach((nd) => {
+                if (!current_data[nd][rate_coefficient_label]) return
+                const ND_val = get_nominal_value(nd)
+                const ND_std = get_std_value(nd)
+                Number_densities.val = [...Number_densities.val, ND_val]
+                Number_densities.std = [...Number_densities.std, ND_std]
 
-        number_densities = Number_densities
-        fitted_values = Fitted_values
+                Fitted_values.val = [...Fitted_values.val, current_data[nd][rate_coefficient_label].val]
+                Fitted_values.std = [...Fitted_values.std, current_data[nd][rate_coefficient_label].std]
+            })
+            const sorted = Number_densities.val.map((val, index) => [val, index]).sort((a, b) => a[0] - b[0])
+            const sorted_indices = sorted.map((val) => val[1])
+
+            Number_densities.val = sorted_indices.map((index) => Number_densities.val[index])
+            Number_densities.std = sorted_indices.map((index) => Number_densities.std[index])
+            Fitted_values.val = sorted_indices.map((index) => Fitted_values.val[index])
+            Fitted_values.std = sorted_indices.map((index) => Fitted_values.std[index])
+
+            if (!Fitted_values.val.length) return
+
+            number_densities = Number_densities
+            fitted_values = Fitted_values
+            return true
+        } catch (error) {
+            if (error instanceof Error) window.handleError(error)
+        }
     }
 
     const load_data = async () => {
@@ -163,6 +207,7 @@
 
         const [_err1, data] = await oO(fs.readTextFile(processed_file))
         if (_err1) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
+
         full_data = JSON.parse(data)
         temperature_values = Object.keys(full_data)
         window.createToast(`${processed_filename} loaded`, 'success')
@@ -176,10 +221,9 @@
         parameters = JSON.parse(params)
         window.createToast(`${processed_params_filename} loaded`, 'success')
         data_loaded = true
-        set_data()
-        // plot()
     }
 
+    let processed_full_data = {}
     const process_data = async (e: Event) => {
         if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
@@ -200,37 +244,31 @@
             })
 
             const { temp, ND } = config_data[filename]
-
-            if (!full_data[temp]) full_data[temp] = {}
+            if (!processed_full_data[temp]) processed_full_data[temp] = {}
 
             rate_paramters.forwards.forEach((key) => {
-                if (!full_data[temp][ND]) full_data[temp][ND] = {}
+                if (!processed_full_data[temp][ND]) processed_full_data[temp][ND] = {}
 
                 const fit_val = fit_data[filename]['default']['k3_fit'][key]
                 if (!fit_val) return
                 const [fitted_val, fitted_val_std] = fit_val
-                if (!full_data[temp][ND][key]) full_data[temp][ND][key] = { val: null, std: null }
-                full_data[temp][ND][key].val = fitted_val
-                full_data[temp][ND][key].std = fitted_val_std
+                if (!processed_full_data[temp][ND][key]) processed_full_data[temp][ND][key] = { val: null, std: null }
+                processed_full_data[temp][ND][key].val = fitted_val
+                processed_full_data[temp][ND][key].std = fitted_val_std
             })
 
             rate_paramters.backwards.forEach((key) => {
-                if (!full_data[temp][ND]) full_data[temp][ND] = {}
+                if (!processed_full_data[temp][ND]) processed_full_data[temp][ND] = {}
                 const fit_val = fit_data[filename]['default']['kCID_fit'][key]
                 if (!fit_val) return
                 const [fitted_val, fitted_val_std] = fit_val
-                if (!full_data[temp][ND][key]) full_data[temp][ND][key] = { val: null, std: null }
-                full_data[temp][ND][key].val = fitted_val
-                full_data[temp][ND][key].std = fitted_val_std
+                if (!processed_full_data[temp][ND][key]) processed_full_data[temp][ND][key] = { val: null, std: null }
+                processed_full_data[temp][ND][key].val = fitted_val
+                processed_full_data[temp][ND][key].std = fitted_val_std
             })
         }
         parameters = [...rate_paramters.forwards, ...rate_paramters.backwards]
-        // console.log({ full_data })
         window.createToast('Data processed and loaded', 'success')
-        // graph_plotted.number_densities = false
-        // graph_plotted.temperature = false
-        data_loaded = true
-        plot_number_density()
     }
 
     const parse_file = async ({ filename, loc = null, toast = true }) => {
@@ -244,13 +282,12 @@
         return filename_json
     }
 
-    let temperature = '4.7'
-    let rate_coefficient = 'k31'
+    let temperature = ''
+    let rate_coefficient_label = ''
     let graphWidth: number
+    let graphDivs: HTMLDivElement[] = []
 
     const saved_filenames = ['configs', 'fit']
-
-    let graphDivs: HTMLDivElement[] = []
 
     onMount(async () => {
         graphDivs = Array.from(document.querySelectorAll<HTMLDivElement>('.kinetics_graph'))
@@ -265,11 +302,11 @@
     }
 
     const save_data = async () => {
-        if (isEmpty(full_data)) return await dialog.message('No data to save', { type: 'error' })
+        if (isEmpty(processed_full_data)) return await dialog.message('No data to save', { type: 'error' })
         if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
 
         const processed_file = await path.join(processed_dir, processed_filename)
-        const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(full_data, null, 4)))
+        const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(processed_full_data, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
         window.createToast(`Saved file ${processed_filename}`, 'success')
@@ -281,7 +318,6 @@
     }
 
     let rate_constant_mean_value_type = 'weighted_mean'
-
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
@@ -327,7 +363,6 @@
             {
                 x: number_densities.val,
                 y: fitY.val,
-                // name: fitY.name,
                 name: 'fit',
                 mode: 'lines',
                 line: { color: `rgb${Colors[0]}` },
@@ -342,15 +377,15 @@
         added_traces++
     }
 
-    const save_rate_constants = async () => {
+    const save_rate_constants = async (type: 'processed' | 'fitted') => {
         if (isEmpty(rate_constant)) return await dialog.message('No data to save', { type: 'error' })
 
         let current_rate_constants = {}
-
-        const processed_file = await path.join(processed_dir, rate_constant_filename)
+        const filename = processed_rateConstants_filename[type]
+        const processed_file = await path.join(processed_dir, filename)
         if (await fs.exists(processed_file)) {
             current_rate_constants = await parse_file({
-                filename: rate_constant_filename,
+                filename,
                 loc: processed_dir,
             })
         }
@@ -361,14 +396,15 @@
         const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(current_rate_constants, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
-        window.createToast(`Saved file ${rate_constant_filename}`, 'success')
+        window.createToast(`Saved file ${filename}`, 'success')
     }
 
     let temp_rate_constants = {}
 
+    let rate_constant_file_loaded = false
+
     const load_temp_rate_constants = async () => {
         const processed_file = await path.join(processed_dir, rate_constant_filename)
-
         if (!(await fs.exists(processed_file))) {
             return await dialog.message(`${rate_constant_filename} file doesn't exists`, { type: 'error' })
         }
@@ -377,30 +413,31 @@
 
         if (err) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         temp_rate_constants = JSON.parse(content)
+        // temperature_values = Object.keys(temp_rate_constants)
 
-        temperature_values = Object.keys(temp_rate_constants)
         parameters = Object.keys(temp_rate_constants[temperature])
 
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         window.createToast(`Loaded file ${rate_constant_filename}`, 'success')
+        rate_constant_file_loaded = true
     }
 
     const plot_fn_temp = async () => {
         if (isEmpty(temp_rate_constants)) return await dialog.message('No data to plot', { type: 'error' })
-
         let temperatures = []
         for (const temp in temp_rate_constants) {
-            if (!temp_rate_constants[temp][rate_coefficient]) continue
+            if (!temp_rate_constants[temp][rate_coefficient_label]) continue
             temperatures = [...temperatures, temp]
         }
 
         const rate_constants_values = { val: [], std: [] }
         temperatures.map((t) => {
-            const val_std = temp_rate_constants[t][rate_coefficient][rate_constant_mean_value_type]
+            const val_std = temp_rate_constants[t][rate_coefficient_label][rate_constant_mean_value_type]
             rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
             rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
         })
 
+        console.log({ rate_constants_values, temperatures })
         const dataToPlot = {
             x: temperatures,
             y: rate_constants_values.val,
@@ -414,11 +451,11 @@
                 color: `rgb${Colors[0]}`,
             },
         }
-        const { ylabel_units } = temp_rate_constants[temperatures[0]][rate_coefficient]
+        const { ylabel_units } = temp_rate_constants[temperatures[0]][rate_coefficient_label]
         const layout = {
             title: 'Rate constant vs Temperature',
             xaxis: { title: 'Temperature (K)' },
-            yaxis: { title: `${rate_coefficient} [${ylabel_units}]`, tickformat: '.0e' },
+            yaxis: { title: `${rate_coefficient_label} [${ylabel_units}]`, tickformat: '.0e' },
         }
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
@@ -467,93 +504,119 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
-        <h2>Function of number density</h2>
-        <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
+        {#if data_loaded}
+            <h2>Function of number density</h2>
+            <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
 
-        <hr />
+            <hr />
+            <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
 
-        <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
-        <div class="align">
-            <Textfield
-                disabled
-                value={rate_constant[temperature]?.[rate_coefficient]?.weighted_mean || ''}
-                label="weighted mean"
-            />
-            <Textfield disabled value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''} label="mean" />
-            {#if data_loaded}
+            <div class="align">
+                <Textfield
+                    disabled
+                    value={rate_constant[temperature]?.[rate_coefficient_label]?.weighted_mean || ''}
+                    label="weighted mean"
+                />
+                <Textfield
+                    disabled
+                    value={rate_constant[temperature]?.[rate_coefficient_label]?.mean || ''}
+                    label="mean"
+                />
+                <!-- {#if data_loaded} -->
                 <button
                     class="button is-link"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
-                        await oO(compute_rate_constat_fn())
+                        await oO(compute_rate_constant())
                         toggle_loading(currentTarget)
                     }}
-                    >compute and plot rate constant
+                    >compute rate constant
                 </button>
-            {/if}
-            <div class="flex ml-auto">
-                <TextAndSelectOptsToggler
-                    style="width: 20em;"
-                    bind:value={processed_rateConstants_filename.default}
-                    label={`*.rateConstants.processed.json`}
-                    lookFor={'.rateConstants.processed.json'}
-                    lookIn={processed_dir}
-                />
-                <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
-            </div>
-        </div>
+                <!-- {/if} -->
 
-        <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
-        <hr />
-        <h2>Function of temperature</h2>
-        <div class="align">
-            <Select bind:value={rate_constant_mean_value_type} options={['weighted_mean', 'mean']} label="value" />
-            <Select
-                bind:value={rate_constant_filename}
-                options={Object.values(processed_rateConstants_filename)}
-                label="value"
-            />
-            <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
-            <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
-        </div>
-        <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
-        <hr />
-
-        <div class="flex flex-col items-start w-full">
-            <div class="align">
-                <span class="tag is-warning">Fit</span>
-                <h2>
-                    rate = rateConstant * ND <sup>x</sup>
-                    {addIntercept ? ' + intercept' : ''}
-                </h2>
-            </div>
-            <div class="align">
-                <Checkbox bind:value={addIntercept} label="add intercept" />
-                <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
-                <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
-                {#if addIntercept}
-                    <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
+                {#if rate_constant_data_loaded}
+                    <button class="button is-link" on:click={plot_rate_constant}>plot rate constant </button>
                 {/if}
-                <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
 
                 <div class="flex ml-auto">
+                    <!-- <button class="button is-warning" on:click={load_rate_constant_data}>load</button> -->
                     <TextAndSelectOptsToggler
                         style="width: 20em;"
-                        bind:value={processed_rateConstants_filename.fitted}
-                        label={`*.rateConstants.fitted.json`}
-                        lookFor={'.rateConstants.fitted.json'}
+                        bind:value={processed_rateConstants_filename.processed}
+                        label={`*.rateConstants.processed.json`}
+                        lookFor={'.rateConstants.processed.json'}
                         lookIn={processed_dir}
                     />
-                    <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+                    <button
+                        class="i-material-symbols-save-rounded text-2xl"
+                        on:click={() => save_rate_constants('processed')}
+                    />
                 </div>
             </div>
 
-            <h3>Fitted parameters</h3>
+            <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
+            <hr />
+            <h2>Function of temperature</h2>
             <div class="align">
-                <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
-                <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
+                <Select
+                    bind:value={rate_constant_mean_value_type}
+                    options={['weighted_mean', 'mean']}
+                    label="rate constant value"
+                />
+                <Select
+                    bind:value={rate_constant_filename}
+                    options={Object.values(processed_rateConstants_filename)}
+                    label="rate constant file"
+                />
+                <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
+                {#if rate_constant_file_loaded}
+                    <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+                {:else}
+                    <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
+                {/if}
             </div>
-        </div>
+            <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
+            <hr />
+
+            <div class="flex flex-col items-start w-full">
+                <div class="align">
+                    <span class="tag is-warning">Fit</span>
+                    <h2>
+                        rate = rateConstant * ND <sup>x</sup>
+                        {addIntercept ? ' + intercept' : ''}
+                    </h2>
+                </div>
+                <div class="align">
+                    <Checkbox bind:value={addIntercept} label="add intercept" />
+                    <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
+                    <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
+                    {#if addIntercept}
+                        <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
+                    {/if}
+                    <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
+
+                    <div class="flex ml-auto">
+                        <TextAndSelectOptsToggler
+                            style="width: 20em;"
+                            bind:value={processed_rateConstants_filename.fitted}
+                            label={`*.rateConstants.fitted.json`}
+                            lookFor={'.rateConstants.fitted.json'}
+                            lookIn={processed_dir}
+                        />
+                        <button
+                            class="i-material-symbols-save-rounded text-2xl"
+                            on:click={() => save_rate_constants('fitted')}
+                        />
+                    </div>
+                </div>
+
+                <h3>Fitted parameters</h3>
+                <div class="align">
+                    <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
+                    <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
+                </div>
+            </div>
+        {/if}
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
@@ -580,14 +643,25 @@
 
         <div class="flex">
             <Select
-                on:change={plot_number_density}
+                class={temperature ? '' : 'has-background-danger'}
+                on:change={() => {
+                    if (temperature && rate_coefficient_label) {
+                        plot_number_density()
+                    }
+                }}
                 bind:value={temperature}
                 options={temperature_values}
                 label="temperature"
             />
+
             <Select
-                on:change={plot_number_density}
-                bind:value={rate_coefficient}
+                class={rate_coefficient_label ? '' : 'has-background-danger'}
+                on:change={() => {
+                    if (temperature && rate_coefficient_label) {
+                        plot_number_density()
+                    }
+                }}
+                bind:value={rate_coefficient_label}
                 options={parameters}
                 label="rate constant"
             />
