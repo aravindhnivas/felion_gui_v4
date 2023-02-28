@@ -19,8 +19,15 @@
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
     let processed_params_filename = 'kinetics.params.processed.json'
-    let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
-    let processed_rateConstants_fitted_filename = 'kinetics.rateConstants.fitted.json'
+
+    let processed_rateConstants_filename = {
+        fitted: 'kinetics.rateConstants.fitted.json',
+        default: 'kinetics.rateConstants.processed.json',
+    }
+    // let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
+    // let processed_rateConstants_fitted_filename = 'kinetics.rateConstants.fitted.json'
+    let rate_constant_filename = processed_rateConstants_filename.default
+
     let rate_constant: {
         [key: string]: {
             [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
@@ -265,7 +272,6 @@
     })
 
     const fixWidth = () => {
-        // console.log('fixing width', graphDivs)
         graphDivs.forEach((div) => {
             console.log({ div })
             if (!div.data) return
@@ -290,6 +296,7 @@
     }
 
     let rate_constant_mean_value_type = 'weighted_mean'
+
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
@@ -352,12 +359,13 @@
 
     const save_rate_constants = async () => {
         if (isEmpty(rate_constant)) return await dialog.message('No data to save', { type: 'error' })
+
         let current_rate_constants = {}
 
-        const current_file = await path.join(processed_dir, processed_rateConstants_filename)
-        if (await fs.exists(current_file)) {
+        const processed_file = await path.join(processed_dir, rate_constant_filename)
+        if (await fs.exists(processed_file)) {
             current_rate_constants = await parse_file({
-                filename: processed_rateConstants_filename,
+                filename: rate_constant_filename,
                 loc: processed_dir,
             })
         }
@@ -365,20 +373,19 @@
         current_rate_constants = { ...current_rate_constants, ...rate_constant }
         if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
 
-        const processed_file = await path.join(processed_dir, processed_rateConstants_filename)
         const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(current_rate_constants, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
-        window.createToast(`Saved file ${processed_rateConstants_filename}`, 'success')
+        window.createToast(`Saved file ${rate_constant_filename}`, 'success')
     }
 
     let temp_rate_constants = {}
 
     const load_temp_rate_constants = async () => {
-        const processed_file = await path.join(processed_dir, processed_rateConstants_filename)
+        const processed_file = await path.join(processed_dir, rate_constant_filename)
 
         if (!(await fs.exists(processed_file))) {
-            return await dialog.message(`${processed_rateConstants_filename} file doesn't exists`, { type: 'error' })
+            return await dialog.message(`${rate_constant_filename} file doesn't exists`, { type: 'error' })
         }
 
         const [err, content] = await oO(fs.readTextFile(processed_file))
@@ -390,7 +397,7 @@
         parameters = Object.keys(temp_rate_constants[temperature])
 
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
-        window.createToast(`Loaded file ${processed_rateConstants_filename}`, 'success')
+        window.createToast(`Loaded file ${rate_constant_filename}`, 'success')
     }
 
     const plot_fn_temp = async () => {
@@ -483,8 +490,8 @@
 
                     <hr />
 
+                    <h3>Rate constant</h3>
                     <div class="align">
-                        <h3>Rate constant</h3>
                         <Textfield
                             disabled
                             value={rate_constant[temperature]?.[rate_coefficient]?.weighted_mean || ''}
@@ -495,10 +502,21 @@
                             value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''}
                             label="mean"
                         />
+                        {#if data_loaded}
+                            <button
+                                class="button is-link"
+                                on:click={async ({ currentTarget }) => {
+                                    toggle_loading(currentTarget)
+                                    await oO(compute_rate_constat_fn())
+                                    toggle_loading(currentTarget)
+                                }}
+                                >compute and plot rate constant
+                            </button>
+                        {/if}
                         <div class="flex ml-auto">
                             <TextAndSelectOptsToggler
                                 style="width: 20em;"
-                                bind:value={processed_rateConstants_filename}
+                                bind:value={processed_rateConstants_filename.default}
                                 label={`*.rateConstants.processed.json`}
                                 lookFor={'.rateConstants.processed.json'}
                                 lookIn={processed_dir}
@@ -511,13 +529,17 @@
                     <hr />
                     <h2>Function of temperature</h2>
                     <div class="align">
-                        <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
                         <Select
-                            on:change={plot_fn_temp}
                             bind:value={rate_constant_mean_value_type}
                             options={['weighted_mean', 'mean']}
                             label="value"
                         />
+                        <Select
+                            bind:value={rate_constant_filename}
+                            options={Object.values(processed_rateConstants_filename)}
+                            label="value"
+                        />
+                        <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
                         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
                     </div>
                     <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
@@ -527,12 +549,12 @@
 
                 <div class="flex flex-col items-start w-full">
                     <h2>
-                        Fit rate vs f(ND): rate = rateConstant * ND <sup>{polyOrder}</sup>
+                        Fit rate vs f(ND): rate = rateConstant * ND <sup>x</sup>
                         {addIntercept ? ' + intercept' : ''}
                     </h2>
                     <div class="align">
                         <Checkbox bind:value={addIntercept} label="add intercept" />
-                        <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="poly-order" />
+                        <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
                         <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
                         {#if addIntercept}
                             <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
@@ -542,7 +564,7 @@
                         <div class="flex ml-auto">
                             <TextAndSelectOptsToggler
                                 style="width: 20em;"
-                                bind:value={processed_rateConstants_fitted_filename}
+                                bind:value={processed_rateConstants_filename.fitted}
                                 label={`*.rateConstants.fitted.json`}
                                 lookFor={'.rateConstants.fitted.json'}
                                 lookIn={processed_dir}
@@ -587,17 +609,6 @@
             <Select on:change={plot} bind:value={temperature} options={temperature_values} label="temperature" />
             <Select on:change={plot} bind:value={rate_coefficient} options={parameters} label="rate constant" />
             <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
-            {#if data_loaded}
-                <button
-                    class="button is-link"
-                    on:click={async ({ currentTarget }) => {
-                        toggle_loading(currentTarget)
-                        await oO(compute_rate_constat_fn())
-                        toggle_loading(currentTarget)
-                    }}
-                    >compute rate constant
-                </button>
-            {/if}
         </div>
     </svelte:fragment>
 
