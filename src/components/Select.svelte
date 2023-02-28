@@ -8,6 +8,9 @@
     export let lookIn: string = ''
     export let lookFor: string = '*'
 
+    let className = ''
+    export { className as class }
+
     onMount(() => {
         if (lookIn) {
             update = async (toast = true) => {
@@ -37,18 +40,18 @@
     $: if (update && lookIn) update(false)
 </script>
 
-<div class="container">
+<div class="container ">
     <span style="font-size: small;">{label}</span>
     <div class:contanier-with-icon={update}>
         <div class="select" class:is-multiple={multiple}>
             {#if multiple}
-                <select multiple bind:value {label} size={options.length} on:change on:click on:dblclick>
+                <select multiple bind:value size={options.length} on:change on:click on:dblclick>
                     {#each options as option}
                         <option value={option}>{option}</option>
                     {/each}
                 </select>
             {:else}
-                <select bind:value {label} on:change on:click on:dblclick>
+                <select class={className} bind:value on:change on:click on:dblclick>
                     {#each options as option}
                         <option value={option}>{option}</option>
                     {/each}
