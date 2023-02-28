@@ -578,7 +578,7 @@
                         await oO(compute_rate_constat_fn())
                         toggle_loading(currentTarget)
                     }}
-                    >compute
+                    >compute rate constant
                 </button>
             {/if}
         </div>
@@ -586,8 +586,6 @@
 
     <svelte:fragment slot="footer_content__slot">
         <button class="button is-warning" on:click={fixWidth}>full-width</button>
-        <!-- <ButtonBadge id="kinetic-plot-submit-button" on:click={plot} label="plot f(ND)" /> -->
-        <!-- <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" /> -->
     </svelte:fragment>
 </SeparateWindow>
 
@@ -599,10 +597,15 @@
         align-items: baseline;
         overflow-y: auto;
     }
+
     .graph {
         display: grid;
         width: 100%;
         grid-template-rows: auto 1fr;
         gap: 0.5em;
+    }
+
+    .kinetics_graph {
+        justify-self: center;
     }
 </style>
