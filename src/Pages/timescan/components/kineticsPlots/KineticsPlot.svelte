@@ -20,6 +20,7 @@
     let processed_filename = 'kinetics.processed.json'
     let processed_params_filename = 'kinetics.params.processed.json'
     let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
+    let processed_rateConstants_fitted_filename = 'kinetics.rateConstants.fitted.json'
     let rate_constant: {
         [key: string]: {
             [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
@@ -455,12 +456,14 @@
 
         <div class="flex" class:hide={hide_header}>
             <TextAndSelectOptsToggler
+                style="width: 20em;"
                 bind:value={processed_filename}
                 label={`*.processed.json`}
                 lookFor={'.processed.json'}
                 lookIn={processed_dir}
             />
             <TextAndSelectOptsToggler
+                style="width: 20em;"
                 bind:value={processed_params_filename}
                 label={`*.params.processed.json`}
                 lookFor={'.params.processed.json'}
@@ -492,13 +495,16 @@
                             value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''}
                             label="mean"
                         />
-                        <TextAndSelectOptsToggler
-                            bind:value={processed_rateConstants_filename}
-                            label={`*.rateConstants.processed.json`}
-                            lookFor={'.rateConstants.processed.json'}
-                            lookIn={processed_dir}
-                        />
-                        <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+                        <div class="flex ml-auto">
+                            <TextAndSelectOptsToggler
+                                style="width: 20em;"
+                                bind:value={processed_rateConstants_filename}
+                                label={`*.rateConstants.processed.json`}
+                                lookFor={'.rateConstants.processed.json'}
+                                lookIn={processed_dir}
+                            />
+                            <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+                        </div>
                     </div>
 
                     <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
@@ -519,24 +525,35 @@
 
                 <hr />
 
-                <div class="flex flex-col items-start">
+                <div class="flex flex-col items-start w-full">
                     <h2>
-                        Fit rate vs f(ND): rate = slope * ND <sup>{polyOrder}</sup>
+                        Fit rate vs f(ND): rate = rateConstant * ND <sup>{polyOrder}</sup>
                         {addIntercept ? ' + intercept' : ''}
                     </h2>
                     <div class="align">
                         <Checkbox bind:value={addIntercept} label="add intercept" />
                         <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="poly-order" />
-                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="slope guess" />
+                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
                         {#if addIntercept}
                             <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
                         {/if}
                         <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
+
+                        <div class="flex ml-auto">
+                            <TextAndSelectOptsToggler
+                                style="width: 20em;"
+                                bind:value={processed_rateConstants_fitted_filename}
+                                label={`*.rateConstants.fitted.json`}
+                                lookFor={'.rateConstants.fitted.json'}
+                                lookIn={processed_dir}
+                            />
+                            <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+                        </div>
                     </div>
 
                     <h3>Fitted parameters</h3>
                     <div class="align">
-                        <Textfield bind:value={fitted_slope} label="slope (cm^{3 * polyOrder}.s-1)" disabled />
+                        <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
                         <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
                     </div>
                 </div>
