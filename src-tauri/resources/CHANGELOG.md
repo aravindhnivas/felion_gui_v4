@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.6.1
+
+- Feature: kinetics plot improved
+
 ## v4.6.0
 
 - Feature: kinetics plot (plotly) added
