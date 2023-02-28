@@ -24,10 +24,7 @@
         fitted: 'kinetics.rateConstants.fitted.json',
         default: 'kinetics.rateConstants.processed.json',
     }
-    // let processed_rateConstants_filename = 'kinetics.rateConstants.processed.json'
-    // let processed_rateConstants_fitted_filename = 'kinetics.rateConstants.fitted.json'
     let rate_constant_filename = processed_rateConstants_filename.default
-
     let rate_constant: {
         [key: string]: {
             [key: string]: { val: number[]; std: number[]; mean: string; weighted_mean: string }
@@ -236,15 +233,6 @@
         plot_number_density()
     }
 
-    // const get_nominal_value = (value: string) => {
-    //     const [value_std, power] = value.split('e')
-    //     return value_std.split('+/-')[0].replace('(', '') + 'e' + power
-    // }
-    // const get_std_value = (value: string) => {
-    //     const [value_std, power] = value.split('e')
-    //     return value_std.split('+/-')[1].replace(')', '') + 'e' + power
-    // }
-
     const parse_file = async ({ filename, loc = null, toast = true }) => {
         const fullpath = await path.join(loc ?? configDir, filename)
         if (!(await fs.exists(fullpath))) {
@@ -442,7 +430,7 @@
     graphMode={true}
     autoHide={true}
     maximize={true}
-    mainContent$style="display: grid; overflow:hidden;"
+    mainContent$style="display: grid; overflow:auto; padding: 0 1em;"
 >
     <svelte:fragment slot="header_content__slot">
         <div class="flex" class:hide={hide_header}>
@@ -479,106 +467,91 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
-        <div class="main_container px-4">
-            <div class="align mt-5 items-baseline" bind:clientWidth={graphWidth}>
-                <div class="graph">
-                    <h2>Function of number density</h2>
-                    <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
+        <h2>Function of number density</h2>
+        <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
 
-                    <hr />
+        <hr />
 
-                    <h3>rateConstant = rate / ND<sup>{polyOrder}</sup></h3>
-                    <div class="align">
-                        <Textfield
-                            disabled
-                            value={rate_constant[temperature]?.[rate_coefficient]?.weighted_mean || ''}
-                            label="weighted mean"
-                        />
-                        <Textfield
-                            disabled
-                            value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''}
-                            label="mean"
-                        />
-                        {#if data_loaded}
-                            <button
-                                class="button is-link"
-                                on:click={async ({ currentTarget }) => {
-                                    toggle_loading(currentTarget)
-                                    await oO(compute_rate_constat_fn())
-                                    toggle_loading(currentTarget)
-                                }}
-                                >compute and plot rate constant
-                            </button>
-                        {/if}
-                        <div class="flex ml-auto">
-                            <TextAndSelectOptsToggler
-                                style="width: 20em;"
-                                bind:value={processed_rateConstants_filename.default}
-                                label={`*.rateConstants.processed.json`}
-                                lookFor={'.rateConstants.processed.json'}
-                                lookIn={processed_dir}
-                            />
-                            <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
-                        </div>
-                    </div>
+        <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
+        <div class="align">
+            <Textfield
+                disabled
+                value={rate_constant[temperature]?.[rate_coefficient]?.weighted_mean || ''}
+                label="weighted mean"
+            />
+            <Textfield disabled value={rate_constant[temperature]?.[rate_coefficient]?.mean || ''} label="mean" />
+            {#if data_loaded}
+                <button
+                    class="button is-link"
+                    on:click={async ({ currentTarget }) => {
+                        toggle_loading(currentTarget)
+                        await oO(compute_rate_constat_fn())
+                        toggle_loading(currentTarget)
+                    }}
+                    >compute and plot rate constant
+                </button>
+            {/if}
+            <div class="flex ml-auto">
+                <TextAndSelectOptsToggler
+                    style="width: 20em;"
+                    bind:value={processed_rateConstants_filename.default}
+                    label={`*.rateConstants.processed.json`}
+                    lookFor={'.rateConstants.processed.json'}
+                    lookIn={processed_dir}
+                />
+                <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
+            </div>
+        </div>
 
-                    <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
-                    <hr />
-                    <h2>Function of temperature</h2>
-                    <div class="align">
-                        <Select
-                            bind:value={rate_constant_mean_value_type}
-                            options={['weighted_mean', 'mean']}
-                            label="value"
-                        />
-                        <Select
-                            bind:value={rate_constant_filename}
-                            options={Object.values(processed_rateConstants_filename)}
-                            label="value"
-                        />
-                        <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
-                        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
-                    </div>
-                    <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
+        <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
+        <hr />
+        <h2>Function of temperature</h2>
+        <div class="align">
+            <Select bind:value={rate_constant_mean_value_type} options={['weighted_mean', 'mean']} label="value" />
+            <Select
+                bind:value={rate_constant_filename}
+                options={Object.values(processed_rateConstants_filename)}
+                label="value"
+            />
+            <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
+            <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+        </div>
+        <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
+        <hr />
+
+        <div class="flex flex-col items-start w-full">
+            <div class="align">
+                <span class="tag is-warning">Fit</span>
+                <h2>
+                    rate = rateConstant * ND <sup>x</sup>
+                    {addIntercept ? ' + intercept' : ''}
+                </h2>
+            </div>
+            <div class="align">
+                <Checkbox bind:value={addIntercept} label="add intercept" />
+                <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
+                <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
+                {#if addIntercept}
+                    <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
+                {/if}
+                <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
+
+                <div class="flex ml-auto">
+                    <TextAndSelectOptsToggler
+                        style="width: 20em;"
+                        bind:value={processed_rateConstants_filename.fitted}
+                        label={`*.rateConstants.fitted.json`}
+                        lookFor={'.rateConstants.fitted.json'}
+                        lookIn={processed_dir}
+                    />
+                    <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
                 </div>
+            </div>
 
-                <hr />
-
-                <div class="flex flex-col items-start w-full">
-                    <div class="align">
-                        <span class="tag is-warning">Fit</span>
-                        <h2>
-                            rate = rateConstant * ND <sup>x</sup>
-                            {addIntercept ? ' + intercept' : ''}
-                        </h2>
-                    </div>
-                    <div class="align">
-                        <Checkbox bind:value={addIntercept} label="add intercept" />
-                        <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
-                        <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
-                        {#if addIntercept}
-                            <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
-                        {/if}
-                        <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
-
-                        <div class="flex ml-auto">
-                            <TextAndSelectOptsToggler
-                                style="width: 20em;"
-                                bind:value={processed_rateConstants_filename.fitted}
-                                label={`*.rateConstants.fitted.json`}
-                                lookFor={'.rateConstants.fitted.json'}
-                                lookIn={processed_dir}
-                            />
-                            <button class="i-material-symbols-save-rounded text-2xl" on:click={save_rate_constants} />
-                        </div>
-                    </div>
-
-                    <h3>Fitted parameters</h3>
-                    <div class="align">
-                        <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
-                        <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
-                    </div>
-                </div>
+            <h3>Fitted parameters</h3>
+            <div class="align">
+                <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
+                <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
             </div>
         </div>
     </svelte:fragment>
@@ -628,22 +601,11 @@
 </SeparateWindow>
 
 <style>
-    .main_container {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        grid-gap: 0.5rem;
-        align-items: baseline;
-        overflow-y: auto;
-    }
-
-    .graph {
-        display: grid;
-        width: 100%;
-        grid-template-rows: auto 1fr;
-        gap: 0.5em;
-    }
-
     .kinetics_graph {
         justify-self: center;
+        margin-top: 0.5em;
+    }
+    hr {
+        width: 100%;
     }
 </style>
