@@ -32,8 +32,6 @@
         processed: {},
         fitted: {},
     }
-    // let rate_constant_processed: RateConstant = {}
-    // let rate_constant_fitted: RateConstant = {}
 
     const update_dir = async (dir: string) => {
         processed_dir = await path.join(dir, 'processed')
@@ -317,7 +315,6 @@
     $: rate_constant_mean_value_type_options = rate_constant_filename.endsWith('processed.json')
         ? ['weighted_mean', 'mean']
         : ['slope', 'intercept']
-    // $: console.log(rate_constant_mean_value_type_options)
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
@@ -421,11 +418,9 @@
         temp_rate_constants = JSON.parse(content)
         // temperature_values = Object.keys(temp_rate_constants)
         parameters = Object.keys(temp_rate_constants[temperature])
+
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         window.createToast(`Loaded file ${rate_constant_filename}`, 'success')
-
-        // console.log(rate_constant_mean_value_type)
-        // if (!rate_constant_mean_value_type) rate_constant_mean_value_type = rate_constant_mean_value_type_options[0]
 
         rate_constant_file_loaded = true
     }
@@ -440,18 +435,11 @@
 
         const rate_constants_values = { val: [], std: [] }
         temperatures.map((t) => {
-            // let val_std: string
-            // if (rate_constant_filename.endsWith('fitted.json')) {
-            //     val_std = temp_rate_constants[t][rate_coefficient_label].slope
-            // } else {
-            //     val_std = temp_rate_constants[t][rate_coefficient_label][rate_constant_mean_value_type]
-            // }
             const val_std = temp_rate_constants[t][rate_coefficient_label][rate_constant_mean_value_type]
             rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
             rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
         })
-
-        // console.log({ rate_constants_values, temperatures })
+        console.log({ rate_constants_values, temperatures })
         const dataToPlot = {
             x: temperatures,
             y: rate_constants_values.val,
@@ -469,7 +457,10 @@
         const layout = {
             title: 'Rate constant vs Temperature',
             xaxis: { title: 'Temperature (K)' },
-            yaxis: { title: `${rate_coefficient_label} [${ylabel_units}]`, tickformat: '.0e' },
+            yaxis: {
+                title: ylabel_units ? `${rate_coefficient_label} [${ylabel_units}]` : rate_coefficient_label,
+                tickformat: '.0e',
+            },
         }
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
