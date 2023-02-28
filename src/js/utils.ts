@@ -30,12 +30,20 @@ export const correctObjValue = (obj: ValueLabel) => ({
     value: Number(obj.value).toExponential(3),
 })
 
-export const get_nominal_value = (value: string) => {
-    const [value_std, power] = value.split('e')
-    return value_std.split('+/-')[0].replace('(', '') + 'e' + power
+const nominal_std_fn = (value: string, ind: 0 | 1 = 0) => {
+    if (value.includes('e')) {
+        const [value_std, power] = value.split('e')
+        return value_std.split('+/-')[ind].replace(ind === 0 ? '(' : ')', '') + `e${power}`
+    }
+    return value.split('+/-')[ind]
 }
 
-export const get_std_value = (value: string) => {
-    const [value_std, power] = value.split('e')
-    return value_std.split('+/-')[1].replace(')', '') + 'e' + power
+export const get_nominal_value = (value: string | string[]) => {
+    if (typeof value === 'object') return value.map(nominal_std_fn)
+    return nominal_std_fn(value)
+}
+
+export const get_std_value = (value: string | string[]) => {
+    if (typeof value === 'object') return value.map((val) => nominal_std_fn(val, 1))
+    return nominal_std_fn(value, 1)
 }
