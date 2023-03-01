@@ -25,6 +25,10 @@
 </div>
 
 <style lang="scss">
+    #footer {
+        border: solid 1px dimgrey;
+        border-radius: 0.2em;
+    }
     .navbar-end {
         display: flex;
         .navbar-item:not(:only-child) {
