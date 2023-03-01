@@ -1,5 +1,5 @@
 import { currentPortPID } from '$src/lib/pyserver/felionpyServer'
-import { pyServerPORT } from '$src/lib/pyserver/stores'
+import { pyServerPORT, pyServerReady } from '$src/lib/pyserver/stores'
 import { serverInfo } from './stores'
 
 const fail = (error) => {
@@ -61,4 +61,5 @@ export const killPID = async () => {
     for (const port of fullports) {
         await kill(port)
     }
+    pyServerReady.set(false)
 }
