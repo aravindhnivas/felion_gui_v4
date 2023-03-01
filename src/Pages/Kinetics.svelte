@@ -1,13 +1,8 @@
 <script>
-    import ROSAAkinetics from './timescan/components/ROSAAkinetics.svelte'
+    import Kinetics from './timescan/components/Kinetics.svelte'
     import ROSAA from './thz/ROSAA.svelte'
-    let activeItem = 'ROSAAkinetics'
-    let kineticMode = false,
-        thzKinetics = false
-    $: if (activeItem) {
-        kineticMode = activeItem === 'ROSAAkinetics'
-        thzKinetics = activeItem === 'ROSAA'
-    }
+
+    const kineticMode = persistentWritable('kineticMode', true)
 </script>
 
 <section id="Kinetics" style="display:block" class="animate__animated animate__fadeIn">
@@ -16,43 +11,43 @@
             <div
                 role="presentation"
                 class="hvr-glow"
-                class:active={kineticMode}
-                on:click={() => (activeItem = 'ROSAAkinetics')}
+                class:active={$kineticMode}
+                on:click={() => ($kineticMode = true)}
             >
-                Timescan Kinetics
+                Kinetics
             </div>
 
             <div
                 role="presentation"
                 class="hvr-glow"
-                class:active={thzKinetics}
-                on:click={() => (activeItem = 'ROSAA')}
+                class:active={!$kineticMode}
+                on:click={() => ($kineticMode = false)}
             >
-                THz Kinetics
+                ROSAA Model
             </div>
         </div>
 
         <div class="content box">
-            <div class="subcontent" class:hide={!kineticMode}>
-                <ROSAAkinetics />
+            <div class="subcontent" class:hide={!$kineticMode}>
+                <Kinetics />
             </div>
-            <div class="subcontent" class:hide={!thzKinetics}><ROSAA /></div>
+            <div class="subcontent" class:hide={$kineticMode}><ROSAA /></div>
         </div>
     </div>
 </section>
 
 <style lang="scss">
     #Kinetics {
-        padding: 1em;
+        padding: 0.5em;
     }
 
     .main_div {
         display: grid;
-        gap: 1em;
+        gap: 0.5em;
         grid-template-columns: 1fr 10fr;
         .nav {
             display: flex;
-            gap: 1em;
+            gap: 0.5em;
             flex-direction: column;
             padding: 0.5em;
 
