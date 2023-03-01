@@ -17,7 +17,7 @@ import { invoke } from '@tauri-apps/api'
 import { isEmpty, round } from 'lodash-es'
 import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
-import axios from 'axios'
+// import axios from 'axios'
 import { auto_download_and_install_assets } from './assets-status'
 
 let assets_downloading = false

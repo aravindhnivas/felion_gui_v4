@@ -21,7 +21,7 @@
     // import { toggle_loading } from '../utils/misc'
     import { check_felionpy_assets_status } from '../utils/assets-status'
     import { install_felionpy_from_zipfile } from '../utils/download-assets'
-    import axios from 'axios'
+    // import axios from 'axios'
 
     // let showServerControls: boolean
     let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }

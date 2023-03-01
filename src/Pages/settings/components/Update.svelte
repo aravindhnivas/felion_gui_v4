@@ -21,35 +21,40 @@
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
     import { Switch, OutputBox, Textfield } from '$src/components'
-    import { persistentWritable } from '$src/js/persistentStore'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
-    // import { toggle_loading } from '../utils/misc'
-    // import { check_felionpy_assets_status } from '../utils/assets-status'
+    // import axios from 'axios'
 
     export const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
         $install_update_without_promt = false
-
-        // await check_felionpy_assets_status()
         await check_assets_update()
 
         outputbox.warn('checking for app update')
-        if (assets_download_progress > 0 && assets_download_progress < 1)
+        if (assets_download_progress > 0 && assets_download_progress < 1) {
             return outputbox.warn('waiting for assets to complete downloading')
-        try {
-            if (import.meta.env.DEV) {
-                if (!$allow_to_check_update) {
-                    return window.createToast('Update check skipped in dev mode', 'danger')
-                }
-            }
+        }
 
+        const response = await axios('https://api.github.com/repos/aravindhnivas/felion_gui_v4/releases/latest')
+        const latest_version = response.data.tag_name
+        outputbox.warn(`latest_version: ${latest_version}`)
+        outputbox.warn(`current_version: v${$currentVersion}`)
+
+        if (`v${$currentVersion}` === latest_version) {
+            version_info = 'latest version installed'
+            outputbox.success(version_info)
+            return
+        }
+
+        try {
             if (log) outputbox.info('Checking for updates...')
             download_progress = 0
             lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
             if (log) outputbox.info(update)
+
+            if (import.meta.env.DEV) return window.createToast('Update installation is skipped in dev mode', 'danger')
 
             if (import.meta.env.PROD && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
@@ -72,14 +77,7 @@
                 }
             }
         } catch (error) {
-            // since the update URL for latest version return undefined object
-            // therefore, JSON.parse throws an error
-            // following is the solution however it is not the best solution
-            if (typeof error === 'string' && error.includes('Json Error: EOF')) {
-                version_info = 'latest version installed'
-            } else {
-                $updateError = error
-            }
+            $updateError = error
         }
     }
 
@@ -109,7 +107,6 @@
         }
     })
 
-    // let updateIntervalCycle: NodeJS.Timer | null = null
     let updateReadyToInstall = false
     let lastUpdateCheck: string = 'Not checked yet'
 
@@ -131,9 +128,6 @@
     onMount(async () => {
         LOGGER.info('Update mounted')
     })
-
-    const allow_to_check_update = persistentWritable('allow_to_check_update', false)
-    let showOutput = true
 </script>
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
@@ -165,11 +159,6 @@
                     }}>What's New</button
                 >
             </div>
-            {#if import.meta.env.DEV}
-                <Switch bind:selected={$allow_to_check_update} label="allow to check update" />
-            {/if}
-
-            <Switch bind:selected={showOutput} label="show update logs" />
 
             <div class="updateCheck_status_div">
                 <span>Last checked</span>
@@ -239,9 +228,7 @@
             </div>
         {/if}
 
-        {#if showOutput}
-            <OutputBox bind:output={$outputbox} heading="update info" />
-        {/if}
+        <OutputBox bind:output={$outputbox} heading="update info" />
     </div>
 </div>
 

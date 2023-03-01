@@ -6,6 +6,7 @@ export {}
 declare global {
   const addTraces: typeof import('plotly.js-basic-dist')['addTraces']
   const afterUpdate: typeof import('svelte')['afterUpdate']
+  const axios: typeof import('axios')['default']
   const beforeUpdate: typeof import('svelte')['beforeUpdate']
   const blur: typeof import('svelte/transition')['blur']
   const createEventDispatcher: typeof import('svelte')['createEventDispatcher']
