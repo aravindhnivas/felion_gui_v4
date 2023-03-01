@@ -1,6 +1,11 @@
 <script lang="ts">
     import { currentTab, pyVersion, felionlibVersion } from '$lib/pyserver/stores'
     import { getVersion, getTauriVersion } from '@tauri-apps/api/app'
+    let py_modules = []
+    onMount(async () => {
+        const result = await axios(import.meta.env.VITE_FELIONPY_RAW_URL + 'src/requirements.txt')
+        py_modules = result?.data.split('\n') ?? ''
+    })
 </script>
 
 <div class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'About'}>
@@ -17,6 +22,13 @@
             <li>Python {$pyVersion}</li>
             <li>felionlib {$felionlibVersion}</li>
             <hr />
+
+            {#if $felionlibVersion && py_modules.length > 0}
+                <h3>Python libraries</h3>
+                {#each py_modules as module}
+                    <li>{module}</li>
+                {/each}
+            {/if}
         </ul>
     </div>
 </div>

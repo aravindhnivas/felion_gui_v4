@@ -512,7 +512,6 @@
         {#if data_loaded && temperature && rate_coefficient_label}
             <h2>Function of number density</h2>
             <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
-
             <hr />
             <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
 
