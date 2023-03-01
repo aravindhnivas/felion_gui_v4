@@ -13,14 +13,16 @@
     {#each lists as list (list.id)}
         <Item>
             <Text>
-                <PrimaryText
-                    style="cursor: pointer;"
-                    on:click={async () => {
-                        if (!list?.link) return window.createToast('Link not defined', 'warning')
-                        await shell.open(list.link)
-                    }}
-                >
+                <PrimaryText>
                     {list.primary}
+                    <button
+                        style="cursor: pointer;"
+                        class="i-mdi-open-in-new"
+                        on:click={async () => {
+                            if (!list?.link) return window.createToast('Inavlid URL', 'warning')
+                            await shell.open(list.link)
+                        }}
+                    />
                 </PrimaryText>
                 {#each list.secondary as item}
                     {#if list.html}

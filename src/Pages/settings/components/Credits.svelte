@@ -1,6 +1,7 @@
 <script>
     import { currentTab } from '$lib/pyserver/stores'
     import { ListsMultiline } from '$src/components'
+
     const credits = [
         {
             primary: 'Tauri',
@@ -33,9 +34,9 @@
         },
 
         {
-            primary: 'Google fonts',
-            secondary: ['Material Symbols and fonts'],
-            link: 'https://fonts.google.com/icons/',
+            primary: 'Iconify',
+            secondary: ['Universal icon framework'],
+            link: 'https://iconify.design/',
             id: window.getID(),
         },
 
@@ -87,10 +88,67 @@
             id: window.getID(),
         },
     ]
+
+    const credits_python = [
+        {
+            primary: 'NumPy',
+            secondary: ['The fundamental package for scientific computing with Python'],
+            link: 'https://numpy.org/',
+            id: window.getID(),
+        },
+        {
+            primary: 'SciPy',
+            secondary: ['Fundamental algorithms for scientific computing in Python'],
+            link: 'https://scipy.org/',
+            id: window.getID(),
+        },
+        {
+            primary: 'uncertainties',
+            secondary: [
+                'cross-platform program that transparently handles calculations with numbers with uncertainties',
+            ],
+            link: 'https://pythonhosted.org/uncertainties/',
+            id: window.getID(),
+        },
+        {
+            primary: 'Matplotlib',
+            secondary: ['Visualization with Python'],
+            link: 'https://matplotlib.org/',
+            id: window.getID(),
+        },
+        {
+            primary: 'PyQt6',
+            secondary: ['Python bindings for the Qt application framework'],
+            link: 'https://www.riverbankcomputing.com/software/pyqt/',
+            id: window.getID(),
+        },
+        {
+            primary: 'Flask',
+            secondary: ['micro web framework written in Python'],
+            link: 'https://flask.palletsprojects.com/en/2.2.x/',
+            id: window.getID(),
+        },
+        {
+            primary: 'waitress',
+            secondary: ['production-quality pure-Python WSGI server'],
+            link: 'https://docs.pylonsproject.org/projects/waitress/en/stable/index.html',
+            id: window.getID(),
+        },
+        {
+            primary: 'PyInstaller ',
+            secondary: ['PyInstaller bundles a Python application and all its dependencies into a single package.'],
+            link: 'https://pyinstaller.org/en/stable/',
+            id: window.getID(),
+        },
+    ]
 </script>
 
 <div class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'Credits'}>
-    <h1>Credits</h1>
+    <h1 class="mb-5">Credits</h1>
 
+    <h1>Back-end: felionpy</h1>
+    <ListsMultiline lists={credits_python} />
+    <hr />
+    <h1>Front-end</h1>
     <ListsMultiline lists={credits} />
 </div>
