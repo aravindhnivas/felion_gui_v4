@@ -8,7 +8,9 @@
 
 - Feature: kinetics plot (plotly) added
 - BUG FIX: kinetocs rate constant fitting
-  
+
+---
+
 ## v4.5.1
 
 - BUG FIX: felionpy min-version download
@@ -18,13 +20,19 @@
 - Kinetics code improvements
 - Requires minimum felionpy ^0.3.0
 
+---
+
 ## v4.4.0
 
 - BUG FIX and improvements on update-checking mechanism
 
+---
+
 ## v4.3.0
 
-- Install assets after restart
+- Auti-install assets after restart
+
+---
 
 ## v4.2.2
 
