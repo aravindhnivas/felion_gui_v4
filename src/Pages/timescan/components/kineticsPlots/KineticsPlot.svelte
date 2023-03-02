@@ -514,7 +514,6 @@
                     value={rate_constant_values.processed[temperature]?.[rate_coefficient_label]?.mean || ''}
                     label="mean"
                 />
-                <!-- {#if data_loaded} -->
                 <button
                     class="button is-link"
                     on:click={async ({ currentTarget }) => {
@@ -524,14 +523,12 @@
                     }}
                     >compute rate constant
                 </button>
-                <!-- {/if} -->
 
                 {#if rate_constant_data_loaded}
                     <button class="button is-link" on:click={plot_rate_constant}>plot rate constant </button>
                 {/if}
 
                 <div class="flex ml-auto">
-                    <!-- <button class="button is-warning" on:click={load_rate_constant_data}>load</button> -->
                     <TextAndSelectOptsToggler
                         style="width: 20em;"
                         bind:value={processed_rateConstants_filename.processed}
@@ -543,11 +540,8 @@
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
-
             <hr />
-
             <h2>Function of temperature</h2>
-
             <div class="align">
                 <Select
                     bind:value={rate_constant_mean_value_type}
@@ -588,7 +582,6 @@
                         <Textfield style="width: 7em;" bind:value={$intercept_guess} label="intercept guess" />
                     {/if}
                     <button class="button is-link ml-5" on:click={derive_rate_constant}>Fit</button>
-
                     <div class="flex ml-auto">
                         <TextAndSelectOptsToggler
                             style="width: 20em;"
@@ -636,21 +629,18 @@
                 <Select
                     class={temperature ? '' : 'has-background-danger'}
                     on:change={() => {
-                        if (temperature && rate_coefficient_label) {
-                            plot_number_density()
-                        }
+                        if (!(temperature && rate_coefficient_label)) return
+                        plot_number_density()
                     }}
                     bind:value={temperature}
                     options={temperature_values}
                     label="temperature"
                 />
-
                 <Select
                     class={rate_coefficient_label ? '' : 'has-background-danger'}
                     on:change={() => {
-                        if (temperature && rate_coefficient_label) {
-                            plot_number_density()
-                        }
+                        if (!(temperature && rate_coefficient_label)) return
+                        plot_number_density()
                     }}
                     bind:value={rate_coefficient_label}
                     options={parameters}
@@ -659,10 +649,6 @@
                 <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
             </div>
         {/if}
-    </svelte:fragment>
-
-    <svelte:fragment slot="footer_content__slot" let:changeGraphDivWidth>
-        <button class="button is-warning" on:click={async () => await changeGraphDivWidth()}>full-width</button>
     </svelte:fragment>
 </SeparateWindow>
 
