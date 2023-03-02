@@ -633,7 +633,7 @@
             <i class="i-carbon-close-outline" />
             <div class="tag is-danger">no data</div>
         {/if}
-        <div aria-label="hide header" data-cooltipz-dir="top">
+        <div aria-label="toggle header visibility" data-cooltipz-dir="top">
             {#if hide_header}
                 <button
                     on:click={() => (hide_header = !hide_header)}
