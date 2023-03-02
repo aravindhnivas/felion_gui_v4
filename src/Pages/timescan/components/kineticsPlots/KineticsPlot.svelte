@@ -278,22 +278,8 @@
 
     let temperature = ''
     let rate_coefficient_label = ''
-    let graphWidth: number
-    let graphDivs: HTMLDivElement[] = []
 
     const saved_filenames = ['configs', 'fit']
-
-    onMount(async () => {
-        graphDivs = Array.from(document.querySelectorAll<HTMLDivElement>('.kinetics_graph'))
-    })
-
-    const fixWidth = () => {
-        graphDivs.forEach((div) => {
-            console.log({ div })
-            if (!div.data) return
-            relayout(div.id, { width: graphWidth })
-        })
-    }
 
     const save_data = async () => {
         if (isEmpty(processed_full_data)) return await dialog.message('No data to save', { type: 'error' })
@@ -473,6 +459,7 @@
     autoHide={true}
     maximize={true}
     mainContent$style="display: grid; overflow:auto; padding: 0 1em;"
+    id="kinetics_plot_window"
 >
     <svelte:fragment slot="header_content__slot">
         <div class="flex" class:hide={hide_header}>
@@ -512,6 +499,7 @@
         {#if data_loaded && temperature && rate_coefficient_label}
             <h2>Function of number density</h2>
             <div class="kinetics_graph graph__div" id={f_ND_plot_ID} />
+
             <hr />
             <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
 
@@ -673,8 +661,8 @@
         {/if}
     </svelte:fragment>
 
-    <svelte:fragment slot="footer_content__slot">
-        <button class="button is-warning" on:click={fixWidth}>full-width</button>
+    <svelte:fragment slot="footer_content__slot" let:changeGraphDivWidth>
+        <button class="button is-warning" on:click={async () => await changeGraphDivWidth()}>full-width</button>
     </svelte:fragment>
 </SeparateWindow>
 
