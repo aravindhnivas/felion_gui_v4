@@ -108,7 +108,7 @@
         gap: 0.5em;
         padding: 0;
         width: 100%;
-        align-items: end;
+        // align-items: end;
         grid-template-rows: auto 1fr auto;
         .header_content {
             display: grid;
@@ -127,6 +127,7 @@
             border-top: solid 1px;
             padding: 0.5rem;
             background-color: #8965c982;
+            align-self: end;
             .right {
                 justify-content: flex-end;
                 flex-wrap: nowrap;
