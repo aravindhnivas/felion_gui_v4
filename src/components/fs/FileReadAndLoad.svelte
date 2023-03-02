@@ -50,6 +50,12 @@
         if (!filename.endsWith(options_filter)) {
             filename = `${filename}${options_filter}`
         }
+
+        if (!(await fs.exists(configDir))) {
+            const [_err] = await oO(fs.createDir(configDir))
+            if (_err) return window.handleError(_err)
+        }
+
         const savefilename = await path.join(configDir, filename)
 
         if (singleFilemode) {
@@ -204,12 +210,21 @@
     />
 
     {#if custom_save_data}
-        <button class="button is-link" on:click={custom_save_data}>Save</button>
+        <button
+            class="button is-link"
+            on:click={async () => {
+                if (!(await fs.exists(configDir))) {
+                    const [_err] = await oO(fs.createDir(configDir))
+                    if (_err) return window.handleError(_err)
+                }
+                await custom_save_data()
+            }}>Save</button
+        >
     {:else}
         <button class="button is-link" on:click={save_data}>Save</button>
     {/if}
     <button
-        class="i-material-symbols-folder-open-outline text-xl"
+        class="i-material-symbols-folder-open-outline"
         on:click={async () => {
             // await dialog.message(configDir, { title: 'save location' })
             await shell.open(configDir)
