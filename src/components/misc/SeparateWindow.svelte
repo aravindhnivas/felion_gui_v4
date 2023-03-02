@@ -50,17 +50,21 @@
     const changeGraphDivWidth = async (ms = 0) => {
         if (!graphMode) return
         await tick()
+        
         if (ms > 0) await sleep(ms)
-        console.log('changeGraphDivWidth', graphDivs)
+        // console.log('changeGraphDivWidth', graphDivs)
+        
+        if(!graphDivs.length) lookForGraph()
+        
         graphDivs.forEach((id) => {
-            if (id.data) {
-                relayout(id, { width: id.clientWidth })
-            }
+            if (!id.data) return
+            relayout(id, { width: clientWidth - 50 })
         })
     }
 
     let graphDivs = []
     function lookForGraph(node = null) {
+        
         if (!graphMode) return
         try {
             graphDivs = Array.from(document.querySelectorAll(`#${id} .graph__div`))
@@ -70,10 +74,7 @@
         }
     }
 
-    onMount(() => {
-        lookForGraph()
-        // changeGraphDivWidth(1000)
-    })
+    onMount(lookForGraph)
     onDestroy(() => {
         try {
             if (active && graphWindow) {
@@ -84,12 +85,14 @@
             console.warn("Couldn't close the window", error)
         }
     })
+
+    let clientWidth = 0
 </script>
 
 <div {id} class="main_content__div" class:hide={autoHide && !active}>
     <div class="header_content"><slot name="header_content__slot" /></div>
-    <div class="main_content" style={mainContent$style}>
-        <slot name="main_content__slot" {changeGraphDivWidth} />
+    <div class="main_content" style={mainContent$style} bind:clientWidth>
+        <slot name="main_content__slot" {changeGraphDivWidth} {clientWidth}/>
     </div>
 
     {#if $$slots.footer_content__slot || $$slots.left_footer_content__slot}
