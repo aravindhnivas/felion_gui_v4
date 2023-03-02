@@ -92,12 +92,12 @@
         <slot name="main_content__slot" {changeGraphDivWidth} />
     </div>
 
-    <!-- {#if autoHide && !$$slots.footer_content__slot} -->
+    {#if $$slots.footer_content__slot || $$slots.left_footer_content__slot}
         <div class="footer_content">
             <div class="container left align"><slot name="left_footer_content__slot" {changeGraphDivWidth} /></div>
             <div class="container right align"><slot name="footer_content__slot" {changeGraphDivWidth} /></div>
         </div>
-    <!-- {/if} -->
+    {/if}
 </div>
 
 <style lang="scss">
