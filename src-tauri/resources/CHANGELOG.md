@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.6.2
+
+- Package and security updates
+
 ## v4.6.1
 
 - Feature: kinetics plot improved
