@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v4.7.0
+
+- Code improvement and bug fixes
+
+---
+
 ## v4.6.2
 
 - Package and security updates
