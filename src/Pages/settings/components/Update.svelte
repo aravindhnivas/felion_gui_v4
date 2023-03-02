@@ -132,7 +132,7 @@
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
     <h1>Update</h1>
-    {#if window.navigator.onLine}
+    {#if !window.navigator.onLine}
         <div class="ml-auto" aria-label="No internet connection" data-cooltipz-dir="left">
             <div class="i-ion-cloud-offline-outline" />
         </div>
@@ -162,7 +162,7 @@
                     class="button is-warning"
                     on:click={() => {
                         $activateChangelog = true
-                    }}>What's New</button
+                    }}>What's New <i class="i-mdi-open-in-new ml-2 text-xs" /></button
                 >
             </div>
 
