@@ -108,7 +108,6 @@
         gap: 0.5em;
         padding: 0;
         width: 100%;
-        // align-items: end;
         grid-template-rows: auto 1fr auto;
         .header_content {
             display: grid;
