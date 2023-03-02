@@ -57,14 +57,14 @@
             }}
             on:click={update}
         >
-            <div class="i-mdi-refresh" />
+            <div class="i-mdi-refresh text-sm" />
         </div>
     {/if}
 
     {#if lock !== null}
         <IconButton toggle bind:pressed={lock}>
-            <Icon><div class="i-mdi-lock-open-outline" /></Icon>
-            <Icon on><div class="i-mdi-lock" /></Icon>
+            <Icon><div class="i-mdi-lock-open-outline text-sm" /></Icon>
+            <Icon on><div class="i-mdi-lock text-sm" /></Icon>
         </IconButton>
     {/if}
     <slot />
