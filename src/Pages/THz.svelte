@@ -206,7 +206,7 @@
         </div>
 
         <div class="align" style="justify-content: flex-end;" class:hide={!fit_options_div}>
-            <button class="i-mdi-settings text-2xl" on:click={() => (openTable = true)} />
+            <button class="i-mdi-settings" on:click={() => (openTable = true)} />
             <Select bind:value={fitfile} label="fitfile" options={[...fileChecked, 'averaged']} />
             <Select bind:value={fitMethod} label="fit method" options={['gaussian', 'lorentz', 'voigt']} />
             <button

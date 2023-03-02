@@ -13,7 +13,7 @@ export default defineConfig({
             extractors: [extractorSvelte],
             presets: [
                 presetIcons({
-                    scale: 1.2,
+                    scale: 2,
                     extraProperties: {
                         cursor: 'pointer',
                     },

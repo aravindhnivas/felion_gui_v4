@@ -155,7 +155,7 @@
             on:click={async () => {
                 const localdir = await path.appLocalDataDir()
                 await shell.open(localdir)
-            }}>APP Local data <i class="i-mdi-open-in-new text-2xl" /></button
+            }}>APP Local data <i class="i-mdi-open-in-new" /></button
         >
 
         <button
@@ -164,16 +164,13 @@
                 toggle_loading(currentTarget)
                 await oO(install_felionpy_from_zipfile())
                 toggle_loading(currentTarget)
-            }}
-            >Install from ZIPfile <i
-                class="i-material-symbols-drive-folder-upload-outline-sharp text-2xl ml-1"
-            /></button
+            }}>Install from ZIPfile <i class="i-material-symbols-drive-folder-upload-outline-sharp ml-1" /></button
         >
 
         <div id="serverControllers" class="align server-control">
             <div class="align">
                 <button
-                    class="i-mdi-refresh text-2xl"
+                    class="i-mdi-refresh"
                     style="align-self: self-end;"
                     on:click={async () => {
                         if ($pyServerReady) return window.createToast('server already running')

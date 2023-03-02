@@ -80,7 +80,7 @@
                 <div class="top-row mr-auto"><slot name="toggle_row" /></div>
                 <div class="tag is-link" aria-label="fullscreen" data-cooltipz-dir="bottom">
                     <button
-                        class="{fullscreen_toggle ? 'i-mdi-fullscreen-exit' : 'i-mdi-fullscreen'} text-2xl"
+                        class={fullscreen_toggle ? 'i-mdi-fullscreen-exit' : 'i-mdi-fullscreen'}
                         on:click={async () => {
                             files_div_toggle = fullscreen_toggle
                             browse_location_div_toggle = fullscreen_toggle
@@ -91,37 +91,37 @@
                     />
                 </div>
                 <div class="tag is-link" aria-label="update plot width" data-cooltipz-dir="bottom">
-                    <button class="i-mdi-cached text-2xl" on:click={async () => await changeGraphDivWidth()} />
+                    <button class="i-mdi-cached" on:click={async () => await changeGraphDivWidth()} />
                 </div>
                 <div class="tag is-link">
                     <button
-                        class="{files_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} text-2xl mr-2"
+                        class="{files_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} mr-2"
                         on:click={() => (files_div_toggle = !files_div_toggle)}
                     />
                     Files
                 </div>
                 <div class="tag is-link">
                     <button
-                        class="{browse_location_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} text-2xl mr-2"
+                        class="{browse_location_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} mr-2"
                         on:click={() => (browse_location_div_toggle = !browse_location_div_toggle)}
                     />
                     Location
                 </div>
                 <div class="tag is-link">
                     <button
-                        class="{button_row_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} text-2xl mr-2"
+                        class="{button_row_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} mr-2"
                         on:click={() => (button_row_div_toggle = !button_row_div_toggle)}
                     />
                     fx
                 </div>
                 <div class="tag is-link">
                     <button
-                        class="{reports_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} text-2xl mr-2"
+                        class="{reports_div_toggle ? 'i-mdi-visibility' : 'i-mdi-visibility-off'} mr-2"
                         on:click={() => (reports_div_toggle = !reports_div_toggle)}
                     />
                     Reports
                 </div>
-                <button class="i-mdi-build text-2xl" on:click={() => (activateConfigModal = true)} />
+                <button class="i-mdi-build" on:click={() => (activateConfigModal = true)} />
             </div>
             {#if browse_location_div_toggle}
                 <BrowseTextfield class="three_col_browse" bind:value={currentLocation} label="Current location" />

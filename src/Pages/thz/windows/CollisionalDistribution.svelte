@@ -270,7 +270,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot" let:changeGraphDivWidth>
-        <button class="i-mdi-refresh text-2xl" on:click={() => changeGraphDivWidth()} />
+        <button class="i-mdi-refresh" on:click={() => changeGraphDivWidth()} />
 
         <div class="graph__container p-3">
             <div id={plotID} class="graph__div" />

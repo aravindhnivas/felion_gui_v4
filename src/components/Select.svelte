@@ -69,7 +69,7 @@
                     update?.()
                 }}
             >
-                <div class="i-mdi-refresh text-2xl" />
+                <div class="i-mdi-refresh" />
             </div>
         {/if}
     </div>

@@ -9,7 +9,7 @@
 </script>
 
 <div class="channel_div">
-    <!-- <button class="i-mdi-menu text-2xl" style="cursor: move;" /> -->
+    <!-- <button class="i-mdi-menu" style="cursor: move;" /> -->
     <span class="channel_counter">{ind + 1}</span>
     <Select bind:value={item.type} label="type" options={['forwards', 'backwards']} />
     <Textfield bind:value={item.name} label="name" />

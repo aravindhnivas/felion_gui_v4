@@ -40,7 +40,7 @@
 <div class="align">
     <button class="button is-link" on:click={(e) => plotData({ e: e })}>Get details</button>
     <button
-        class="{toggleFileDetailsTable ? 'i-mdi-arrow-drop-up' : 'i-mdi-arrow-drop-down'} text-2xl mr-2"
+        class="{toggleFileDetailsTable ? 'i-mdi-arrow-drop-up' : 'i-mdi-arrow-drop-down'} mr-2"
         on:click={() => (toggleFileDetailsTable = !toggleFileDetailsTable)}
     />
     <button

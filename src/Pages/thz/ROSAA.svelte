@@ -408,7 +408,7 @@
                 <Select options={plt_styles} bind:value={$plot_style} label="plot style" />
                 <Select options={variablesList} bind:value={variable} label="variable" />
                 <button class="button is-link" on:click={resetConfig}>Reset Config</button>
-                <button class="i-mdi-open-in-new text-2xl" on:click={() => (toggle_modal = !toggle_modal)} />
+                <button class="i-mdi-open-in-new" on:click={() => (toggle_modal = !toggle_modal)} />
             </div>
             <VariableSelector
                 {variable}

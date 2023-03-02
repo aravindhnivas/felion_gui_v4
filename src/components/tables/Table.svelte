@@ -50,7 +50,7 @@
     {/if}
 
     {#if addextraOption}
-        <button class="i-mdi-add text-2xl m-3" style="float: right; padding: 0.5em;" on:click={addRow} />
+        <button class="i-mdi-add m-3" style="float: right; padding: 0.5em;" on:click={addRow} />
     {/if}
 
     <div class="mdc-data-table tableContainer">
@@ -73,11 +73,7 @@
                         >
                             <div role="presentation" class="tableIcon" on:click={() => sortTable(keys[index])}>
                                 {#if sortOption}
-                                    <button
-                                        class="{sortTypeAscending
-                                            ? 'i-mdi-arrow-upward'
-                                            : 'i-mdi-arrow-downward'} text-2xl"
-                                    />
+                                    <button class={sortTypeAscending ? 'i-mdi-arrow-upward' : 'i-mdi-arrow-downward'} />
                                     <!-- {#if sortTypeAscending}
                                         <Icon_arrow_upward />
                                     {:else}
@@ -108,7 +104,7 @@
                         {#if closeOption}
                             <td class="mdc-data-table__cell">
                                 <button
-                                    class="i-mdi-close text-2xl bg-red"
+                                    class="i-mdi-close bg-red"
                                     id={row.id}
                                     on:click={(e) => {
                                         rows = rows.filter((tb) => tb.id != e.currentTarget.id)

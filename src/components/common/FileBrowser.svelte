@@ -113,9 +113,9 @@
 
 <div class="top__div px-1 mb-3 box">
     <div class="mr-auto">
-        <button class="i-mdi-arrow-back text-2xl" on:click={() => changeDirectory('..')} />
+        <button class="i-mdi-arrow-back" on:click={() => changeDirectory('..')} />
         <button
-            class="animate__animated animate__faster i-mdi-refresh text-2xl"
+            class="animate__animated animate__faster i-mdi-refresh"
             on:click={({ currentTarget }) => {
                 currentTarget.classList.add('animate__rotateIn')
                 keepfiles = true
@@ -126,21 +126,21 @@
             }}
         />
         <button
-            class="{sortFile ? 'i-mdi-trending-up' : 'i-mdi-trending-down'} text-2xl"
+            class={sortFile ? 'i-mdi-trending-up' : 'i-mdi-trending-down'}
             on:click={() => (sortFile = !sortFile)}
         />
     </div>
 
     <div class="ml-auto">
         <button
-            class="{selectAll ? 'i-mdi-cancel-outline' : 'i-mdi-select-all'} text-2xl"
+            class={selectAll ? 'i-mdi-cancel-outline' : 'i-mdi-select-all'}
             on:click={() => {
                 selectAll = !selectAll
                 selectAll ? (fileChecked = fullfiles.map((file) => file.name)) : (fileChecked = [])
             }}
         />
 
-        <button class="i-mdi-search text-2xl" on:click={() => searchSurface.setOpen(true)} />
+        <button class="i-mdi-search" on:click={() => searchSurface.setOpen(true)} />
     </div>
 
     <MenuSurface

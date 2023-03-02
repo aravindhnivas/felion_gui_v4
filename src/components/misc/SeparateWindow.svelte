@@ -104,11 +104,12 @@
     .main_content__div {
         display: grid;
         max-height: 100%;
-        grid-template-rows: auto 1fr auto;
         height: 100%;
         gap: 0.5em;
         padding: 0;
         width: 100%;
+        align-items: end;
+        grid-template-rows: auto 1fr auto;
         .header_content {
             display: grid;
             grid-row-gap: 0.5em;

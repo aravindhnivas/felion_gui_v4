@@ -22,7 +22,7 @@
         console.log('Computed attachment rates')
     }
 
-    $: console.warn({ $numberDensity })
+    // $: console.warn({ $numberDensity })
     $: if ($numberDensity) {
         computeAttachmentRate()
     }

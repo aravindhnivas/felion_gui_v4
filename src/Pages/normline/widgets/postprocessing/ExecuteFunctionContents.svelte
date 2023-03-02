@@ -242,7 +242,7 @@
 {#if toggleFindPeaksRow}
     <div class="align v-baseline">
         <div class="align">
-            <button class="i-mdi-settings text-2xl" on:click={() => (modalActivate = true)} />
+            <button class="i-mdi-settings" on:click={() => (modalActivate = true)} />
             <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
             <Switch bind:selected={fitall} label="fit all methods" />
             <button

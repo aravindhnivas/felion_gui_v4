@@ -127,7 +127,7 @@
     <div class="align h-center mb-5">
         {#if !rateConstantMode}
             <Textfield bind:value={maxGuess} label="max-guess-value" />
-            <button class="i-mdi-refresh text-2xl" on:click={() => updateGuessMaxValues()} />
+            <button class="i-mdi-refresh" on:click={() => updateGuessMaxValues()} />
         {/if}
     </div>
 

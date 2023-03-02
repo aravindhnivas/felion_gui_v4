@@ -226,7 +226,7 @@
                 >
                     <Textfield bind:value={$depletionplot_figure_kwargs['rows_cols']} label="subplot (rows, cols)" />
                 </MenuSurface>
-                <button class="i-mdi-settings text-2xl" on:click={() => surface.setOpen(true)} />
+                <button class="i-mdi-settings" on:click={() => surface.setOpen(true)} />
             </div>
             <ButtonBadge on:click={(e) => plotData({ e: e, filetype: 'general' })}>Submit</ButtonBadge>
         </div>

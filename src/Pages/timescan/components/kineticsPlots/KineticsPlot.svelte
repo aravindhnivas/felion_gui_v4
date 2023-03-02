@@ -482,7 +482,7 @@
                 {/each}
                 <button class="button is-warning" on:click={process_data}>process data</button>
                 <div data-cooltipz-dir="left" aria-label="save *.processed.json">
-                    <button class="i-material-symbols-save-rounded text-2xl" on:click={save_data} />
+                    <button class="i-material-symbols-save-rounded" on:click={save_data} />
                 </div>
             </div>
         </div>
@@ -551,10 +551,7 @@
                         lookFor={'.rateConstants.processed.json'}
                         lookIn={processed_dir}
                     />
-                    <button
-                        class="i-material-symbols-save-rounded text-2xl"
-                        on:click={() => save_rate_constants('processed')}
-                    />
+                    <button class="i-material-symbols-save-rounded" on:click={() => save_rate_constants('processed')} />
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
@@ -613,7 +610,7 @@
                             lookIn={processed_dir}
                         />
                         <button
-                            class="i-material-symbols-save-rounded text-2xl"
+                            class="i-material-symbols-save-rounded"
                             on:click={() => save_rate_constants('fitted')}
                         />
                     </div>
@@ -640,13 +637,10 @@
             {#if hide_header}
                 <button
                     on:click={() => (hide_header = !hide_header)}
-                    class="i-material-symbols-visibility-off-rounded text-2xl"
+                    class="i-material-symbols-visibility-off-rounded"
                 />
             {:else}
-                <button
-                    on:click={() => (hide_header = !hide_header)}
-                    class="i-material-symbols-visibility-rounded text-2xl"
-                />
+                <button on:click={() => (hide_header = !hide_header)} class="i-material-symbols-visibility-rounded" />
             {/if}
         </div>
         {#if data_loaded}

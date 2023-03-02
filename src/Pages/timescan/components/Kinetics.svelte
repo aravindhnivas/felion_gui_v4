@@ -518,7 +518,7 @@
         <button class="button is-link" on:click={() => (open_plot_modal = true)}>plots</button>
         <Select bind:value={selectedFile} label="Filename" options={fileCollections} />
         <button class="button is-link" on:click={async () => await computeParameters()}>compute</button>
-        <button class="i-mdi-settings text-2xl" on:click={() => (kinetic_plot_adjust_dialog_active = true)} />
+        <button class="i-mdi-settings" on:click={() => (kinetic_plot_adjust_dialog_active = true)} />
         <ButtonBadge id="kinetic-submit-button" on:click={kineticSimulation} />
     </svelte:fragment>
 </LayoutDiv>

@@ -74,9 +74,7 @@
                                 <span>{key}</span>
                                 {#if sortable}
                                     <button
-                                        class="{sortToggle[rowKeys[i]]
-                                            ? 'i-mdi-arrow-upward'
-                                            : 'i-mdi-arrow-downward'} text-2xl"
+                                        class={sortToggle[rowKeys[i]] ? 'i-mdi-arrow-upward' : 'i-mdi-arrow-downward'}
                                         on:click={() => (sortToggle[rowKeys[i]] = !sortToggle[rowKeys[i]])}
                                     />
                                 {/if}
@@ -122,7 +120,7 @@
                         {#if closeableRows}
                             <Cell>
                                 <button
-                                    class="i-mdi-close text-2xl bg-red"
+                                    class="i-mdi-close bg-red"
                                     on:click={() => {
                                         rows = rows.filter((r) => r[idKey] !== row[idKey])
                                     }}

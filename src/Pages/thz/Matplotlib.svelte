@@ -49,7 +49,7 @@
 <Modal bind:active title="THz plots">
     <svelte:fragment slot="body_header__div">
         <div class="align">
-            <button class="i-mdi-refresh text-2xl" on:click={loadfiles} />
+            <button class="i-mdi-refresh" on:click={loadfiles} />
             <span class="tag is-{loadStatus.type}">{loadStatus.name}</span>
         </div>
     </svelte:fragment>

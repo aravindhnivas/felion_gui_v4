@@ -23,11 +23,7 @@
         <div class="main__div box {className}" {style}>
             <div class="align">
                 <div class="flex mr-auto">
-                    <button
-                        class:hide={active}
-                        class="i-mdi-open-in-new text-2xl"
-                        on:click={() => (active = !active)}
-                    />
+                    <button class:hide={active} class="i-mdi-open-in-new" on:click={() => (active = !active)} />
                     <h3>{heading.toUpperCase()}</h3>
                 </div>
 

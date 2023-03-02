@@ -15,14 +15,14 @@
     <Header>
         <div class="align">
             <IconButton pressed={loaded}>
-                <Icon><div class="i-mdi-sync-problem" /></Icon>
-                <Icon on><div class="i-mdi-done" /></Icon>
+                <Icon><div class="i-mdi-sync-problem text-sm" /></Icon>
+                <Icon on><div class="i-mdi-done text-sm" /></Icon>
             </IconButton>
             {label}
         </div>
         <IconButton slot="icon" toggle pressed={open}>
-            <Icon on><div class="i-mdi-expand-more" /></Icon>
-            <Icon><div class="i-mdi-expand-less" /></Icon>
+            <Icon on><div class="i-mdi-expand-more text-sm" /></Icon>
+            <Icon><div class="i-mdi-expand-less text-sm" /></Icon>
         </IconButton>
     </Header>
     <Content class={className} style="{style}; border-top: solid 1px;">

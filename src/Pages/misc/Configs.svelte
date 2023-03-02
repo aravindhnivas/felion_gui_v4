@@ -28,7 +28,7 @@
                     }} />
 
                     <button
-                        class="i-mdi-backup text-2xl"
+                        class="i-mdi-backup"
                         on:click={() => {
                             window.localStorage.setItem(label, CONFIGS[label])
                             update_list()
@@ -37,7 +37,7 @@
                     />
                     
                     <button
-                        class="i-mdi-close bg-red text-2xl"
+                        class="i-mdi-close bg-red"
                         on:click={() => {
                             window.localStorage.removeItem(label)
                             update_list()

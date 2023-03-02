@@ -81,7 +81,7 @@
         </button>
 
         <button
-            class="{lock_energylevels ? 'i-mdi-lock' : 'i-mdi-lock-open-outline'} text-2xl"
+            class={lock_energylevels ? 'i-mdi-lock' : 'i-mdi-lock-open-outline'}
             on:click={() => (lock_energylevels = !lock_energylevels)}
         />
     </div>

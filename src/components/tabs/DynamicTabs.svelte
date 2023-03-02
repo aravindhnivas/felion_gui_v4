@@ -78,11 +78,11 @@
             </li>
         {/each}
         <li class="tabs-li ml-3 border-1 hover:border-solid hover:bg-violet-500">
-            <button class="i-mdi-add text-2xl" on:click={() => addTab()} />
+            <button class="i-mdi-add" on:click={() => addTab()} />
         </li>
     </ul>
     {#if list.length > 1}
-        <button class="i-mdi-close text-2xl bg-red" on:click={closeAllTabs} />
+        <button class="i-mdi-close bg-red" on:click={closeAllTabs} />
     {/if}
 </div>
 

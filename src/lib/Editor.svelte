@@ -151,7 +151,7 @@
             {showReport ? 'hideReport' : 'showReport'}
         </div>
         {#if reportWindowClosed}
-            <button class="i-mdi-open-in-new text-2xl" on:click={openReport} />
+            <button class="i-mdi-open-in-new" on:click={openReport} />
         {/if}
     </div>
 

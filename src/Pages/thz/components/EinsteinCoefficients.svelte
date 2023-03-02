@@ -205,7 +205,7 @@
         <button class="button is-link" class:is-loading={computing_lineshape} on:click={computeEinsteinB}>
             {#if $einsteinCoefficientB.length < 1}
                 <!-- <IconSync class="mr-3" /> -->
-                <div class="i-mdi-sync-problem text-2xl mr-2" />
+                <div class="i-mdi-sync-problem mr-2" />
             {/if}
             Compute Einstein B
         </button>
@@ -236,7 +236,7 @@
             <Textfield bind:value={voigtline} label="voigt lineshape (Hz)" />
             <button class="button is-link " on:click={computeRates}>
                 {#if !einsteinB_rateComputed}
-                    <div class="i-mdi-sync-problem text-2xl mr-2" />
+                    <div class="i-mdi-sync-problem mr-2" />
                 {/if}
                 Compute rate constants
             </button>
