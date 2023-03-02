@@ -39,7 +39,7 @@
         const latest_version = response.data.tag_name
         outputbox.warn(`latest_version: ${latest_version}`)
         outputbox.warn(`current_version: v${$currentVersion}`)
-
+        lastUpdateCheck = new Date().toLocaleString()
         if (`v${$currentVersion}` === latest_version) {
             version_info = 'latest version installed'
             outputbox.success(version_info)
@@ -49,7 +49,7 @@
         try {
             if (log) outputbox.info('Checking for updates...')
             download_progress = 0
-            lastUpdateCheck = new Date().toLocaleString()
+            // lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
             if (log) outputbox.info(update)
@@ -132,6 +132,12 @@
 
 <div class="align animate__animated animate__fadeIn" class:hide={$currentTab !== 'Update'}>
     <h1>Update</h1>
+    {#if window.navigator.onLine}
+        <div class="ml-auto" aria-label="No internet connection" data-cooltipz-dir="left">
+            <div class="i-ion-cloud-offline-outline" />
+        </div>
+    {/if}
+
     <div class="align">
         <div class="subtitle" style="width: 100%;">
             Current version: {$currentVersion}
@@ -194,8 +200,10 @@
                     toggle_loading(currentTarget)
                     const [_err] = await oO(check_assets_update({ download_request: true }))
                     toggle_loading(currentTarget)
-                }}>Check assets update</button
+                }}
             >
+                Check assets update
+            </button>
             <button
                 id="btn-download-asset"
                 class="button is-link"
