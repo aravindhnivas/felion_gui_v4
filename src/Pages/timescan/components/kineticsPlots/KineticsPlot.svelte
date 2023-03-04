@@ -88,7 +88,7 @@
     }
 
     let rate_constant_data_loaded = false
-
+    let weighted_mean = ''
     const compute_rate_constant = async () => {
         if (!graph_plotted.number_densities) return await dialog.message('Please plot the number density first')
 
@@ -110,10 +110,13 @@
         // console.log(dataFromPython)
 
         const current_temp_rate_constants = dataFromPython.rate_constant
+
         rate_constant_values.processed[temperature][rate_coefficient_label] = {
             ...current_temp_rate_constants,
             number_densities,
         }
+
+        weighted_mean = current_temp_rate_constants.weighted_mean
         rate_constant_data_loaded = true
     }
 
@@ -543,16 +546,7 @@
             <h2>rateConstant = rate / ND<sup>{polyOrder}</sup></h2>
 
             <div class="align">
-                <Textfield
-                    disabled
-                    value={rate_constant_values.processed[temperature]?.[rate_coefficient_label]?.weighted_mean || ''}
-                    label="weighted mean"
-                />
-                <!-- <Textfield
-                    disabled
-                    value={rate_constant_values.processed[temperature]?.[rate_coefficient_label]?.mean || ''}
-                    label="mean"
-                /> -->
+                <Textfield disabled value={weighted_mean || ''} label="weighted mean" />
                 <button
                     class="button is-link"
                     on:click={async ({ currentTarget }) => {
