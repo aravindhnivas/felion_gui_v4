@@ -15,7 +15,10 @@
     let graph_plotted = { number_densities: false, temperature: false }
     let full_data = {}
     let data_loaded = false
-    let parameters = []
+    let parameters = {
+        labels: [],
+        fileCollections: [],
+    }
     let temperature_values = []
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
@@ -209,11 +212,17 @@
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [_err2, params] = await oO(fs.readTextFile(processed_params_file))
-        if (_err2)
-            return await dialog.message(`Error reading file ${processed_params_filename}`, {
+
+        if (_err2) {
+            await dialog.message(`Error reading file ${processed_params_filename}`, {
                 type: 'error',
             })
+            return
+        }
+
         parameters = JSON.parse(params)
+        fileCollections = parameters.fileCollections
+
         window.createToast(`${processed_params_filename} loaded`, 'success')
         data_loaded = true
 
@@ -238,6 +247,7 @@
 
     const process_data = async (e: Event) => {
         if (!fileCollections.length) return await dialog.message('No filelists loaded')
+
         let rate_paramters = { forwards: [], backwards: [] }
 
         for (const filelist of fileCollections) {
@@ -278,7 +288,11 @@
                 processed_full_data[temp][ND][key].std = fitted_val_std
             })
         }
-        parameters = [...rate_paramters.forwards, ...rate_paramters.backwards]
+
+        parameters = {
+            labels: [...rate_paramters.forwards, ...rate_paramters.backwards],
+            fileCollections,
+        }
         window.createToast('Data processed and loaded', 'success')
     }
 
@@ -309,7 +323,7 @@
         window.createToast(`Saved file ${processed_filename}`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
-        const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters)))
+        const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters, null, 4)))
         if (err2) return await dialog.message(`Error saving file ${processed_params_filename}`)
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
     }
@@ -420,7 +434,7 @@
         if (err) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         temp_rate_constants = JSON.parse(content)
         // temperature_values = Object.keys(temp_rate_constants)
-        parameters = Object.keys(temp_rate_constants[temperature])
+        parameters.labels = Object.keys(temp_rate_constants[temperature])
 
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         window.createToast(`Loaded file ${rate_constant_filename}`, 'success')
@@ -666,7 +680,7 @@
                         plot_number_density()
                     }}
                     bind:value={rate_coefficient_label}
-                    options={parameters}
+                    options={parameters.labels}
                     label="rate constant"
                 />
                 <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
