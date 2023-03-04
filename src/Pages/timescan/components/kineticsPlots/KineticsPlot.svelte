@@ -7,7 +7,6 @@
     import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import FileListsModal from './FileListsModal.svelte'
-    // import { toggle_loading } from '$src/Pages/settings/utils/misc'
 
     export let active = false
     export let configDir: string = ''
@@ -15,7 +14,10 @@
     let graph_plotted = { number_densities: false, temperature: false }
     let full_data = {}
     let data_loaded = false
-    let parameters = {
+    let parameters: {
+        labels: string[]
+        fileCollections: { name: string; selected: boolean }[]
+    } = {
         labels: [],
         fileCollections: [],
     }
