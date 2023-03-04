@@ -6,6 +6,7 @@
     import { kinetics_filenames } from '$src/Pages/timescan/stores'
     import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
+    import FileListsModal from './FileListsModal.svelte'
     // import { toggle_loading } from '$src/Pages/settings/utils/misc'
 
     export let active = false
@@ -215,17 +216,33 @@
         parameters = JSON.parse(params)
         window.createToast(`${processed_params_filename} loaded`, 'success')
         data_loaded = true
+
+        console.log('full_data', full_data)
+    }
+
+    let config_data = {}
+    let fit_data = {}
+    let fileCollections: { name: string; selected: boolean }[] = []
+
+    const load_data_for_processing = async (e: Event) => {
+        if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
+
+        fit_data = await parse_file({ filename: $kinetics_filenames.fit })
+        config_data = await parse_file({ filename: $kinetics_filenames.configs })
+        fileCollections = Object.keys(fit_data).map((name) => ({ name, selected: true }))
+
+        window.createToast('Filelists loaded', 'success')
     }
 
     let processed_full_data = {}
-    const process_data = async (e: Event) => {
-        if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
-        const fit_data = await parse_file({ filename: $kinetics_filenames.fit })
-        const config_data = await parse_file({ filename: $kinetics_filenames.configs })
+    const process_data = async (e: Event) => {
+        if (!fileCollections.length) return await dialog.message('No filelists loaded')
         let rate_paramters = { forwards: [], backwards: [] }
 
-        for (const filename in fit_data) {
+        for (const filelist of fileCollections) {
+            if (!filelist.selected) continue
+            const filename = filelist.name
             if (!config_data[filename]) continue
 
             Object.keys(fit_data[filename]['default']['k3_fit']).forEach((key) => {
@@ -391,7 +408,7 @@
 
     let temp_rate_constants = {}
     let rate_constant_file_loaded = false
-
+    let filelists_selection_modal_active = false
     const load_temp_rate_constants = async () => {
         const processed_file = await path.join(processed_dir, rate_constant_filename)
         if (!(await fs.exists(processed_file))) {
@@ -450,6 +467,8 @@
         }
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
+
+    // let fileCollections = []
 </script>
 
 <SeparateWindow
@@ -462,15 +481,19 @@
     id="kinetics_plot_window"
 >
     <svelte:fragment slot="header_content__slot">
-        <div class="flex" class:hide={hide_header}>
-            <div class="flex w-full justify-end gap-1">
-                {#each saved_filenames as filename}
-                    <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
-                {/each}
-                <button class="button is-warning" on:click={process_data}>process data</button>
-                <div data-cooltipz-dir="left" aria-label="save *.processed.json">
-                    <button class="i-material-symbols-save-rounded" on:click={save_data} />
-                </div>
+        <FileListsModal bind:active={filelists_selection_modal_active} bind:fileCollections />
+        <div class="flex w-full justify-end gap-2" class:hide={hide_header}>
+            <button class="button is-link" on:click={load_data_for_processing}>load files</button>
+            <button class="button is-link" on:click={() => (filelists_selection_modal_active = true)}>
+                Filelists
+                <i class="i-mdi-open-in-new text-xs ml-2" />
+            </button>
+            {#each saved_filenames as filename}
+                <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
+            {/each}
+            <button class="button is-warning" on:click={process_data}>process files</button>
+            <div data-cooltipz-dir="left" aria-label="save *.processed.json">
+                <button class="i-material-symbols-save-rounded" on:click={save_data} />
             </div>
         </div>
         <h3 class:hide={hide_header}>Processed files</h3>
