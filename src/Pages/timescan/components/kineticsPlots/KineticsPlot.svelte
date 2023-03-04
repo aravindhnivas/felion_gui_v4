@@ -299,7 +299,7 @@
 
     let rate_constant_mean_value_type = 'weighted_mean'
     $: rate_constant_mean_value_type_options = rate_constant_filename.endsWith('processed.json')
-        ? ['weighted_mean', 'mean']
+        ? ['weighted_mean']
         : ['slope', 'intercept']
     let hide_header = false
     let addIntercept = true
@@ -509,11 +509,11 @@
                     value={rate_constant_values.processed[temperature]?.[rate_coefficient_label]?.weighted_mean || ''}
                     label="weighted mean"
                 />
-                <Textfield
+                <!-- <Textfield
                     disabled
                     value={rate_constant_values.processed[temperature]?.[rate_coefficient_label]?.mean || ''}
                     label="mean"
-                />
+                /> -->
                 <button
                     class="button is-link"
                     on:click={async ({ currentTarget }) => {

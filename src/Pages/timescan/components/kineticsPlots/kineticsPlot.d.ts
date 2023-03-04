@@ -5,7 +5,7 @@ export interface RateConstantProcessed {
         [key: string]: {
             val: number[]
             std: number[]
-            mean: string
+            // mean: string
             weighted_mean: string
             number_densities: {
                 val: number[]
