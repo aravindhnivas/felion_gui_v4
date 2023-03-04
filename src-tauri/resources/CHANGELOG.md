@@ -3,7 +3,9 @@
 ## v4.8.0
 
 - Kinetic update: weighted mean and std calculation method
-- App size reduced (including only required APIs)
+- Kinetics: bug fixes
+- Features
+  - App size reduced (including only required APIs)
 
 ---
 
