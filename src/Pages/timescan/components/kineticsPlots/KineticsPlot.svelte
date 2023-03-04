@@ -159,7 +159,6 @@
             await dialog.message('Invalid temperature.', { type: 'error' })
             return false
         }
-
         if (!rate_coefficient_label) {
             await dialog.message('Invalid rate coefficient.', { type: 'error' })
             return false
