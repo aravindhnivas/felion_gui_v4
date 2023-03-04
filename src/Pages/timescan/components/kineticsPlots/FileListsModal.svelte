@@ -8,7 +8,7 @@
 </script>
 
 {#if active}
-    <Modal bind:active title="File Lists: Left-click to toggle selection">
+    <Modal bind:active title="File Lists">
         <svelte:fragment slot="content">
             <!-- <SegBtn bind:choices={fileCollections} /> -->
 
