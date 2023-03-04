@@ -107,8 +107,6 @@
 
         if (!dataFromPython) return
         if (!rate_constant_values.processed[temperature]) rate_constant_values.processed[temperature] = {}
-        // console.log(dataFromPython)
-
         const current_temp_rate_constants = dataFromPython.rate_constant
 
         rate_constant_values.processed[temperature][rate_coefficient_label] = {
@@ -150,12 +148,12 @@
                 tickformat: '.0e',
             },
         }
+
         react(`${f_ND_plot_ID}_rateconstant`, [data_rate_constant], layout_rate_constant)
     }
 
     const set_data = async () => {
         if (!data_loaded) return false
-        added_traces = 0
 
         if (!temperature) {
             await dialog.message('Invalid temperature.', { type: 'error' })
@@ -337,11 +335,13 @@
     $: rate_constant_mean_value_type_options = rate_constant_filename.endsWith('processed.json')
         ? ['weighted_mean']
         : ['slope', 'intercept']
+
     let hide_header = false
     let addIntercept = true
     let polyOrder = 2
-    let polyOrderRateConstant = 2
-    let added_traces = 0
+    let polyOrderRateConstant = 1
+    let effective_rate_polyOrder = 1
+
     let fitted_intercept = ''
     let fitted_slope = ''
 
@@ -351,10 +351,6 @@
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
         if (!fitted_values.val.length) return await dialog.message('No data to fit', { type: 'error' })
-        if (added_traces > 0) {
-            deleteTraces(f_ND_plot_ID, -1)
-            added_traces--
-        }
 
         const pyfile = 'kineticsCode.fit_rates'
         const args = {
@@ -365,38 +361,77 @@
             number_densities,
             $intercept_guess,
             $rate_constant_guess,
+            effective_rate_polyOrder,
         }
 
         const dataFromPython: void | {
             fitted_intercept: string
             fitted_slope: string
-            fitY: { val: number[]; std: number[]; name: string }
+            fitY: number[]
+            fitX: number[]
+            ke: {
+                val: number[]
+                std: number[]
+            }
         } = await computePy_func({ e, pyfile, args })
 
         if (!dataFromPython) return
-        const { fitY } = dataFromPython
+        const { fitY, fitX, ke } = dataFromPython
 
         ;({ fitted_intercept, fitted_slope } = dataFromPython)
-        addTraces(f_ND_plot_ID, [
-            {
-                x: number_densities.val,
-                y: fitY.val,
-                name: 'fit',
-                mode: 'lines',
-                line: { color: `rgb${Colors[0]}` },
-                error_y: {
-                    type: 'data',
-                    array: fitY.std,
-                    visible: true,
-                    color: `rgb${Colors[0]}`,
-                },
+
+        const data_rate_constant: Partial<Plotly.PlotData> = {
+            x: fitX,
+            y: fitY,
+            line: { color: `rgb${Colors[0]}` },
+            type: 'scatter',
+            mode: 'lines',
+            name: `${temperature} K`,
+            showlegend: false,
+        }
+
+        const data_effective_rate_constant: Partial<Plotly.PlotData> = {
+            x: number_densities.val,
+            y: ke.val,
+            error_y: {
+                type: 'data',
+                array: ke.std,
+                visible: true,
+                color: `rgb${Colors[0]}`,
             },
-        ])
-        added_traces++
+            error_x: {
+                type: 'data',
+                array: number_densities.std,
+                visible: true,
+                color: `rgb${Colors[0]}`,
+            },
+            marker: { color: `rgb${Colors[0]}` },
+            type: 'scatter',
+            mode: 'markers',
+            name: `${temperature} K`,
+            showlegend: false,
+        }
+
+        const layout_rate_constant: Partial<Plotly.Layout> = {
+            title: `${rate_coefficient_label} effective rate constant as a function of number density at ${temperature} K`,
+            xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
+            yaxis: {
+                title: `${rate_coefficient_label} [s <sup>-1</sup> cm <sup>${3 * effective_rate_polyOrder}</sup>]`,
+                tickformat: '.0e',
+            },
+        }
+
+        // const raw_data = document.getElementById(f_ND_plot_ID)?.data ?? []
+        const data = [data_effective_rate_constant, data_rate_constant]
+        react(`${f_ND_plot_ID}_effective_rateconstant`, data, layout_rate_constant)
+
+        // window.createToast(`Fitted ${rate_coefficient_label} as a function of number density`, 'success')
+
         if (!rate_constant_values.fitted[temperature]) rate_constant_values.fitted[temperature] = {}
         rate_constant_values.fitted[temperature][rate_coefficient_label] = {
-            val: fitY.val,
-            std: fitY.std,
+            ke,
+            fitX,
+            fitY,
             number_densities,
             slope: fitted_slope,
             intercept: fitted_intercept,
@@ -603,12 +638,14 @@
                 <div class="align">
                     <span class="tag is-warning">Fit</span>
                     <h2>
-                        rate = rateConstant * ND <sup>x</sup>
+                        rate = effective_rateConstant * ND<sup>order</sup> = rateConstant * ND <sup>x</sup>
                         {addIntercept ? ' + intercept' : ''}
                     </h2>
                 </div>
+
                 <div class="align">
                     <Checkbox bind:value={addIntercept} label="add intercept" />
+                    <Textfield style="width: 7em;" bind:value={effective_rate_polyOrder} label="order" />
                     <Textfield style="width: 7em;" bind:value={polyOrderRateConstant} label="x" />
                     <Textfield style="width: 7em;" bind:value={$rate_constant_guess} label="rateConstant guess" />
                     {#if addIntercept}
@@ -632,10 +669,15 @@
 
                 <h3>Fitted parameters</h3>
                 <div class="align">
-                    <Textfield bind:value={fitted_slope} label="rateConstant (cm^{3 * polyOrder}.s-1)" disabled />
+                    <Textfield
+                        bind:value={fitted_slope}
+                        label="rateConstant (cm^{3 * (effective_rate_polyOrder + polyOrderRateConstant)}.s-1)"
+                        disabled
+                    />
                     <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
                 </div>
             </div>
+            <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_effective_rateconstant" />
         {/if}
     </svelte:fragment>
 
