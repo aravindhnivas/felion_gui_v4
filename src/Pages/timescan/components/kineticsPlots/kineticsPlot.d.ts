@@ -17,10 +17,14 @@ export interface RateConstantProcessed {
 export interface RateConstantFitted {
     [key: string]: {
         [key: string]: {
-            val: number[]
-            std: number[]
             slope: string
             intercept: string
+            fitX: number[]
+            fitY: number[]
+            ke: {
+                val: number[]
+                std: number[]
+            }
             number_densities: {
                 val: number[]
                 std: number[]
