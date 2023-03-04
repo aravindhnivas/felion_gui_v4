@@ -37,10 +37,11 @@
         if (!(await fs.exists($currentLocation))) {
             return window.createToast('Invalid location', 'danger', { target: 'left' })
         }
-        if (!(await fs.exists(configDir))) {
-            const [_err] = await oO(fs.createDir(configDir))
-            if (_err) return window.handleError(_err)
-        }
+        // if (!(await fs.exists(configDir))) {
+        //     console.log('creating config dir')
+        //     const [_err] = await oO(fs.createDir(configDir))
+        //     if (_err) return window.handleError(_err)
+        // }
         const [_err, dirs] = await oO(fs.readDir($currentLocation))
         if (_err) return window.handleError(_err)
         fileCollections = dirs
