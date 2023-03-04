@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v4.8.0
+
+- Kinetic update: weighted mean and std calculation method
+- App size reduced (including only required APIs)
+
+---
+
 ## v4.7.0
 
 - Code improvement and bug fixes
