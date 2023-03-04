@@ -8,17 +8,21 @@
   },
   "package": {
     "productName": "feliongui",
-    "version": "4.7.0"
+    "version": "4.8.0"
   },
   "tauri": {
     "allowlist": {
-      "all": true,
+      "all": false,
       "fs": {
+        "all": true,
         "scope": [
           "**",
           "$APPLOCALDATA/**",
           "$RESOURCE/**"
         ]
+      },
+      "path": {
+        "all": true
       },
       "shell": {
         "all": true,
@@ -99,13 +103,21 @@
           }
         ]
       },
-      "http": {
-        "all": true,
-        "request": true,
-        "scope": [
-          "https://github.com/aravindhnivas/felionpy/*",
-          "https://raw.githubusercontent.com/aravindhnivas/felionpy/*"
-        ]
+      "dialog": {
+        "all": true
+      },
+      "process": {
+        "all": false,
+        "exit": false,
+        "relaunch": true,
+        "relaunchDangerousAllowSymlinkMacos": false
+      },
+      "os": {
+        "all": true
+      },
+      "window": {
+        "all": false,
+        "close": true
       }
     },
     "bundle": {
