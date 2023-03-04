@@ -511,10 +511,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@iconify/json@^2.2.29":
-  version "2.2.29"
-  resolved "https://registry.yarnpkg.com/@iconify/json/-/json-2.2.29.tgz#fc6f14e4e663d356dd5d88f0e3348260acee7296"
-  integrity sha512-kNDXoVp5TCf74txUa6urGcs5/S5rdZ8j+FE3OjnEvkCUUBzxJShWljF03c0WYXbLVi2ifVPzWiDBjr00FyBVCA==
+"@iconify/json@^2.2.30":
+  version "2.2.30"
+  resolved "https://registry.yarnpkg.com/@iconify/json/-/json-2.2.30.tgz#f6c2bbb9a86f258c0a037f94ff24aaaf76b14379"
+  integrity sha512-F+eeFDEe+5iZ6wn/GrpQhycWN5XeULA17oPZdl8t+BuOwrq0rRWanB0sruGRir+SScsUuKR2TJyWTaQwmqtnvQ==
   dependencies:
     "@iconify/types" "*"
     pathe "^1.0.0"
@@ -1994,10 +1994,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.1.tgz#90dad8476f1e42797c49d6f8b69aaf9f876fc69f"
   integrity sha512-QH+37Qds3E0eDlReeboBxfHbX9omAcBCXEzswCu6jySP642jiM3cYSIkU/REqwhCUqXdonHFuBfJDiAJxMNhaQ==
 
-"@types/node@^18.14.4":
-  version "18.14.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.4.tgz#0e64ec0b35a772e1e3d849f9a0ff61782d0cb647"
-  integrity sha512-VhCw7I7qO2X49+jaKcAUwi3rR+hbxT5VcYF493+Z5kMLI0DL568b7JI4IDJaxWFH0D/xwmGJNoXisyX+w7GH/g==
+"@types/node@^18.14.6":
+  version "18.14.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.6.tgz#ae1973dd2b1eeb1825695bb11ebfb746d27e3e93"
+  integrity sha512-93+VvleD3mXwlLI/xASjw0FzKcwzl3OdTCzm1LaRfqgS21gfFtK3zDXM5Op9TeeMsJVOaJ2VRDpT9q4Y3d0AvA==
 
 "@types/plotly.js-basic-dist@^1.54.1":
   version "1.54.1"
