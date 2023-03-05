@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v4.8.1
+
+- Kinetics plots - write to txt file
+- cargo updates
+- Clean up unused lottie icons
+
 ## v4.8.0
 
 - Kinetic update: weighted mean and std calculation method
