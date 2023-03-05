@@ -1,5 +1,5 @@
 [package]
-name = "felion_gui"
+name = "feliongui"
 version = "4.8.1"
 description = "FELion spectrum analyser for FELIX data"
 authors = ["A.N. Marimuthu"]
