@@ -1,7 +1,7 @@
 
 # FELionGUI - FELion Graphical User Interface
 
-The FELionGUI is a desktop application built to analysis vibrational and rotational data for FELion instrument (Nijmegen, Netherlands).
+The FELionGUI is a desktop application built to analyze vibrational, rotational and kinetics data for the FELion instrument (Nijmegen, Netherlands).
 
 ## Documentation
 
@@ -40,12 +40,6 @@ Build the application
 ```bash
   yarn build
 ```
-
-## Used By
-
-This project is used by the following Instruments:
-
-- FELion Instrument
 
 ## Authors
 
