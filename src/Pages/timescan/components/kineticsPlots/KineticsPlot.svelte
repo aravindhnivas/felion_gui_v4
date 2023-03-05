@@ -346,7 +346,22 @@
 
     const intercept_guess = persistentWritable('kinetics_intercept_guess', 0)
     const rate_constant_guess = persistentWritable('kinetics_rate_constant_guess', 1e-30)
+    let fitted_effective_rate: {
+        fitX: number[]
+        fitY: number[]
+        ke: {
+            val: number[]
+            std: number[]
+        }
 
+    } = {
+        fitX: [],
+        fitY: [],
+        ke: {
+            val: [],
+            std: [],
+        },
+    }
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
         if (!fitted_values.val.length) return await dialog.message('No data to fit', { type: 'error' })
@@ -376,7 +391,7 @@
 
         if (!dataFromPython) return
         const { fitY, fitX, ke } = dataFromPython
-
+        fitted_effective_rate = { fitY, fitX, ke }
         ;({ fitted_intercept, fitted_slope } = dataFromPython)
 
         const data_rate_constant: Partial<Plotly.PlotData> = {
@@ -480,7 +495,19 @@
 
         rate_constant_file_loaded = true
     }
-
+    let temp_rate_constants_for_txt: {
+        temperatures: number[]
+        rate_constants_values: {
+            val: number[]
+            std: number[]
+        }
+    } = {
+        temperatures: [],
+        rate_constants_values: {
+            val: [],
+            std: [],
+        },
+    }
     const plot_fn_temp = async () => {
         if (isEmpty(temp_rate_constants)) return await dialog.message('No data to plot', { type: 'error' })
         let temperatures = []
@@ -495,7 +522,8 @@
             rate_constants_values.val = [...rate_constants_values.val, get_nominal_value(val_std)]
             rate_constants_values.std = [...rate_constants_values.std, get_std_value(val_std)]
         })
-        console.log({ rate_constants_values, temperatures })
+        temp_rate_constants_for_txt = { temperatures, rate_constants_values }
+        // console.log({ rate_constants_values, temperatures })
         const dataToPlot = {
             x: temperatures,
             y: rate_constants_values.val,
@@ -520,8 +548,65 @@
         }
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
+    const write_to_txt_files = async () => {
+        const saveloc = await path.join(processed_dir, 'txt_files')
+        if (!(await fs.exists(saveloc))) await fs.createDir(saveloc)
 
-    // let fileCollections = []
+        const current_temp_rate_constants = rate_constant_values.processed[temperature][rate_coefficient_label]
+        let data_rate_constants = [
+            `# temperature = ${temperature} K\n`,
+            `# number_density\tnumber_density_std\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate__constant_std\n`,
+        ]
+
+        let data_rates = [
+            `# weighted_mean = ${weighted_mean}\n`,
+            `# number_density\tnumber_density_std\t${rate_coefficient_label}_rate\t${rate_coefficient_label}_rate_std\n`,
+        ]
+
+        for (let i = 0; i < fitted_values.val.length; i++) {
+            data_rates = [
+                ...data_rates,
+                `${number_densities.val[i]}\t${number_densities.std[i]}\t${fitted_values.val[i]}\t${fitted_values.std[i]}\n`,
+            ]
+
+            data_rate_constants = [
+                ...data_rate_constants,
+                `${number_densities.val[i]}\t${number_densities.std[i]}\t${current_temp_rate_constants.val[i]}\t${current_temp_rate_constants.std[i]}\n`,
+            ]
+        }
+        const filename_rates = `${rate_coefficient_label}_rates_${temperature}K_func_of_number_density.txt`
+        const filename_rate_constants = `${rate_coefficient_label}_rate_constants_${temperature}K_func_of_number_density.txt`
+        const [err1] = await oO(fs.writeTextFile(await path.join(saveloc, filename_rates), data_rates.join('')))
+        const [err2] = await oO(
+            fs.writeTextFile(await path.join(saveloc, filename_rate_constants), data_rate_constants.join(''))
+        )
+
+        if (temp_rate_constants_for_txt.temperatures.length > 0) {
+            const { temperatures, rate_constants_values } = temp_rate_constants_for_txt
+            let data_temp_rate_constants = [
+                `# temperatures\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate_constant_std\n`,
+            ]
+
+            for (let i = 0; i < temperatures.length; i++) {
+                data_temp_rate_constants = [
+                    ...data_temp_rate_constants,
+                    `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
+                ]
+            }
+            const filename_temp_rate_constants = `${rate_coefficient_label}_rate_constants_func_of_temperature.txt`
+            const [err3] = await oO(
+                fs.writeTextFile(
+                    await path.join(saveloc, filename_temp_rate_constants),
+                    data_temp_rate_constants.join('')
+                )
+            )
+            if (err3) await dialog.message(`Error saving temperature file`, { type: 'error' })
+        }
+        if (err1) await dialog.message(`Error saving rates file`, { type: 'error' })
+        if (err2) return await dialog.message(`Error saving rate constants file`, { type: 'error' })
+
+        window.createToast(`Files saved`, 'success')
+    }
 </script>
 
 <SeparateWindow
@@ -721,6 +806,9 @@
                     label="rate constant"
                 />
                 <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+                {#if data_loaded && temperature && rate_coefficient_label}
+                    <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
+                {/if}
             </div>
         {/if}
     </svelte:fragment>
