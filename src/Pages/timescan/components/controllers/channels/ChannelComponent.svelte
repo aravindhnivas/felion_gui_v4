@@ -6,9 +6,9 @@
     export let ind: number = 0
 
     const dispatch = createEventDispatcher()
-    onMount(() => {
-        if (!('sliderController' in item)) item.sliderController = '0, 0.5, 1e-3'
-    })
+    // onMount(() => {
+    //     if (!('sliderController' in item)) item.sliderController = '0, 0.5, 1e-3'
+    // })
 </script>
 
 <div class="channel_div">
