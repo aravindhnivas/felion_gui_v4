@@ -3,7 +3,7 @@
     import Changelog from '$src/components/misc/Changelog.svelte'
     import { Configuration, About, Update, Credits, Console } from './settings/components/'
     import { Badge } from '$src/components'
-    import { LOGGER, python_asset_ready, assets_installation_required } from './settings/utils/stores'
+    import { LOGGER, assets_installation_required } from './settings/utils/stores'
     import { updateInterval } from '$src/sveltewritables'
     import { check_felionpy_assets_status } from './settings/utils/assets-status'
     import { unZIP } from './settings/utils/download-assets'
@@ -42,11 +42,22 @@
         const no_active_status = warningStatuses.every((element) => element === false)
         navbarBadgeSettings.style.backgroundColor = no_active_status ? '' : 'var(--color-danger)'
     }
-
+    // $: console.log('update interval', $updateInterval)
+    $: if (import.meta.env.PROD && $updateInterval) {
+        if (updateIntervalCycle) {
+            console.warn('Update interval cleared')
+            clearInterval(updateIntervalCycle)
+        }
+        updateIntervalCycle = setInterval(async () => {
+            // if ($install_dialog_active) return window.createToast('Please wait for the installation to finish')
+            await check_for_update()
+        }, $updateInterval * 60 * 1000)
+        console.warn('Update interval set')
+    }
     onMount(async () => {
         LOGGER.info('Settings page mounted')
         if (import.meta.env.DEV) return
-        updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
+        // updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
 
         if ($assets_installation_required) {
             const [_err] = await oO(unZIP(false))

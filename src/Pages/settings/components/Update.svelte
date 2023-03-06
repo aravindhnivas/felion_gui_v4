@@ -1,11 +1,11 @@
 <script lang="ts">
     import {
+        LOGGER,
         outputbox,
         downloadURL,
         downloadoverrideURL,
+        // install_dialog_active,
         python_asset_ready_to_install,
-        LOGGER,
-        // assets_installation_required,
         install_update_without_promt,
     } from '../utils/stores'
     import { currentTab } from '$lib/pyserver/stores'
@@ -17,16 +17,18 @@
     import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
     import { relaunch } from '@tauri-apps/api/process'
     import { stopServer } from '$src/lib/pyserver/felionpyServer'
-    import { confirm } from '@tauri-apps/api/dialog'
     import { listen } from '@tauri-apps/api/event'
     import LinearProgress from '@smui/linear-progress'
     import { Switch, OutputBox, Textfield } from '$src/components'
     import { footerMsg } from '$src/layout/main/footer_utils/stores'
     import { download_assets, check_assets_update, unZIP } from '../utils/download-assets'
-    // import axios from 'axios'
+    import { updateInterval } from '$src/sveltewritables'
 
+    let install_dialog_active = false
     export const check_for_update = async (log = false) => {
         if (!window.navigator.onLine) return
+        if (install_dialog_active) return
+
         $install_update_without_promt = false
         await check_assets_update()
 
@@ -49,7 +51,6 @@
         try {
             if (log) outputbox.info('Checking for updates...')
             download_progress = 0
-            // lastUpdateCheck = new Date().toLocaleString()
 
             const update = await checkUpdate()
             if (log) outputbox.info(update)
@@ -58,12 +59,14 @@
 
             if (import.meta.env.PROD && update.shouldUpdate) {
                 const newVersion = update.manifest?.version
-
                 let install_promted = $install_update_without_promt
+
                 if (!install_promted) {
-                    install_promted = await confirm(`Do you want to install the latest update and restart.`, {
+                    install_dialog_active = true
+                    install_promted = await dialog.confirm(`Do you want to install the latest update and restart.`, {
                         title: `Update available ${newVersion}`,
                     })
+                    install_dialog_active = false
                 }
 
                 if (install_promted) {
@@ -112,7 +115,6 @@
 
     const unlisten_download_asset_event = listen<string>('assets-download-progress', (event) => {
         const percent = event.payload
-
         assets_download_progress = Number(percent) / 100
         $footerMsg.msg = `Downloading python assets (${percent} %)`
         update_footer_download_label(Number(percent))
@@ -164,6 +166,15 @@
                         $activateChangelog = true
                     }}>What's New <i class="i-mdi-open-in-new ml-2 text-xs" /></button
                 >
+
+                <div class="ml-auto">
+                    <Textfield
+                        input$type="number"
+                        variant="outlined"
+                        bind:value={$updateInterval}
+                        label="update interval (in min)"
+                    />
+                </div>
             </div>
 
             <div class="updateCheck_status_div">
