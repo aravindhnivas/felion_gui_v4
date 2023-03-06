@@ -42,7 +42,7 @@
         </div>
 
         <hr />
-        <Textfield bind:value={fixedDigit} label="decimal significant digit(s)" />
+        <Textfield bind:value={fixedDigit} input$type="number" label="decimal significant digit(s)" />
 
         <div class="align subtitle is-pulled-left mt-5">Fundamental constants</div>
         <div class="align">
