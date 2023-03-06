@@ -14,7 +14,7 @@
     onMount(() => {
         if (lookIn) {
             update = async (toast = true) => {
-                console.log(lookIn, lookFor)
+                // console.log(lookIn, lookFor)
                 if (!(await fs.exists(lookIn))) {
                     if (toast) {
                         console.error(`looking in ${lookIn} is not a directory`)
@@ -23,15 +23,24 @@
                     return
                 }
                 const folders = await fs.readDir(lookIn)
-                options = folders?.filter((n) => n.name.endsWith(lookFor)).map((n) => n.name)
+                const pattern = new RegExp(lookFor)
+                options = folders
+                    ?.filter((n) => {
+                        const name = n.name
+                        const ind = name.match(pattern)?.index
+                        if (!ind) return false
+                        const new_name = name.slice(0, ind)
+                        return !new_name.includes('.')
+                        // return n.name.endsWith(lookFor)
+                    })
+                    .map((n) => n.name)
+
                 if (toast) window.createToast(`Found ${options.length} files`, 'success')
-                // console.log(options)
                 if (auto_init && value && options.length === 0) {
                     if (typeof value === 'string') options[0] = value
                 }
             }
             update(false)
-            // if (!value && options.length > 0) value = options[0]
             console.log('update', options, value)
             value ||= options[0] || ''
         }
