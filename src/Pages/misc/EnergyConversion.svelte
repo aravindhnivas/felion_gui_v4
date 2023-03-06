@@ -2,17 +2,17 @@
     import { Textfield } from '$src/components'
     import { boltzmanConstant, PlanksConstant, electricCharge, SpeedOfLight } from '$src/js/constants'
 
-    let fixedDigit = 3
+    const fixedDigit = persistentWritable('energyConversion_fixedDigit', 3)
 
-    $: hz = Number((1e12).toExponential(fixedDigit))
-    $: eV = Number((PlanksConstant / electricCharge) * hz).toFixed(fixedDigit)
-    $: kelvin = Number((PlanksConstant / boltzmanConstant) * hz).toFixed(fixedDigit)
+    $: hz = Number((1e12).toExponential($fixedDigit))
+    $: eV = Number((PlanksConstant / electricCharge) * hz).toFixed($fixedDigit)
+    $: kelvin = Number((PlanksConstant / boltzmanConstant) * hz).toFixed($fixedDigit)
 
-    $: cm_1 = Number(hz / (SpeedOfLight * 1e2)).toFixed(fixedDigit)
-    $: um = Number((SpeedOfLight / hz) * 1e6).toFixed(fixedDigit)
-    $: ghz = Number(hz * 1e-9).toFixed(fixedDigit)
-    $: nm = Number((SpeedOfLight / hz) * 1e9).toFixed(fixedDigit)
-    $: J = Number(PlanksConstant * hz).toExponential(fixedDigit)
+    $: cm_1 = Number(hz / (SpeedOfLight * 1e2)).toFixed($fixedDigit)
+    $: um = Number((SpeedOfLight / hz) * 1e6).toFixed($fixedDigit)
+    $: ghz = Number(hz * 1e-9).toFixed($fixedDigit)
+    $: nm = Number((SpeedOfLight / hz) * 1e9).toFixed($fixedDigit)
+    $: J = Number(PlanksConstant * hz).toExponential($fixedDigit)
 </script>
 
 <div class="box">
@@ -42,7 +42,7 @@
         </div>
 
         <hr />
-        <Textfield bind:value={fixedDigit} input$type="number" label="decimal significant digit(s)" />
+        <Textfield bind:value={$fixedDigit} input$type="number" label="decimal significant digit(s)" />
 
         <div class="align subtitle is-pulled-left mt-5">Fundamental constants</div>
         <div class="align">
