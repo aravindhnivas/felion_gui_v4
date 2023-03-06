@@ -85,17 +85,16 @@
         let data = {}
         if (await fs.exists(savefilename)) {
             const content = await fs.readTextFile(savefilename)
-
             data = tryF(() => JSON.parse(content))
             if (isError(data)) return window.handleError(data)
         }
 
         if (!selectedFile) return window.createToast('No file selected', 'danger', toastOpts)
-        data[selectedFile] ??= { tags: {}, default: {} }
+        data[selectedFile] ??= { tag: {}, default: {} }
 
         if (useTaggedFile) {
             if (!tagFile) return window.createToast('No tag file selected', 'danger', toastOpts)
-            data[selectedFile]['tags'][tagFile] = dataToSave
+            data[selectedFile]['tag'][tagFile] = dataToSave
         } else {
             data[selectedFile]['default'] = dataToSave
         }
@@ -170,14 +169,14 @@
             if (!tagFile) {
                 return window.createToast(`Invalid tagFile name`, 'danger', toastOpts)
             }
-            if (!data[selectedFile]?.['tags']) {
+            if (!data[selectedFile]?.['tag']) {
                 return window.createToast('No tag column created for this file', 'danger', toastOpts)
             }
-            if (!data[selectedFile]['tags'][tagFile]) {
+            if (!data[selectedFile]['tag'][tagFile]) {
                 return window.createToast(`tag-mode: No data found for ${selectedFile} file`, 'danger', toastOpts)
             }
             data_loaded = true
-            dataToSave = data[selectedFile]['tags'][tagFile]
+            dataToSave = data[selectedFile]['tag'][tagFile]
             if (toast) notify('loaded')
             return
         }

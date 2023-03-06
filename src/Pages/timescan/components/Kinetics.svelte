@@ -221,10 +221,11 @@
 
         const content = await fs.readTextFile(paramsFile)
         const data = tryF(() => JSON.parse(content))
-        if (isError(data)) return window.createToast('no data found while reading file', 'danger', { target: 'left' })
+        if (isError(data))
+            return window.createToast('no data found while reading  params file', 'danger', { target: 'left' })
 
         const contents = data[selectedFile]
-        if (!contents) return window.createToast('no contents in the data', 'danger', { target: 'left' })
+        if (!contents) return window.createToast('no contents in the data in params file', 'danger', { target: 'left' })
 
         if (contents.tag) {
             tagOptions = Object.keys(contents.tag)
@@ -238,9 +239,10 @@
             }
             setContents = contents.tag[tagFile]
         } else {
-            setContents = contents.default
+            setContents = contents?.default ?? contents
         }
-        if (!setContents) return window.createToast('no contents available while reading', 'danger', { target: 'left' })
+        if (!setContents)
+            return window.createToast('no contents available while reading params file', 'danger', { target: 'left' })
         params_load(setContents)
     }
 
