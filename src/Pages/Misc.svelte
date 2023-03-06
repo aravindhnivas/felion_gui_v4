@@ -83,7 +83,7 @@
                 overflow: hidden;
 
                 gap: 1em;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 2fr;
 
                 .number_density__container {
                     overflow: hidden;
