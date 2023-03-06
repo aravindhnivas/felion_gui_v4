@@ -229,8 +229,8 @@
 
         window.createToast(`${processed_params_filename} loaded`, 'success')
         data_loaded = true
-
         console.log('full_data', full_data)
+        if (temperature && rate_coefficient_label) plot_number_density()
     }
 
     let config_data = {}
@@ -635,6 +635,7 @@
                 <button class="i-material-symbols-save-rounded" on:click={save_data} />
             </div>
         </div>
+
         <h3 class:hide={hide_header}>Processed files</h3>
 
         <div class="flex" class:hide={hide_header}>
@@ -644,6 +645,7 @@
                 label={`*.processed.json`}
                 lookFor={'.processed.json'}
                 lookIn={processed_dir}
+                on:change={() => (data_loaded = false)}
             />
             <Textfield style="width: 20em;" disabled value={processed_params_filename} />
             <button class="button is-warning" on:click={load_data}>load</button>
@@ -813,8 +815,5 @@
     .kinetics_graph {
         justify-self: center;
         margin-top: 0.5em;
-    }
-    hr {
-        width: 100%;
     }
 </style>
