@@ -116,10 +116,10 @@
     }
 
     export let load_data = async (toast = true) => {
-        // await tick()
         dataToSave = []
         data_loaded = false
         const loadfilename = await path.join(configDir, filename)
+        console.log(`loading data from ${loadfilename}`)
 
         if (!(await fs.exists(loadfilename))) {
             return window.createToast(`File does not exists. Save it first.`, 'danger', toastOpts)
@@ -127,17 +127,23 @@
 
         const content = await fs.readTextFile(loadfilename)
         const data = tryF(() => JSON.parse(content))
+
+        console.log({ data })
         if (isError(data)) return window.handleError(`Error reading ${filename}\n${data.message}`)
 
         if (singleFilemode) {
+            console.log('file load in single file mode')
             if (singleFilemode_ObjectKey) {
                 const keys = Object.keys(data)
+                console.log('file load in single file mode with object key', { keys, singleFilemode_ObjectKey })
 
                 if (keys.length === 0) return window.createToast(`No data found`, 'danger', toastOpts)
 
                 for (const key of keys) {
-                    dataToSave = [{ [singleFilemode_ObjectKey]: key, ...data[key] }, ...dataToSave]
+                    const id = data[key]?.id ?? window.getID()
+                    dataToSave = [{ [singleFilemode_ObjectKey]: key, ...data[key], id }, ...dataToSave]
                 }
+                // console.log({ dataToSave })
 
                 if (uniqFilter) {
                     dataToSave = uniqBy(dataToSave, uniqFilter)
