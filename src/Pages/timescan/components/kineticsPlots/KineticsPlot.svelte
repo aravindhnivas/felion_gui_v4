@@ -24,7 +24,9 @@
     let temperature_values = []
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
-    let processed_params_filename = 'kinetics.params.processed.json'
+    // let processed_params_filename = 'kinetics.params.processed.json'
+    $: processed_params_filename = processed_filename.split('.')[0] + '.params.processed.json'
+
     let processed_rateConstants_filename = {
         fitted: 'kinetics.rateConstants.fitted.json',
         processed: 'kinetics.rateConstants.processed.json',
@@ -353,7 +355,6 @@
             val: number[]
             std: number[]
         }
-
     } = {
         fitX: [],
         fitY: [],
@@ -644,13 +645,7 @@
                 lookFor={'.processed.json'}
                 lookIn={processed_dir}
             />
-            <TextAndSelectOptsToggler
-                style="width: 20em;"
-                bind:value={processed_params_filename}
-                label={`*.params.processed.json`}
-                lookFor={'.params.processed.json'}
-                lookIn={processed_dir}
-            />
+            <Textfield style="width: 20em;" disabled value={processed_params_filename} />
             <button class="button is-warning" on:click={load_data}>load</button>
             <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_number_density} label="plot f(ND)" />
         </div>
