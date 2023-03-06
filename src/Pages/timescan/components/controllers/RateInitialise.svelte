@@ -13,9 +13,11 @@
 
 <Panel label="Labels" style="display: flex; flex-direction: column; gap: 1em;" {loaded}>
     <slot name="basic-infos" />
-    <div class="align h-center">
-        <Textfield bind:value={nameOfReactants} label="nameOfReactants" style="width:30%" />
-        <Textfield bind:value={legends} label="legends" style="width:30%" />
+    <div class="flex justify-center w-full">
+        <Textfield style="width: 30%;" bind:value={nameOfReactants} label="nameOfReactants" />
+        <div style="width: 30%;" aria-label="plot-legend labels" data-cooltipz-dir="top">
+            <Textfield style="width: 100%;" bind:value={legends} label="legends" />
+        </div>
     </div>
 
     <div class="align h-center">
