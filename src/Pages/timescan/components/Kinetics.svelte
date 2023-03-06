@@ -505,7 +505,11 @@
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
-        <Checkbox on:change={async () => await computeParameters()} bind:value={useParamsFile} label="useParams" />
+        <Checkbox
+            on:change={async () => await computeParameters()}
+            bind:value={useParamsFile}
+            label="get values from file(s)"
+        />
         <Checkbox bind:value={useTaggedFile} label="useTag" />
         <TextAndSelectOptsToggler
             style="width: 7em;"
