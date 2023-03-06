@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v4.8.3
+
+- major bug fixes on kinetics
+- file select/text toggle bug fix
+- code improvements
+
+## v4.8.2
+
+- minor bug fixes
+
 ## v4.8.1
 
 - Kinetics plots - write to txt file
