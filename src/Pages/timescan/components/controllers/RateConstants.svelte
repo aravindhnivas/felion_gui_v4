@@ -9,7 +9,9 @@
 
 <div class="align h-center">
     <Switch bind:selected={defaultInitialValues} label="default" />
-    <Textfield bind:value={initialValues} label="initialValues" />
+    <div aria-label="initial values for fit" data-cooltipz-dir="bottom">
+        <Textfield bind:value={initialValues} label="initialValues" />
+    </div>
     <TextAndSelectOptsToggler
         bind:value={$fit_config_filename}
         label="fit-config file (*.fit.json)"
