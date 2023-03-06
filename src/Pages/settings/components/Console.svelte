@@ -5,7 +5,7 @@
 </script>
 
 <div id="console-log-main" class="animate__animated animate__fadeIn" class:hide={$currentTab !== 'Console'}>
-    <OutputBox output={$LOGGER} heading="console logs" testMode={true} />
+    <OutputBox output={$LOGGER} heading="console logs" />
 </div>
 
 <style>
