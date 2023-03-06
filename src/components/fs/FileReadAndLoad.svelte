@@ -160,7 +160,11 @@
         }
 
         if (!data?.[selectedFile]) {
-            return window.createToast(`No data found for ${selectedFile} file`, 'danger', toastOpts)
+            return window.createToast(
+                `No data found for ${selectedFile} (${options_filter} filetype)`,
+                'danger',
+                toastOpts
+            )
         }
         if (useTaggedFile) {
             if (!tagFile) {
