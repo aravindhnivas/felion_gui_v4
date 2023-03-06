@@ -50,7 +50,10 @@
         plotGraph()
     }
 
-    let saveInfo = { msg: '', error: '' }
+    let saveInfo: {
+        msg: string
+        error: Error | null
+    } = { msg: '', error: null }
     const update_output_file = async (_loc: string, _trapTemp: number) => {
         outputFile = await path.join(_loc, `boltzman/boltzman_distribution${_trapTemp}K.dat`)
     }

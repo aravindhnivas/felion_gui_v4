@@ -72,7 +72,7 @@
     }
 
     let polyOrder = 2
-    const layout = {
+    const layout: Partial<Plotly.Layout> = {
         title: 'Rate constants',
         yaxis: { title: 'Rate constants (cm3 molecules-1 s-1)' },
         xaxis: { title: 'Temperature (K)' },
@@ -114,7 +114,7 @@
             const tranposedArr = arr[0].map((_, colIndex) => arr.map((row) => row[colIndex]))
 
             const { equation } = polynomial(tranposedArr, {
-                order: parseInt(polyOrder),
+                order: polyOrder,
             })
 
             const currentCollisionalRateConstant = equation
@@ -156,9 +156,8 @@
                 mode: 'lines',
             }
         })
-        console.log({ $collisionalCoefficient })
-
-        console.log({ fitData, dataToPlot })
+        // console.log({ $collisionalCoefficient })
+        // console.log({ fitData, dataToPlot })
         react('rateConstantsPlot', [...dataToPlot, ...fitData], layout)
     }
 

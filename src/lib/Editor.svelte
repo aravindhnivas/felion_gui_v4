@@ -20,6 +20,7 @@
 
     async function mountEditorFn(node) {
         try {
+            // @ts-ignore
             editor = await ClassicEditor.create(node, {
                 toolbar: { shouldNotGroupWhenFull: true },
             })

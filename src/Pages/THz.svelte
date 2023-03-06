@@ -72,7 +72,7 @@
             return computePy_func({ e, pyfile, args, general: true })
         }
         if (!justPlot && paramsTable.length < 1) return window.createToast('No initial guesses were given', 'danger')
-        const dataFromPython = await computePy_func({ e, pyfile, args })
+        const dataFromPython = await computePy_func<{ fittedParamsTable: Array<{}> }>({ e, pyfile, args })
         if (!dataFromPython) return
 
         const fitPlot = !justPlot
@@ -145,8 +145,8 @@
     let plotlySelectCreated = false
 
     const makePlotlySelect = () => {
-        const graphDIV = document.getElementById(`${uniqueID}-thzPlot`)
-        graphDIV.on('plotly_selected', (data) => {
+        const graphDIV = document.getElementById(`${uniqueID}-thzPlot`) as Plotly.PlotlyHTMLElement
+        graphDIV?.on('plotly_selected', (data) => {
             try {
                 if (!data) return
                 console.log(data)

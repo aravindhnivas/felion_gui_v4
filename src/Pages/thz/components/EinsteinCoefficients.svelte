@@ -117,7 +117,7 @@
         }
 
         computing_lineshape = true
-        const dataFromPython = await computePy_func({
+        const dataFromPython = await computePy_func<{ lineShape: number }>({
             e,
             pyfile: 'ROSAA.voigt',
             args: { lorrentz, gaussian },

@@ -143,14 +143,14 @@
     }
 
     const linearlogCheck = () => {
-        const layout = {
+        const layout: Partial<Plotly.Layout> = {
             yaxis: { title: 'Counts', type: logScale ? 'log' : null },
         }
 
         if (graphPlotted) {
             fileChecked.forEach((file) => {
                 let tplot = `${uniqueID}-${file}_tplot`
-                const id = document.getElementById(tplot)
+                const id = document.getElementById(tplot) as Plotly.PlotlyHTMLElement
                 if (id?.data) {
                     relayout(id, layout)
                 }

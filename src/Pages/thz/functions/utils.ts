@@ -1,16 +1,10 @@
-import { path } from '@tauri-apps/api'
 import { writeTextFile } from '@tauri-apps/api/fs'
 
 export const save_data_to_file = async (filename: string, data: string) => {
-    const [_err] = await oO(writeTextFile(filename, data))
-    const saveInfo = { msg: '', error: _err }
-    if (isError(_err)) {
-        saveInfo.error = _err
-        return Promise.resolve(saveInfo)
-    }
-    saveInfo.msg = `Saved to ${filename}`
+    const [err] = await oO(writeTextFile(filename, data))
+    if (isError(err)) return Promise.resolve({ msg: '', error: err })
     window.createToast(`Data saved`)
-    return Promise.resolve(saveInfo)
+    return Promise.resolve({ msg:  `Saved to ${filename}`, error: null })
 }
 
 export function makeTableRow(coefficient: ValueLabel, rateMultiplier: string | null = null) {
