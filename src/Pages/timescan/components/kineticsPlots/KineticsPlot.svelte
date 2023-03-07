@@ -24,14 +24,28 @@
     let temperature_values = []
     let processed_dir = ''
     let processed_filename = 'kinetics.processed.json'
-    // let processed_params_filename = 'kinetics.params.processed.json'
     $: processed_params_filename = processed_filename.split('.')[0] + '.params.processed.json'
+
+    let file_available = {
+        processed: false,
+        rateConstants: false,
+    }
+    const check_processed_file = async (filename: string) => {
+        const filePath = await path.join(processed_dir, filename)
+        return await fs.exists(filePath)
+    }
 
     let processed_rateConstants_filename = {
         fitted: 'kinetics.rateConstants.fitted.json',
         processed: 'kinetics.rateConstants.processed.json',
     }
     let rate_constant_filename = processed_rateConstants_filename.processed
+
+    onMount(async () => {
+        await update_dir(configDir)
+        file_available.processed = await check_processed_file(processed_filename)
+        file_available.rateConstants = await check_processed_file(rate_constant_filename)
+    })
 
     let rate_constant_values: {
         fitted: KineticsPlot.RateConstantFitted
@@ -42,10 +56,10 @@
     }
 
     const update_dir = async (dir: string) => {
+        if (!dir) return
         processed_dir = await path.join(dir, 'processed')
     }
     $: update_dir(configDir)
-
     let number_densities = { val: [], std: [] }
     let fitted_values = { val: [], std: [] }
 
@@ -85,14 +99,17 @@
         react(f_ND_plot_ID, [data_rate], layout_rate)
         graph_plotted.number_densities = true
 
+        if (!polyOrder) return
         await compute_rate_constant()
         plot_rate_constant()
     }
 
     let rate_constant_data_loaded = false
     let weighted_mean = ''
+
     const compute_rate_constant = async () => {
         if (!graph_plotted.number_densities) return await dialog.message('Please plot the number density first')
+        if (!polyOrder) return await dialog.message('Please enter a polynomial order')
 
         rate_constant_data_loaded = false
         const dataFromPython: void | {
@@ -238,6 +255,7 @@
 
     let fileCollections: { name: string; selected: boolean }[] = []
     $: selected_file_length = fileCollections.filter((file) => file.selected).length
+
     const load_data_for_processing = async ({ toast = true } = {}) => {
         if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
@@ -344,6 +362,7 @@
         const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters, null, 4)))
         if (err2) return await dialog.message(`Error saving file ${processed_params_filename}`)
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
+        file_available.processed = await check_processed_file(processed_filename)
     }
 
     let rate_constant_mean_value_type = 'weighted_mean'
@@ -353,15 +372,14 @@
 
     let hide_header = false
     let addIntercept = true
-    let polyOrder = 2
+    let polyOrder = ''
     let polyOrderRateConstant = 1
     let effective_rate_polyOrder = 1
-
     let fitted_intercept = ''
     let fitted_slope = ''
-
     const intercept_guess = persistentWritable('kinetics_intercept_guess', 0)
     const rate_constant_guess = persistentWritable('kinetics_rate_constant_guess', 1e-30)
+
     let fitted_effective_rate: {
         fitX: number[]
         fitY: number[]
@@ -377,6 +395,7 @@
             std: [],
         },
     }
+
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
         if (!fitted_values.val.length) return await dialog.message('No data to fit', { type: 'error' })
@@ -487,11 +506,13 @@
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
         window.createToast(`Saved file ${filename}`, 'success')
+        file_available.rateConstants = true
     }
 
     let temp_rate_constants = {}
     let rate_constant_file_loaded = false
     let filelists_selection_modal_active = false
+
     const load_temp_rate_constants = async () => {
         const processed_file = await path.join(processed_dir, rate_constant_filename)
         if (!(await fs.exists(processed_file))) {
@@ -502,7 +523,6 @@
 
         if (err) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         temp_rate_constants = JSON.parse(content)
-        // temperature_values = Object.keys(temp_rate_constants)
         parameters.labels = Object.keys(temp_rate_constants[temperature])
 
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
@@ -510,6 +530,7 @@
 
         rate_constant_file_loaded = true
     }
+
     let temp_rate_constants_for_txt: {
         temperatures: number[]
         rate_constants_values: {
@@ -523,6 +544,7 @@
             std: [],
         },
     }
+
     const plot_fn_temp = async () => {
         if (isEmpty(temp_rate_constants)) return await dialog.message('No data to plot', { type: 'error' })
         let temperatures = []
@@ -563,6 +585,7 @@
         }
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
+
     const write_to_txt_files = async () => {
         const saveloc = await path.join(processed_dir, 'txt_files')
         if (!(await fs.exists(saveloc))) await fs.createDir(saveloc)
@@ -660,28 +683,41 @@
                     window.createToast(`Tag changed to ${tag}`, 'success')
                 }}
             />
-
             <button class="button is-warning" on:click={async () => await process_data()}>process files</button>
             <div data-cooltipz-dir="left" aria-label="save *.processed.json">
                 <button class="i-material-symbols-save-rounded" on:click={save_data} />
             </div>
         </div>
 
-        <h3 class:hide={hide_header}>Processed files</h3>
-
         <div class="flex" class:hide={hide_header}>
-            <TextAndSelectOptsToggler
-                style="width: 20em;"
-                bind:value={processed_filename}
-                label={`*.processed.json`}
-                lookFor={'.processed.json'}
-                lookIn={processed_dir}
-                on:change={() => (data_loaded = false)}
+            <h3>Processed files</h3>
+            <button
+                class="i-material-symbols-folder-open-outline"
+                on:click={async () => {
+                    if (!(await fs.exists(processed_dir)))
+                        return window.createToast(`Directory does not exist`, 'danger')
+                    await shell.open(processed_dir)
+                }}
             />
-            <Textfield style="width: 20em;" disabled value={processed_params_filename} />
-            <button class="button is-warning" on:click={load_data}>load</button>
-            <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_number_density} label="plot f(ND)" />
         </div>
+
+        {#if file_available.processed}
+            <div class="flex" class:hide={hide_header}>
+                <TextAndSelectOptsToggler
+                    style="width: 20em;"
+                    bind:value={processed_filename}
+                    label={`*.processed.json`}
+                    lookFor={'.processed.json'}
+                    lookIn={processed_dir}
+                    on:change={() => (data_loaded = false)}
+                />
+                <Textfield style="width: 20em;" disabled value={processed_params_filename} />
+                <button class="button is-warning" on:click={load_data}>load</button>
+                <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_number_density} label="plot f(ND)" />
+            </div>
+        {:else}
+            <span>{'Load => process => save file to continue plotting'}</span>
+        {/if}
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
@@ -720,30 +756,6 @@
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
-            <hr />
-            <h2>Function of temperature</h2>
-            <div class="align">
-                <Select
-                    bind:value={rate_constant_mean_value_type}
-                    options={rate_constant_mean_value_type_options}
-                    label="rate constant value"
-                />
-                <Select
-                    bind:value={rate_constant_filename}
-                    options={Object.values(processed_rateConstants_filename)}
-                    label="rate constant file"
-                    on:change={() => {
-                        rate_constant_mean_value_type = rate_constant_mean_value_type_options[0]
-                    }}
-                />
-                <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
-                {#if rate_constant_file_loaded}
-                    <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
-                {:else}
-                    <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
-                {/if}
-            </div>
-            <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
             <hr />
 
             <div class="flex flex-col items-start w-full">
@@ -790,6 +802,36 @@
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_effective_rateconstant" />
+            <hr />
+
+            <h2>Function of temperature</h2>
+
+            {#if file_available.rateConstants}
+                <div class="align">
+                    <Select
+                        bind:value={rate_constant_mean_value_type}
+                        options={rate_constant_mean_value_type_options}
+                        label="rate constant value"
+                    />
+                    <Select
+                        bind:value={rate_constant_filename}
+                        options={Object.values(processed_rateConstants_filename)}
+                        label="rate constant file"
+                        on:change={() => {
+                            rate_constant_mean_value_type = rate_constant_mean_value_type_options[0]
+                        }}
+                    />
+                    <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
+                    {#if rate_constant_file_loaded}
+                        <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+                    {:else}
+                        <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
+                    {/if}
+                </div>
+                <div class="kinetics_graph graph__div" id="kinetic_plot_f_temp_rate" />
+            {:else}
+                <span>Save rate constants file(s) to continue</span>
+            {/if}
         {/if}
     </svelte:fragment>
 
@@ -812,7 +854,7 @@
             {/if}
         </div>
         {#if data_loaded}
-            <div class="flex">
+            <div class="flex items-end">
                 <Select
                     class={temperature ? '' : 'has-background-danger'}
                     on:change={() => {
@@ -827,13 +869,16 @@
                     class={rate_coefficient_label ? '' : 'has-background-danger'}
                     on:change={() => {
                         if (!(temperature && rate_coefficient_label)) return
+                        polyOrder = ''
                         plot_number_density()
                     }}
                     bind:value={rate_coefficient_label}
                     options={parameters.labels}
                     label="rate constant"
                 />
-                <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+                <div class:has-background-danger={!polyOrder}>
+                    <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+                </div>
                 {#if data_loaded && temperature && rate_coefficient_label}
                     <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
                 {/if}
