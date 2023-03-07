@@ -40,12 +40,11 @@
         fitted: 'kinetics.rateConstants.fitted.json',
         processed: 'kinetics.rateConstants.processed.json',
     }
-    let rate_constant_filename = ""
+    let rate_constant_filename = ''
 
     onMount(async () => {
         await update_dir(configDir)
         file_available.processed = await check_processed_file($processed_filename)
-        
 
         if ($autoChangeName) {
             const firstName = $processed_filename.split('.')[0]
@@ -77,7 +76,6 @@
     const plot_number_density = async () => {
         const data_set = await set_data()
         if (!data_set) return
-        fitted_effective_rate = null
         graph_plotted.number_densities = false
 
         const data_rate: Partial<Plotly.PlotData> = {
@@ -110,6 +108,7 @@
         if (!polyOrder) return
         await compute_rate_constant()
         plot_rate_constant()
+
         file_available.rateConstants = await check_processed_file(rate_constant_filename)
     }
 
@@ -389,15 +388,6 @@
     const intercept_guess = persistentWritable('kinetics_intercept_guess', 0)
     const rate_constant_guess = persistentWritable('kinetics_rate_constant_guess', 1e-30)
 
-    let fitted_effective_rate: {
-        fitX: number[]
-        fitY: number[]
-        ke: {
-            val: number[]
-            std: number[]
-        }
-    } = null
-
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
         if (!fitted_values.val.length) return await dialog.message('No data to fit', { type: 'error' })
@@ -425,8 +415,8 @@
             }
         } = await computePy_func({ e, pyfile, args })
         if (!dataFromPython) return
+        
         const { fitY, fitX, ke } = dataFromPython
-        fitted_effective_rate = { fitY, fitX, ke }
         ;({ fitted_intercept, fitted_slope } = dataFromPython)
 
         const data_rate_constant: Partial<Plotly.PlotData> = {
@@ -508,6 +498,7 @@
 
         window.createToast(`Saved file ${filename}`, 'success')
         file_available.rateConstants = true
+        type === 'processed' ? save_fn_of_ND_to_txt_file() : save_effective_ke_to_txt_file()
     }
 
     let temp_rate_constants = {}
@@ -599,8 +590,9 @@
     }
 
     const save_effective_ke_to_txt_file = async () => {
-        if (!fitted_effective_rate) return
-        const { ke } = fitted_effective_rate
+        const current_temp_ke = rate_constant_values.fitted[temperature][rate_coefficient_label]
+        if (!current_temp_ke) return
+        const {number_densities, ke, slope, intercept, fitX, fitY} = current_temp_ke
 
         let data_ke = [
             `# temperature = ${temperature} K\n`,
@@ -618,12 +610,10 @@
 
         let data_fitted_ke = [
             `# temperature = ${temperature} K\n`,
-            `# slope = ${fitted_slope} K\n`,
-            `# intercept = ${fitted_intercept} K\n`,
+            `# slope = ${slope} K\n`,
+            `# intercept = ${intercept} K\n`,
             `# fitted_number_density\tfitted_${rate_coefficient_label}_effective_rate_constant\n`,
         ]
-
-        const { fitX, fitY } = fitted_effective_rate
 
         for (let i = 0; i < fitX.length; i++) {
             data_fitted_ke = [...data_fitted_ke, `${fitX[i]}\t${fitY[i]}\n`]
@@ -649,7 +639,7 @@
         save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
     }
 
-    const write_to_txt_files = async () => {
+    const save_fn_of_ND_to_txt_file = async () => {
         const current_temp_rate_constants = rate_constant_values.processed[temperature][rate_coefficient_label]
         let data_rate_constants = [
             `# temperature = ${temperature} K\n`,
@@ -678,10 +668,6 @@
 
         save_txt_file(filename_rates, data_rates)
         save_txt_file(filename_rate_constants, data_rate_constants)
-
-        await save_fn_of_T_to_txt_file()
-        await save_effective_ke_to_txt_file()
-        window.createToast(`Files saved`, 'success')
     }
 
     const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
@@ -878,6 +864,7 @@
                     <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
                     {#if rate_constant_file_loaded}
                         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+                        <button class="button is-link" on:click={save_fn_of_T_to_txt_file}>Write to .txt</button>
                     {:else}
                         <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
                     {/if}
@@ -944,9 +931,9 @@
                         }}
                     />
                 </div>
-                {#if data_loaded && temperature && rate_coefficient_label}
+                <!-- {#if data_loaded && temperature && rate_coefficient_label}
                     <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
-                {/if}
+                {/if} -->
             </div>
         {/if}
     </svelte:fragment>
