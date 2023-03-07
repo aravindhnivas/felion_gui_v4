@@ -415,7 +415,7 @@
             }
         } = await computePy_func({ e, pyfile, args })
         if (!dataFromPython) return
-        
+
         const { fitY, fitX, ke } = dataFromPython
         ;({ fitted_intercept, fitted_slope } = dataFromPython)
 
@@ -519,7 +519,6 @@
 
         if (!temp_rate_constants) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         window.createToast(`Loaded file ${rate_constant_filename}`, 'success')
-
         rate_constant_file_loaded = true
     }
 
@@ -575,7 +574,24 @@
                 tickformat: '.0e',
             },
         }
+
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
+    }
+
+    const reset_values = () => {
+        rate_constant_values = {
+            processed: {},
+            fitted: {},
+        }
+        number_densities = { val: [], std: [] }
+        fitted_values = { val: [], std: [] }
+        temp_rate_constants_for_txt = {
+            temperatures: [],
+            rate_constants_values: {
+                val: [],
+                std: [],
+            },
+        }
     }
 
     const save_txt_file = async (filename: string, data: string[]) => {
@@ -592,7 +608,7 @@
     const save_effective_ke_to_txt_file = async () => {
         const current_temp_ke = rate_constant_values.fitted[temperature][rate_coefficient_label]
         if (!current_temp_ke) return
-        const {number_densities, ke, slope, intercept, fitX, fitY} = current_temp_ke
+        const { number_densities, ke, slope, intercept, fitX, fitY } = current_temp_ke
 
         let data_ke = [
             `# temperature = ${temperature} K\n`,
@@ -736,8 +752,8 @@
                 lookIn={processed_dir}
                 on:change={async () => {
                     data_loaded = false
+                    reset_values()
                     file_available.processed = await check_processed_file($processed_filename)
-
                     if (!$autoChangeName) return
                     const firstName = $processed_filename.split('.')[0]
                     processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
@@ -931,9 +947,6 @@
                         }}
                     />
                 </div>
-                <!-- {#if data_loaded && temperature && rate_coefficient_label}
-                    <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
-                {/if} -->
             </div>
         {/if}
     </svelte:fragment>
