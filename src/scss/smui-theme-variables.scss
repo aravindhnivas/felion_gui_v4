@@ -120,6 +120,13 @@ li.mdc-deprecated-list-item.mdc-ripple-upgraded {
   min-height: 10px;
   min-width: 10px;
   padding: 0;
+  &:not(:empty) {
+    width: 2em;
+    height: 2em;
+  }
+  &.has-background-warning {
+    color: black;
+  }
 }
 
 button.mdc-segmented-button__segment.mdc-ripple-upgraded {
