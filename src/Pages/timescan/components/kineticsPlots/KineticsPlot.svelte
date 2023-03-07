@@ -286,17 +286,24 @@
 
     const process_data = async ({ toast = true } = {}) => {
         if (!fileCollections.length) return await dialog.message('No filelists loaded')
-        let rate_paramters = { forwards: [], backwards: [] }
-        let processed_filelists: { name: string; selected: boolean }[] = []
 
-        for (const filelist of fileCollections) {
-            if (!filelist.selected) continue
+        let rate_paramters = { forwards: [], backwards: [] }
+        // let processed_filelists: { name: string; selected: boolean }[] = []
+
+        // let counter = -1
+        // for (const filelist of fileCollections) {
+        fileCollections.forEach((filelist, ind) => {
+            // counter++
+            if (!filelist.selected) return
             const filename = filelist.name
-            if (!config_data[filename]) continue
+            if (!config_data[filename]) return
 
             const current_data = tag === 'default' ? fit_data[filename]?.[tag] : fit_data[filename]?.tag?.[tag]
-            processed_filelists = [...processed_filelists, { name: filename, selected: current_data !== undefined }]
-            if (!current_data) continue
+            // processed_filelists = [...processed_filelists, { name: filename, selected: current_data ? true : false }]
+            if (!current_data) {
+                fileCollections[ind].selected = false
+                return
+            }
 
             Object.keys(current_data['k3_fit']).forEach((key) => {
                 if (!rate_paramters.forwards.includes(key)) rate_paramters.forwards = [...rate_paramters.forwards, key]
@@ -330,12 +337,15 @@
                 processed_full_data[temp][ND][key].val = fitted_val
                 processed_full_data[temp][ND][key].std = fitted_val_std
             })
-        }
-        fileCollections = processed_filelists
+        })
+        console.log({ fileCollections })
+        // fileCollections = structuredClone(processed_filelists)
+        // console.log({ fileCollections })
         parameters = {
             labels: [...rate_paramters.forwards, ...rate_paramters.backwards],
             fileCollections,
         }
+        console.log({ parameters, fileCollections })
 
         if (toast) window.createToast('Data processed and loaded', 'success')
     }
@@ -592,6 +602,7 @@
                 std: [],
             },
         }
+        console.warn('values reset')
     }
 
     const save_txt_file = async (filename: string, data: string[]) => {
