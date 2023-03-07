@@ -40,18 +40,20 @@
         fitted: 'kinetics.rateConstants.fitted.json',
         processed: 'kinetics.rateConstants.processed.json',
     }
-    let rate_constant_filename = processed_rateConstants_filename.processed
+    let rate_constant_filename = ""
 
     onMount(async () => {
         await update_dir(configDir)
         file_available.processed = await check_processed_file($processed_filename)
-        file_available.rateConstants = await check_processed_file(rate_constant_filename)
+        
 
         if ($autoChangeName) {
             const firstName = $processed_filename.split('.')[0]
             processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
             processed_rateConstants_filename.processed = firstName + '.rateConstants.processed.json'
         }
+        rate_constant_filename = processed_rateConstants_filename.processed
+        file_available.rateConstants = await check_processed_file(rate_constant_filename)
     })
 
     let rate_constant_values: {
@@ -105,10 +107,10 @@
         }
         react(f_ND_plot_ID, [data_rate], layout_rate)
         graph_plotted.number_densities = true
-
         if (!polyOrder) return
         await compute_rate_constant()
         plot_rate_constant()
+        file_available.rateConstants = await check_processed_file(rate_constant_filename)
     }
 
     let rate_constant_data_loaded = false
