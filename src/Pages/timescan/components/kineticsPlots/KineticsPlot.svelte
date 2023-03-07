@@ -870,14 +870,14 @@
                     </div>
                 </div>
 
-                <h3>Fitted parameters</h3>
                 <div class="align">
+                    <h3 style="width: 100%;">Fitted parameters</h3>
                     <Textfield
-                        bind:value={fitted_slope}
+                        value={fitted_slope}
                         label="rateConstant (cm^{3 * (effective_rate_polyOrder + polyOrderRateConstant)}.s-1)"
                         disabled
                     />
-                    <Textfield bind:value={fitted_intercept} label="intercept (s-1)" disabled />
+                    <Textfield value={fitted_intercept} label="intercept (s-1)" disabled />
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_effective_rateconstant" />
