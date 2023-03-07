@@ -15,13 +15,15 @@
     let full_data = {}
     let data_loaded = false
     let parameters: {
+        tag_name: string
         labels: string[]
         fileCollections: { name: string; selected: boolean }[]
     } = {
+        tag_name: 'default',
         labels: [],
         fileCollections: [],
     }
-    let temperature_values = []
+    // let temperature_values = []
     let processed_dir = ''
     const processed_filename = persistentWritable('processed_filename', 'kinetics.processed.json')
     $: processed_params_filename = $processed_filename.split('.')[0] + '.params.processed.json'
@@ -193,6 +195,7 @@
 
         try {
             const current_data = full_data[temperature]
+            if (!current_data) return false
             const ND_keys = Object.keys(current_data)
             const Number_densities = { val: [], std: [] }
             const Fitted_values = { val: [], std: [] }
@@ -234,9 +237,9 @@
 
         const [_err1, data] = await oO(fs.readTextFile(processed_file))
         if (_err1) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
-
         full_data = JSON.parse(data)
-        temperature_values = Object.keys(full_data)
+
+        // temperature_values = Object.keys(full_data)
         window.createToast(`${$processed_filename} loaded`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
@@ -250,10 +253,14 @@
         }
 
         parameters = JSON.parse(params)
+
         fileCollections = parameters.fileCollections
+        tag_name = parameters.tag_name ?? 'default'
+        if (tag_name && tagOpts.indexOf(tag_name) === -1) tagOpts = [...tagOpts, tag_name]
 
         window.createToast(`${processed_params_filename} loaded`, 'success')
         data_loaded = true
+
         console.log('full_data', full_data)
         if (temperature && rate_coefficient_label) plot_number_density()
     }
@@ -268,38 +275,45 @@
         if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
         fit_data = await parse_file({ filename: $kinetics_filenames.fit })
+
         config_data = await parse_file({ filename: $kinetics_filenames.configs })
+
         fileCollections = Object.keys(fit_data).map((name) => ({ name, selected: true }))
         fileCollections.forEach((file) => {
             if (!fit_data[file.name]['tag']) return
+
             const keys = Object.keys(fit_data[file.name]['tag'])
             keys.forEach((key) => {
                 if (!tagOpts.includes(key)) tagOpts = [...tagOpts, key]
             })
         })
+
+        reset_values()
         if (toast) window.createToast('Filelists loaded', 'success')
     }
 
     let processed_full_data = {}
+
     let tagOpts = ['default']
-    let tag = 'default'
+    let tag_name = 'default'
 
     const process_data = async ({ toast = true } = {}) => {
         if (!fileCollections.length) return await dialog.message('No filelists loaded')
 
         let rate_paramters = { forwards: [], backwards: [] }
-        // let processed_filelists: { name: string; selected: boolean }[] = []
 
-        // let counter = -1
-        // for (const filelist of fileCollections) {
+        reset_values()
+
         fileCollections.forEach((filelist, ind) => {
-            // counter++
             if (!filelist.selected) return
+
             const filename = filelist.name
             if (!config_data[filename]) return
 
-            const current_data = tag === 'default' ? fit_data[filename]?.[tag] : fit_data[filename]?.tag?.[tag]
-            // processed_filelists = [...processed_filelists, { name: filename, selected: current_data ? true : false }]
+            const default_data = fit_data[filename]?.['default']
+            const tag_data = fit_data[filename]?.tag?.[tag_name]
+            const current_data = tag_name === 'default' ? default_data : tag_data
+
             if (!current_data) {
                 fileCollections[ind].selected = false
                 return
@@ -337,16 +351,9 @@
                 processed_full_data[temp][ND][key].val = fitted_val
                 processed_full_data[temp][ND][key].std = fitted_val_std
             })
+            console.log(`processed ${filename} at ${temp}K and ${ND}cm-3`)
         })
-        console.log({ fileCollections })
-        // fileCollections = structuredClone(processed_filelists)
-        // console.log({ fileCollections })
-        parameters = {
-            labels: [...rate_paramters.forwards, ...rate_paramters.backwards],
-            fileCollections,
-        }
-        console.log({ parameters, fileCollections })
-
+        parameters = { tag_name, labels: [...rate_paramters.forwards, ...rate_paramters.backwards], fileCollections }
         if (toast) window.createToast('Data processed and loaded', 'success')
     }
 
@@ -508,7 +515,7 @@
 
         window.createToast(`Saved file ${filename}`, 'success')
         file_available.rateConstants = true
-        type === 'processed' ? save_fn_of_ND_to_txt_file() : save_effective_ke_to_txt_file()
+        type === 'processed' ? await save_fn_of_ND_to_txt_file() : await save_effective_ke_to_txt_file()
     }
 
     let temp_rate_constants = {}
@@ -602,7 +609,8 @@
                 std: [],
             },
         }
-        console.warn('values reset')
+        full_data = {}
+        processed_full_data = {}
     }
 
     const save_txt_file = async (filename: string, data: string[]) => {
@@ -633,7 +641,7 @@
             ]
         }
         const ke_filename = `effective_rate_constant_${temperature}K_func_of_number_density.txt`
-        save_txt_file(ke_filename, data_ke)
+        await save_txt_file(ke_filename, data_ke)
 
         let data_fitted_ke = [
             `# temperature = ${temperature} K\n`,
@@ -646,7 +654,7 @@
             data_fitted_ke = [...data_fitted_ke, `${fitX[i]}\t${fitY[i]}\n`]
         }
         const ke_fit_filename = `effective_rate_constant_${temperature}K_func_of_number_density_fitted.txt`
-        save_txt_file(ke_fit_filename, data_fitted_ke)
+        await save_txt_file(ke_fit_filename, data_fitted_ke)
     }
 
     const save_fn_of_T_to_txt_file = async () => {
@@ -662,8 +670,9 @@
                 `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
             ]
         }
+
         const filename_temp_rate_constants = `rate_constants_func_of_temperature.txt`
-        save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
+        await save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
     }
 
     const save_fn_of_ND_to_txt_file = async () => {
@@ -693,8 +702,8 @@
         const filename_rates = `rates_${temperature}K_func_of_number_density.txt`
         const filename_rate_constants = `rate_constants_${temperature}K_func_of_number_density.txt`
 
-        save_txt_file(filename_rates, data_rates)
-        save_txt_file(filename_rate_constants, data_rate_constants)
+        await save_txt_file(filename_rates, data_rates)
+        await save_txt_file(filename_rate_constants, data_rate_constants)
     }
 
     const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
@@ -727,13 +736,13 @@
             {/each}
 
             <Select
-                bind:value={tag}
+                bind:value={tag_name}
                 label="tag"
                 options={tagOpts}
                 on:change={async () => {
                     await load_data_for_processing({ toast: false })
                     await process_data({ toast: false })
-                    window.createToast(`Tag changed to ${tag}`, 'success')
+                    window.createToast(`Tag changed to ${tag_name}`, 'success')
                 }}
             />
             <button class="button is-warning" on:click={async () => await process_data()}>process files</button>
@@ -819,7 +828,10 @@
                         lookFor={'.rateConstants.processed.json'}
                         lookIn={processed_dir}
                     />
-                    <button class="i-material-symbols-save-rounded" on:click={() => save_rate_constants('processed')} />
+                    <button
+                        class="i-material-symbols-save-rounded"
+                        on:click={async () => await save_rate_constants('processed')}
+                    />
                 </div>
             </div>
             <div class="kinetics_graph graph__div" id="{f_ND_plot_ID}_rateconstant" />
@@ -853,7 +865,7 @@
                         />
                         <button
                             class="i-material-symbols-save-rounded"
-                            on:click={() => save_rate_constants('fitted')}
+                            on:click={async () => await save_rate_constants('fitted')}
                         />
                     </div>
                 </div>
@@ -891,7 +903,9 @@
                     <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
                     {#if rate_constant_file_loaded}
                         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
-                        <button class="button is-link" on:click={save_fn_of_T_to_txt_file}>Write to .txt</button>
+                        <button class="button is-link" on:click={async () => await save_fn_of_T_to_txt_file()}
+                            >Write to .txt</button
+                        >
                     {:else}
                         <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
                     {/if}
@@ -930,7 +944,7 @@
                         plot_number_density()
                     }}
                     bind:value={temperature}
-                    options={temperature_values}
+                    options={Object.keys(full_data)}
                     label="temperature"
                 />
                 <Select
