@@ -75,7 +75,7 @@
     const plot_number_density = async () => {
         const data_set = await set_data()
         if (!data_set) return
-
+        fitted_effective_rate = null
         graph_plotted.number_densities = false
 
         const data_rate: Partial<Plotly.PlotData> = {
