@@ -232,7 +232,6 @@
         console.log('full_data', full_data)
         if (temperature && rate_coefficient_label) plot_number_density()
     }
-
     let config_data = {}
     let fit_data = {}
     let fileCollections: { name: string; selected: boolean }[] = []
@@ -243,27 +242,41 @@
         fit_data = await parse_file({ filename: $kinetics_filenames.fit })
         config_data = await parse_file({ filename: $kinetics_filenames.configs })
         fileCollections = Object.keys(fit_data).map((name) => ({ name, selected: true }))
+        fileCollections.forEach((file) => {
+            if (!fit_data[file.name]['tag']) return
+            const keys = Object.keys(fit_data[file.name]['tag'])
+            keys.forEach((key) => {
+                if (!tagOpts.includes(key)) tagOpts = [...tagOpts, key]
+            })
+        })
 
         window.createToast('Filelists loaded', 'success')
     }
 
     let processed_full_data = {}
+    let tagOpts = ['default']
+    let tag = 'default'
 
     const process_data = async (e: Event) => {
         if (!fileCollections.length) return await dialog.message('No filelists loaded')
-
+        // fileCollections = fileCollections.map((file) => ({ ...file, selected: true }))
         let rate_paramters = { forwards: [], backwards: [] }
+        let processed_filelists: { name: string; selected: boolean }[] = []
 
         for (const filelist of fileCollections) {
             if (!filelist.selected) continue
             const filename = filelist.name
             if (!config_data[filename]) continue
 
-            Object.keys(fit_data[filename]['default']['k3_fit']).forEach((key) => {
+            const current_data = tag === 'default' ? fit_data[filename]?.[tag] : fit_data[filename]?.tag?.[tag]
+            processed_filelists = [...processed_filelists, { name: filename, selected: current_data !== undefined }]
+            if (!current_data) continue
+
+            Object.keys(current_data['k3_fit']).forEach((key) => {
                 if (!rate_paramters.forwards.includes(key)) rate_paramters.forwards = [...rate_paramters.forwards, key]
             })
 
-            Object.keys(fit_data[filename]['default']['kCID_fit']).forEach((key) => {
+            Object.keys(current_data['kCID_fit']).forEach((key) => {
                 if (!rate_paramters.backwards.includes(key))
                     rate_paramters.backwards = [...rate_paramters.backwards, key]
             })
@@ -274,7 +287,7 @@
             rate_paramters.forwards.forEach((key) => {
                 if (!processed_full_data[temp][ND]) processed_full_data[temp][ND] = {}
 
-                const fit_val = fit_data[filename]['default']['k3_fit'][key]
+                const fit_val = current_data['k3_fit'][key]
                 if (!fit_val) return
                 const [fitted_val, fitted_val_std] = fit_val
                 if (!processed_full_data[temp][ND][key]) processed_full_data[temp][ND][key] = { val: null, std: null }
@@ -284,7 +297,7 @@
 
             rate_paramters.backwards.forEach((key) => {
                 if (!processed_full_data[temp][ND]) processed_full_data[temp][ND] = {}
-                const fit_val = fit_data[filename]['default']['kCID_fit'][key]
+                const fit_val = current_data['kCID_fit'][key]
                 if (!fit_val) return
                 const [fitted_val, fitted_val_std] = fit_val
                 if (!processed_full_data[temp][ND][key]) processed_full_data[temp][ND][key] = { val: null, std: null }
@@ -292,7 +305,7 @@
                 processed_full_data[temp][ND][key].std = fitted_val_std
             })
         }
-
+        fileCollections = processed_filelists
         parameters = {
             labels: [...rate_paramters.forwards, ...rate_paramters.backwards],
             fileCollections,
@@ -575,8 +588,9 @@
                 `${number_densities.val[i]}\t${number_densities.std[i]}\t${current_temp_rate_constants.val[i]}\t${current_temp_rate_constants.std[i]}\n`,
             ]
         }
-        const filename_rates = `${rate_coefficient_label}_rates_${temperature}K_func_of_number_density.txt`
-        const filename_rate_constants = `${rate_coefficient_label}_rate_constants_${temperature}K_func_of_number_density.txt`
+        const append_name = `${rate_constant_filename.split('.')[0]}_${rate_coefficient_label}`
+        const filename_rates = `${append_name}_rates_${temperature}K_func_of_number_density.txt`
+        const filename_rate_constants = `${append_name}_rate_constants_${temperature}K_func_of_number_density.txt`
         const [err1] = await oO(fs.writeTextFile(await path.join(saveloc, filename_rates), data_rates.join('')))
         const [err2] = await oO(
             fs.writeTextFile(await path.join(saveloc, filename_rate_constants), data_rate_constants.join(''))
@@ -594,7 +608,7 @@
                     `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
                 ]
             }
-            const filename_temp_rate_constants = `${rate_coefficient_label}_rate_constants_func_of_temperature.txt`
+            const filename_temp_rate_constants = `${append_name}_rate_constants_func_of_temperature.txt`
             const [err3] = await oO(
                 fs.writeTextFile(
                     await path.join(saveloc, filename_temp_rate_constants),
@@ -630,6 +644,7 @@
             {#each saved_filenames as filename}
                 <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
             {/each}
+            <Select bind:value={tag} label="tag" options={tagOpts} on:change={load_data_for_processing} />
             <button class="button is-warning" on:click={process_data}>process files</button>
             <div data-cooltipz-dir="left" aria-label="save *.processed.json">
                 <button class="i-material-symbols-save-rounded" on:click={save_data} />
