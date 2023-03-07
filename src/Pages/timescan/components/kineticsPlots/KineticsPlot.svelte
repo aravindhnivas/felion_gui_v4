@@ -230,6 +230,7 @@
 
     const load_data = async () => {
         const processed_file = await path.join(processed_dir, $processed_filename)
+        
         if (!(await fs.exists(processed_file))) {
             await dialog.message(`${processed_file} does not exist`, { type: 'error' })
             return
@@ -239,7 +240,6 @@
         if (_err1) return await dialog.message(`Error reading file ${processed_file}`, { type: 'error' })
         full_data = JSON.parse(data)
 
-        // temperature_values = Object.keys(full_data)
         window.createToast(`${$processed_filename} loaded`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
@@ -604,10 +604,7 @@
         fitted_values = { val: [], std: [] }
         temp_rate_constants_for_txt = {
             temperatures: [],
-            rate_constants_values: {
-                val: [],
-                std: [],
-            },
+            rate_constants_values: { val: [], std: [] },
         }
         full_data = {}
         processed_full_data = {}
