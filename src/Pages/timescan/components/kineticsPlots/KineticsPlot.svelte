@@ -877,7 +877,18 @@
                     label="rate constant"
                 />
                 <div class:has-background-danger={!polyOrder}>
-                    <Textfield style="width: 5em;" bind:value={polyOrder} label="order" />
+                    <Textfield
+                        style="width: 5em;"
+                        bind:value={polyOrder}
+                        label="polyOrder"
+                        on:keyup={async (e) => {
+                            if (!(graph_plotted.number_densities && polyOrder)) return
+                            if (e.key === 'Enter') {
+                                await compute_rate_constant()
+                                plot_rate_constant()
+                            }
+                        }}
+                    />
                 </div>
                 {#if data_loaded && temperature && rate_coefficient_label}
                     <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
