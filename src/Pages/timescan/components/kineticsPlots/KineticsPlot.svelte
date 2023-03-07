@@ -46,6 +46,12 @@
         await update_dir(configDir)
         file_available.processed = await check_processed_file($processed_filename)
         file_available.rateConstants = await check_processed_file(rate_constant_filename)
+
+        if ($autoChangeName) {
+            const firstName = $processed_filename.split('.')[0]
+            processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
+            processed_rateConstants_filename.processed = firstName + '.rateConstants.processed.json'
+        }
     })
 
     let rate_constant_values: {
@@ -388,14 +394,7 @@
             val: number[]
             std: number[]
         }
-    } = {
-        fitX: [],
-        fitY: [],
-        ke: {
-            val: [],
-            std: [],
-        },
-    }
+    } = null
 
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
@@ -423,7 +422,6 @@
                 std: number[]
             }
         } = await computePy_func({ e, pyfile, args })
-
         if (!dataFromPython) return
         const { fitY, fitX, ke } = dataFromPython
         fitted_effective_rate = { fitY, fitX, ke }
@@ -587,10 +585,69 @@
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
 
-    const write_to_txt_files = async () => {
+    const save_txt_file = async (filename: string, data: string[]) => {
         const saveloc = await path.join(processed_dir, 'txt_files')
         if (!(await fs.exists(saveloc))) await fs.createDir(saveloc)
 
+        const first_name = processed_rateConstants_filename.processed.split('.')[0]
+        const append_name = `${first_name}_${rate_coefficient_label}`
+
+        const [err] = await oO(fs.writeTextFile(await path.join(saveloc, `${append_name}_${filename}`), data.join('')))
+        if (err) return await dialog.message(`Error saving file ${filename}`, { type: 'error' })
+    }
+
+    const save_effective_ke_to_txt_file = async () => {
+        if (!fitted_effective_rate) return
+        const { ke } = fitted_effective_rate
+
+        let data_ke = [
+            `# temperature = ${temperature} K\n`,
+            `# number_density\tnumber_density_std\t${rate_coefficient_label}_effective_rate_constant\t${rate_coefficient_label}_effective_rate_constant_std\n`,
+        ]
+
+        for (let i = 0; i < number_densities.val.length; i++) {
+            data_ke = [
+                ...data_ke,
+                `${number_densities.val[i]}\t${number_densities.std[i]}\t${ke.val[i]}\t${ke.std[i]}\n`,
+            ]
+        }
+        const ke_filename = `effective_rate_constant_${temperature}K_func_of_number_density.txt`
+        save_txt_file(ke_filename, data_ke)
+
+        let data_fitted_ke = [
+            `# temperature = ${temperature} K\n`,
+            `# slope = ${fitted_slope} K\n`,
+            `# intercept = ${fitted_intercept} K\n`,
+            `# fitted_number_density\tfitted_${rate_coefficient_label}_effective_rate_constant\n`,
+        ]
+
+        const { fitX, fitY } = fitted_effective_rate
+
+        for (let i = 0; i < fitX.length; i++) {
+            data_fitted_ke = [...data_fitted_ke, `${fitX[i]}\t${fitY[i]}\n`]
+        }
+        const ke_fit_filename = `effective_rate_constant_${temperature}K_func_of_number_density_fitted.txt`
+        save_txt_file(ke_fit_filename, data_fitted_ke)
+    }
+
+    const save_fn_of_T_to_txt_file = async () => {
+        if (temp_rate_constants_for_txt.temperatures.length === 0) return
+        const { temperatures, rate_constants_values } = temp_rate_constants_for_txt
+        let data_temp_rate_constants = [
+            `# temperatures\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate_constant_std\n`,
+        ]
+
+        for (let i = 0; i < temperatures.length; i++) {
+            data_temp_rate_constants = [
+                ...data_temp_rate_constants,
+                `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
+            ]
+        }
+        const filename_temp_rate_constants = `rate_constants_func_of_temperature.txt`
+        save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
+    }
+
+    const write_to_txt_files = async () => {
         const current_temp_rate_constants = rate_constant_values.processed[temperature][rate_coefficient_label]
         let data_rate_constants = [
             `# temperature = ${temperature} K\n`,
@@ -613,37 +670,15 @@
                 `${number_densities.val[i]}\t${number_densities.std[i]}\t${current_temp_rate_constants.val[i]}\t${current_temp_rate_constants.std[i]}\n`,
             ]
         }
-        const append_name = `${rate_constant_filename.split('.')[0]}_${rate_coefficient_label}`
-        const filename_rates = `${append_name}_rates_${temperature}K_func_of_number_density.txt`
-        const filename_rate_constants = `${append_name}_rate_constants_${temperature}K_func_of_number_density.txt`
-        const [err1] = await oO(fs.writeTextFile(await path.join(saveloc, filename_rates), data_rates.join('')))
-        const [err2] = await oO(
-            fs.writeTextFile(await path.join(saveloc, filename_rate_constants), data_rate_constants.join(''))
-        )
 
-        if (temp_rate_constants_for_txt.temperatures.length > 0) {
-            const { temperatures, rate_constants_values } = temp_rate_constants_for_txt
-            let data_temp_rate_constants = [
-                `# temperatures\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate_constant_std\n`,
-            ]
+        const filename_rates = `rates_${temperature}K_func_of_number_density.txt`
+        const filename_rate_constants = `rate_constants_${temperature}K_func_of_number_density.txt`
 
-            for (let i = 0; i < temperatures.length; i++) {
-                data_temp_rate_constants = [
-                    ...data_temp_rate_constants,
-                    `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
-                ]
-            }
-            const filename_temp_rate_constants = `${append_name}_rate_constants_func_of_temperature.txt`
-            const [err3] = await oO(
-                fs.writeTextFile(
-                    await path.join(saveloc, filename_temp_rate_constants),
-                    data_temp_rate_constants.join('')
-                )
-            )
-            if (err3) await dialog.message(`Error saving temperature file`, { type: 'error' })
-        }
-        if (err1) await dialog.message(`Error saving rates file`, { type: 'error' })
-        if (err2) return await dialog.message(`Error saving rate constants file`, { type: 'error' })
+        save_txt_file(filename_rates, data_rates)
+        save_txt_file(filename_rate_constants, data_rate_constants)
+
+        await save_fn_of_T_to_txt_file()
+        await save_effective_ke_to_txt_file()
         window.createToast(`Files saved`, 'success')
     }
 
@@ -714,9 +749,11 @@
                 on:change={async () => {
                     data_loaded = false
                     file_available.processed = await check_processed_file($processed_filename)
-                    const first = $processed_filename.split('.')[0]
-                    processed_rateConstants_filename.fitted = first + '.rateConstants.fitted.json'
-                    processed_rateConstants_filename.processed = first + '.rateConstants.processed.json'
+
+                    if (!$autoChangeName) return
+                    const firstName = $processed_filename.split('.')[0]
+                    processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
+                    processed_rateConstants_filename.processed = firstName + '.rateConstants.processed.json'
                 }}
             />
             <Textfield
