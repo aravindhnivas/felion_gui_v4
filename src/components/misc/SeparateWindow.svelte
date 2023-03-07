@@ -51,12 +51,12 @@
     const changeGraphDivWidth = async (ms = 0) => {
         if (!graphMode) return
         await tick()
-        
+
         if (ms > 0) await sleep(ms)
         // console.log('changeGraphDivWidth', graphDivs)
-        
-        if(!graphDivs.length) lookForGraph()
-        
+
+        if (!graphDivs.length) lookForGraph()
+
         graphDivs.forEach((id) => {
             if (!id.data) return
             relayout(id, { width: graphWidth })
@@ -70,7 +70,9 @@
         try {
             graphDivs = Array.from(document.querySelectorAll(`#${id} .graph__div`))
             console.log('lookForGraph', graphDivs)
-        } catch (error) {console.log('No graph in this window')}
+        } catch (error) {
+            console.log('No graph in this window')
+        }
     }
     let fullWidth = true
 
@@ -95,7 +97,7 @@
 <div {id} class="main_content__div" class:hide={autoHide && !active}>
     <div class="header_content"><slot name="header_content__slot" /></div>
     <div class="main_content" style={mainContent$style} bind:clientWidth>
-        <slot name="main_content__slot" {changeGraphDivWidth} {clientWidth}/>
+        <slot name="main_content__slot" {changeGraphDivWidth} {clientWidth} />
     </div>
 
     {#if $$slots.footer_content__slot || $$slots.left_footer_content__slot}
@@ -103,17 +105,16 @@
             <div class="container left align"><slot name="left_footer_content__slot" {changeGraphDivWidth} /></div>
             <div class="container right align">
                 {#if graphMode}
-                    <Checkbox bind:value={fullWidth} label="full-width-mode" />
+                    <Checkbox bind:value={fullWidth} label="full-width" />
                     <Textfield
+                        style="width: 5em;"
                         label="width"
                         bind:value={currentWidth}
                         on:change={async () => await changeGraphDivWidth(100)}
                     />
 
-                    <button class="button is-warning" 
-                        on:click={async () => await changeGraphDivWidth()}
-                    >
-                     {fullWidth ? 'full-width' : 'set-width'}
+                    <button class="button is-warning" on:click={async () => await changeGraphDivWidth()}>
+                        {fullWidth ? 'full-width' : 'set-width'}
                     </button>
                 {/if}
                 <slot name="footer_content__slot" {changeGraphDivWidth} />
