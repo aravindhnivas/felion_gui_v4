@@ -23,13 +23,14 @@
     }
     let temperature_values = []
     let processed_dir = ''
-    let processed_filename = 'kinetics.processed.json'
-    $: processed_params_filename = processed_filename.split('.')[0] + '.params.processed.json'
+    const processed_filename = persistentWritable('processed_filename', 'kinetics.processed.json')
+    $: processed_params_filename = $processed_filename.split('.')[0] + '.params.processed.json'
 
     let file_available = {
         processed: false,
         rateConstants: false,
     }
+
     const check_processed_file = async (filename: string) => {
         const filePath = await path.join(processed_dir, filename)
         return await fs.exists(filePath)
@@ -39,11 +40,18 @@
         fitted: 'kinetics.rateConstants.fitted.json',
         processed: 'kinetics.rateConstants.processed.json',
     }
-    let rate_constant_filename = processed_rateConstants_filename.processed
+    let rate_constant_filename = ''
 
     onMount(async () => {
         await update_dir(configDir)
-        file_available.processed = await check_processed_file(processed_filename)
+        file_available.processed = await check_processed_file($processed_filename)
+
+        if ($autoChangeName) {
+            const firstName = $processed_filename.split('.')[0]
+            processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
+            processed_rateConstants_filename.processed = firstName + '.rateConstants.processed.json'
+        }
+        rate_constant_filename = processed_rateConstants_filename.processed
         file_available.rateConstants = await check_processed_file(rate_constant_filename)
     })
 
@@ -68,7 +76,6 @@
     const plot_number_density = async () => {
         const data_set = await set_data()
         if (!data_set) return
-
         graph_plotted.number_densities = false
 
         const data_rate: Partial<Plotly.PlotData> = {
@@ -98,10 +105,11 @@
         }
         react(f_ND_plot_ID, [data_rate], layout_rate)
         graph_plotted.number_densities = true
-
         if (!polyOrder) return
         await compute_rate_constant()
         plot_rate_constant()
+
+        file_available.rateConstants = await check_processed_file(rate_constant_filename)
     }
 
     let rate_constant_data_loaded = false
@@ -218,7 +226,7 @@
     }
 
     const load_data = async () => {
-        const processed_file = await path.join(processed_dir, processed_filename)
+        const processed_file = await path.join(processed_dir, $processed_filename)
         if (!(await fs.exists(processed_file))) {
             await dialog.message(`${processed_file} does not exist`, { type: 'error' })
             return
@@ -229,7 +237,7 @@
 
         full_data = JSON.parse(data)
         temperature_values = Object.keys(full_data)
-        window.createToast(`${processed_filename} loaded`, 'success')
+        window.createToast(`${$processed_filename} loaded`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [_err2, params] = await oO(fs.readTextFile(processed_params_file))
@@ -352,17 +360,17 @@
         if (isEmpty(processed_full_data)) return await dialog.message('No data to save', { type: 'error' })
         if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
 
-        const processed_file = await path.join(processed_dir, processed_filename)
+        const processed_file = await path.join(processed_dir, $processed_filename)
         const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(processed_full_data, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
-        window.createToast(`Saved file ${processed_filename}`, 'success')
+        window.createToast(`Saved file ${$processed_filename}`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters, null, 4)))
         if (err2) return await dialog.message(`Error saving file ${processed_params_filename}`)
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
-        file_available.processed = await check_processed_file(processed_filename)
+        file_available.processed = await check_processed_file($processed_filename)
     }
 
     let rate_constant_mean_value_type = 'weighted_mean'
@@ -379,22 +387,6 @@
     let fitted_slope = ''
     const intercept_guess = persistentWritable('kinetics_intercept_guess', 0)
     const rate_constant_guess = persistentWritable('kinetics_rate_constant_guess', 1e-30)
-
-    let fitted_effective_rate: {
-        fitX: number[]
-        fitY: number[]
-        ke: {
-            val: number[]
-            std: number[]
-        }
-    } = {
-        fitX: [],
-        fitY: [],
-        ke: {
-            val: [],
-            std: [],
-        },
-    }
 
     async function derive_rate_constant(e: Event) {
         if (!graph_plotted.number_densities) return await dialog.message('No data to fit', { type: 'error' })
@@ -422,10 +414,9 @@
                 std: number[]
             }
         } = await computePy_func({ e, pyfile, args })
-
         if (!dataFromPython) return
+        
         const { fitY, fitX, ke } = dataFromPython
-        fitted_effective_rate = { fitY, fitX, ke }
         ;({ fitted_intercept, fitted_slope } = dataFromPython)
 
         const data_rate_constant: Partial<Plotly.PlotData> = {
@@ -507,6 +498,7 @@
 
         window.createToast(`Saved file ${filename}`, 'success')
         file_available.rateConstants = true
+        type === 'processed' ? save_fn_of_ND_to_txt_file() : save_effective_ke_to_txt_file()
     }
 
     let temp_rate_constants = {}
@@ -586,10 +578,68 @@
         react('kinetic_plot_f_temp_rate', [dataToPlot], layout)
     }
 
-    const write_to_txt_files = async () => {
+    const save_txt_file = async (filename: string, data: string[]) => {
         const saveloc = await path.join(processed_dir, 'txt_files')
         if (!(await fs.exists(saveloc))) await fs.createDir(saveloc)
 
+        const first_name = processed_rateConstants_filename.processed.split('.')[0]
+        const append_name = `${first_name}_${rate_coefficient_label}`
+
+        const [err] = await oO(fs.writeTextFile(await path.join(saveloc, `${append_name}_${filename}`), data.join('')))
+        if (err) return await dialog.message(`Error saving file ${filename}`, { type: 'error' })
+    }
+
+    const save_effective_ke_to_txt_file = async () => {
+        const current_temp_ke = rate_constant_values.fitted[temperature][rate_coefficient_label]
+        if (!current_temp_ke) return
+        const {number_densities, ke, slope, intercept, fitX, fitY} = current_temp_ke
+
+        let data_ke = [
+            `# temperature = ${temperature} K\n`,
+            `# number_density\tnumber_density_std\t${rate_coefficient_label}_effective_rate_constant\t${rate_coefficient_label}_effective_rate_constant_std\n`,
+        ]
+
+        for (let i = 0; i < number_densities.val.length; i++) {
+            data_ke = [
+                ...data_ke,
+                `${number_densities.val[i]}\t${number_densities.std[i]}\t${ke.val[i]}\t${ke.std[i]}\n`,
+            ]
+        }
+        const ke_filename = `effective_rate_constant_${temperature}K_func_of_number_density.txt`
+        save_txt_file(ke_filename, data_ke)
+
+        let data_fitted_ke = [
+            `# temperature = ${temperature} K\n`,
+            `# slope = ${slope} K\n`,
+            `# intercept = ${intercept} K\n`,
+            `# fitted_number_density\tfitted_${rate_coefficient_label}_effective_rate_constant\n`,
+        ]
+
+        for (let i = 0; i < fitX.length; i++) {
+            data_fitted_ke = [...data_fitted_ke, `${fitX[i]}\t${fitY[i]}\n`]
+        }
+        const ke_fit_filename = `effective_rate_constant_${temperature}K_func_of_number_density_fitted.txt`
+        save_txt_file(ke_fit_filename, data_fitted_ke)
+    }
+
+    const save_fn_of_T_to_txt_file = async () => {
+        if (temp_rate_constants_for_txt.temperatures.length === 0) return
+        const { temperatures, rate_constants_values } = temp_rate_constants_for_txt
+        let data_temp_rate_constants = [
+            `# temperatures\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate_constant_std\n`,
+        ]
+
+        for (let i = 0; i < temperatures.length; i++) {
+            data_temp_rate_constants = [
+                ...data_temp_rate_constants,
+                `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
+            ]
+        }
+        const filename_temp_rate_constants = `rate_constants_func_of_temperature.txt`
+        save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
+    }
+
+    const save_fn_of_ND_to_txt_file = async () => {
         const current_temp_rate_constants = rate_constant_values.processed[temperature][rate_coefficient_label]
         let data_rate_constants = [
             `# temperature = ${temperature} K\n`,
@@ -612,39 +662,15 @@
                 `${number_densities.val[i]}\t${number_densities.std[i]}\t${current_temp_rate_constants.val[i]}\t${current_temp_rate_constants.std[i]}\n`,
             ]
         }
-        const append_name = `${rate_constant_filename.split('.')[0]}_${rate_coefficient_label}`
-        const filename_rates = `${append_name}_rates_${temperature}K_func_of_number_density.txt`
-        const filename_rate_constants = `${append_name}_rate_constants_${temperature}K_func_of_number_density.txt`
-        const [err1] = await oO(fs.writeTextFile(await path.join(saveloc, filename_rates), data_rates.join('')))
-        const [err2] = await oO(
-            fs.writeTextFile(await path.join(saveloc, filename_rate_constants), data_rate_constants.join(''))
-        )
 
-        if (temp_rate_constants_for_txt.temperatures.length > 0) {
-            const { temperatures, rate_constants_values } = temp_rate_constants_for_txt
-            let data_temp_rate_constants = [
-                `# temperatures\t${rate_coefficient_label}_rate_constant\t${rate_coefficient_label}_rate_constant_std\n`,
-            ]
+        const filename_rates = `rates_${temperature}K_func_of_number_density.txt`
+        const filename_rate_constants = `rate_constants_${temperature}K_func_of_number_density.txt`
 
-            for (let i = 0; i < temperatures.length; i++) {
-                data_temp_rate_constants = [
-                    ...data_temp_rate_constants,
-                    `${temperatures[i]}\t${rate_constants_values.val[i]}\t${rate_constants_values.std[i]}\n`,
-                ]
-            }
-            const filename_temp_rate_constants = `${append_name}_rate_constants_func_of_temperature.txt`
-            const [err3] = await oO(
-                fs.writeTextFile(
-                    await path.join(saveloc, filename_temp_rate_constants),
-                    data_temp_rate_constants.join('')
-                )
-            )
-            if (err3) await dialog.message(`Error saving temperature file`, { type: 'error' })
-        }
-        if (err1) await dialog.message(`Error saving rates file`, { type: 'error' })
-        if (err2) return await dialog.message(`Error saving rate constants file`, { type: 'error' })
-        window.createToast(`Files saved`, 'success')
+        save_txt_file(filename_rates, data_rates)
+        save_txt_file(filename_rate_constants, data_rate_constants)
     }
+
+    const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
 </script>
 
 <SeparateWindow
@@ -701,23 +727,37 @@
             />
         </div>
 
-        {#if file_available.processed}
-            <div class="flex" class:hide={hide_header}>
-                <TextAndSelectOptsToggler
-                    style="width: 20em;"
-                    bind:value={processed_filename}
-                    label={`*.processed.json`}
-                    lookFor={'.processed.json'}
-                    lookIn={processed_dir}
-                    on:change={() => (data_loaded = false)}
-                />
-                <Textfield style="width: 20em;" disabled value={processed_params_filename} />
+        <div class="flex" class:hide={hide_header}>
+            <TextAndSelectOptsToggler
+                style="width: 20em;"
+                bind:value={$processed_filename}
+                label={`*.processed.json`}
+                lookFor={'.processed.json'}
+                lookIn={processed_dir}
+                on:change={async () => {
+                    data_loaded = false
+                    file_available.processed = await check_processed_file($processed_filename)
+
+                    if (!$autoChangeName) return
+                    const firstName = $processed_filename.split('.')[0]
+                    processed_rateConstants_filename.fitted = firstName + '.rateConstants.fitted.json'
+                    processed_rateConstants_filename.processed = firstName + '.rateConstants.processed.json'
+                }}
+            />
+            <Textfield
+                style="width: 20em;"
+                disabled
+                value={processed_params_filename}
+                label={`*params.processed.json`}
+            />
+            {#if file_available.processed}
                 <button class="button is-warning" on:click={load_data}>load</button>
                 <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_number_density} label="plot f(ND)" />
-            </div>
-        {:else}
-            <span>{'Load => process => save file to continue plotting'}</span>
-        {/if}
+            {:else}
+                <span>{'Load => process => save file to continue plotting'}</span>
+            {/if}
+            <Checkbox class="ml-auto" bind:value={$autoChangeName} label="auto-change-names" />
+        </div>
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
@@ -824,6 +864,7 @@
                     <button class="button is-warning" on:click={load_temp_rate_constants}>load</button>
                     {#if rate_constant_file_loaded}
                         <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_fn_temp} label="plot f(T)" />
+                        <button class="button is-link" on:click={save_fn_of_T_to_txt_file}>Write to .txt</button>
                     {:else}
                         <span class="tag is-warning">select rate constant value type and filename to plot f(T)</span>
                     {/if}
@@ -890,9 +931,9 @@
                         }}
                     />
                 </div>
-                {#if data_loaded && temperature && rate_coefficient_label}
+                <!-- {#if data_loaded && temperature && rate_coefficient_label}
                     <button class="button is-link" on:click={write_to_txt_files}>Write as .txt</button>
-                {/if}
+                {/if} -->
             </div>
         {/if}
     </svelte:fragment>
