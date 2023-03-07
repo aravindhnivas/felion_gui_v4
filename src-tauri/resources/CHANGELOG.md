@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.8.5
+
+- major bug fixes on kinetics plots
+
 ## v4.8.4
 
 - code improvements on kinetics plots
