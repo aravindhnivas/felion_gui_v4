@@ -23,13 +23,14 @@
     }
     let temperature_values = []
     let processed_dir = ''
-    let processed_filename = 'kinetics.processed.json'
-    $: processed_params_filename = processed_filename.split('.')[0] + '.params.processed.json'
+    const processed_filename = persistentWritable('processed_filename', 'kinetics.processed.json')
+    $: processed_params_filename = $processed_filename.split('.')[0] + '.params.processed.json'
 
     let file_available = {
         processed: false,
         rateConstants: false,
     }
+
     const check_processed_file = async (filename: string) => {
         const filePath = await path.join(processed_dir, filename)
         return await fs.exists(filePath)
@@ -43,7 +44,7 @@
 
     onMount(async () => {
         await update_dir(configDir)
-        file_available.processed = await check_processed_file(processed_filename)
+        file_available.processed = await check_processed_file($processed_filename)
         file_available.rateConstants = await check_processed_file(rate_constant_filename)
     })
 
@@ -218,7 +219,7 @@
     }
 
     const load_data = async () => {
-        const processed_file = await path.join(processed_dir, processed_filename)
+        const processed_file = await path.join(processed_dir, $processed_filename)
         if (!(await fs.exists(processed_file))) {
             await dialog.message(`${processed_file} does not exist`, { type: 'error' })
             return
@@ -229,7 +230,7 @@
 
         full_data = JSON.parse(data)
         temperature_values = Object.keys(full_data)
-        window.createToast(`${processed_filename} loaded`, 'success')
+        window.createToast(`${$processed_filename} loaded`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [_err2, params] = await oO(fs.readTextFile(processed_params_file))
@@ -352,17 +353,17 @@
         if (isEmpty(processed_full_data)) return await dialog.message('No data to save', { type: 'error' })
         if (!(await fs.exists(processed_dir))) await fs.createDir(processed_dir)
 
-        const processed_file = await path.join(processed_dir, processed_filename)
+        const processed_file = await path.join(processed_dir, $processed_filename)
         const [err1] = await oO(fs.writeTextFile(processed_file, JSON.stringify(processed_full_data, null, 4)))
         if (err1) return await dialog.message(`Error saving file ${processed_file}`)
 
-        window.createToast(`Saved file ${processed_filename}`, 'success')
+        window.createToast(`Saved file ${$processed_filename}`, 'success')
 
         const processed_params_file = await path.join(processed_dir, processed_params_filename)
         const [err2] = await oO(fs.writeTextFile(processed_params_file, JSON.stringify(parameters, null, 4)))
         if (err2) return await dialog.message(`Error saving file ${processed_params_filename}`)
         window.createToast(`Saved file ${processed_params_filename}`, 'success')
-        file_available.processed = await check_processed_file(processed_filename)
+        file_available.processed = await check_processed_file($processed_filename)
     }
 
     let rate_constant_mean_value_type = 'weighted_mean'
@@ -645,6 +646,8 @@
         if (err2) return await dialog.message(`Error saving rate constants file`, { type: 'error' })
         window.createToast(`Files saved`, 'success')
     }
+
+    const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
 </script>
 
 <SeparateWindow
@@ -701,23 +704,35 @@
             />
         </div>
 
-        {#if file_available.processed}
-            <div class="flex" class:hide={hide_header}>
-                <TextAndSelectOptsToggler
-                    style="width: 20em;"
-                    bind:value={processed_filename}
-                    label={`*.processed.json`}
-                    lookFor={'.processed.json'}
-                    lookIn={processed_dir}
-                    on:change={() => (data_loaded = false)}
-                />
-                <Textfield style="width: 20em;" disabled value={processed_params_filename} />
+        <div class="flex" class:hide={hide_header}>
+            <TextAndSelectOptsToggler
+                style="width: 20em;"
+                bind:value={$processed_filename}
+                label={`*.processed.json`}
+                lookFor={'.processed.json'}
+                lookIn={processed_dir}
+                on:change={async () => {
+                    data_loaded = false
+                    file_available.processed = await check_processed_file($processed_filename)
+                    const first = $processed_filename.split('.')[0]
+                    processed_rateConstants_filename.fitted = first + '.rateConstants.fitted.json'
+                    processed_rateConstants_filename.processed = first + '.rateConstants.processed.json'
+                }}
+            />
+            <Textfield
+                style="width: 20em;"
+                disabled
+                value={processed_params_filename}
+                label={`*params.processed.json`}
+            />
+            {#if file_available.processed}
                 <button class="button is-warning" on:click={load_data}>load</button>
                 <ButtonBadge id="kinetic-plot-submit-button" on:click={plot_number_density} label="plot f(ND)" />
-            </div>
-        {:else}
-            <span>{'Load => process => save file to continue plotting'}</span>
-        {/if}
+            {:else}
+                <span>{'Load => process => save file to continue plotting'}</span>
+            {/if}
+            <Checkbox class="ml-auto" bind:value={$autoChangeName} label="auto-change-names" />
+        </div>
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
