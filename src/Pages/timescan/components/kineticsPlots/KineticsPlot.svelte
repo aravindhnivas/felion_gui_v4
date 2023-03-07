@@ -4,7 +4,7 @@
     import computePy_func from '$lib/pyserver/computePy'
     import ButtonBadge from '$src/components/ButtonBadge.svelte'
     import { kinetics_filenames } from '$src/Pages/timescan/stores'
-    import { Textfield, SeparateWindow, Select, Checkbox } from '$src/components'
+    import { Textfield, SeparateWindow, Select, Checkbox, Badge } from '$src/components'
     import TextAndSelectOptsToggler from '$src/components/TextAndSelectOptsToggler.svelte'
     import FileListsModal from './FileListsModal.svelte'
 
@@ -232,11 +232,13 @@
         console.log('full_data', full_data)
         if (temperature && rate_coefficient_label) plot_number_density()
     }
+
     let config_data = {}
     let fit_data = {}
-    let fileCollections: { name: string; selected: boolean }[] = []
 
-    const load_data_for_processing = async (e: Event) => {
+    let fileCollections: { name: string; selected: boolean }[] = []
+    $: selected_file_length = fileCollections.filter((file) => file.selected).length
+    const load_data_for_processing = async ({ toast = true } = {}) => {
         if (!(await fs.exists(configDir))) return await dialog.message('No config directory found')
 
         fit_data = await parse_file({ filename: $kinetics_filenames.fit })
@@ -249,17 +251,15 @@
                 if (!tagOpts.includes(key)) tagOpts = [...tagOpts, key]
             })
         })
-
-        window.createToast('Filelists loaded', 'success')
+        if (toast) window.createToast('Filelists loaded', 'success')
     }
 
     let processed_full_data = {}
     let tagOpts = ['default']
     let tag = 'default'
 
-    const process_data = async (e: Event) => {
+    const process_data = async ({ toast = true } = {}) => {
         if (!fileCollections.length) return await dialog.message('No filelists loaded')
-        // fileCollections = fileCollections.map((file) => ({ ...file, selected: true }))
         let rate_paramters = { forwards: [], backwards: [] }
         let processed_filelists: { name: string; selected: boolean }[] = []
 
@@ -310,7 +310,8 @@
             labels: [...rate_paramters.forwards, ...rate_paramters.backwards],
             fileCollections,
         }
-        window.createToast('Data processed and loaded', 'success')
+
+        if (toast) window.createToast('Data processed and loaded', 'success')
     }
 
     const parse_file = async ({ filename, loc = null, toast = true }) => {
@@ -619,7 +620,6 @@
         }
         if (err1) await dialog.message(`Error saving rates file`, { type: 'error' })
         if (err2) return await dialog.message(`Error saving rate constants file`, { type: 'error' })
-
         window.createToast(`Files saved`, 'success')
     }
 </script>
@@ -635,17 +635,33 @@
 >
     <svelte:fragment slot="header_content__slot">
         <FileListsModal bind:active={filelists_selection_modal_active} bind:fileCollections />
+
         <div class="flex w-full justify-end gap-2" class:hide={hide_header}>
-            <button class="button is-link" on:click={load_data_for_processing}>load files</button>
+            <button class="button is-link" on:click={async () => await load_data_for_processing()}>load files</button>
             <button class="button is-link" on:click={() => (filelists_selection_modal_active = true)}>
-                Filelists
+                <span>Filelists</span>
                 <i class="i-mdi-open-in-new text-xs ml-2" />
+                <Badge class="has-background-{selected_file_length > 0 ? 'warning' : 'danger'}"
+                    >{selected_file_length || ''}</Badge
+                >
             </button>
+
             {#each saved_filenames as filename}
                 <Textfield value={$kinetics_filenames[filename]} label={`*.${filename}.json`} disabled />
             {/each}
-            <Select bind:value={tag} label="tag" options={tagOpts} on:change={load_data_for_processing} />
-            <button class="button is-warning" on:click={process_data}>process files</button>
+
+            <Select
+                bind:value={tag}
+                label="tag"
+                options={tagOpts}
+                on:change={async () => {
+                    await load_data_for_processing({ toast: false })
+                    await process_data({ toast: false })
+                    window.createToast(`Tag changed to ${tag}`, 'success')
+                }}
+            />
+
+            <button class="button is-warning" on:click={async () => await process_data()}>process files</button>
             <div data-cooltipz-dir="left" aria-label="save *.processed.json">
                 <button class="i-material-symbols-save-rounded" on:click={save_data} />
             </div>
