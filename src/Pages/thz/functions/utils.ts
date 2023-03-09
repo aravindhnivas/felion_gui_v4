@@ -1,8 +1,8 @@
-import { writeTextFile } from '@tauri-apps/api/fs'
-
 export const save_data_to_file = async (filename: string, data: string) => {
-    const [err] = await oO(writeTextFile(filename, data))
-    if (isError(err)) return Promise.resolve({ msg: '', error: err })
+    const parentDir = await path.dirname(filename)
+    if(!(await fs.exists(parentDir))) await fs.createDir(parentDir, { recursive: true })
+    const [err] = await oO(fs.writeTextFile(filename, data))
+    if (err) return Promise.resolve({ msg: '', error: err })
     window.createToast(`Data saved`)
     return Promise.resolve({ msg:  `Saved to ${filename}`, error: null })
 }

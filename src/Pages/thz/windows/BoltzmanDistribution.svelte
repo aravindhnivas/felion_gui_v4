@@ -52,7 +52,7 @@
 
     let saveInfo: {
         msg: string
-        error: Error | null
+        error: unknown
     } = { msg: '', error: null }
     const update_output_file = async (_loc: string, _trapTemp: number) => {
         outputFile = await path.join(_loc, `boltzman/boltzman_distribution${_trapTemp}K.dat`)
@@ -67,9 +67,11 @@
             writeContent += `${plotData[0][i]}\t${plotData[1][i]}\n`
         }
         saveInfo = await save_data_to_file(outputFile, writeContent)
+        console.log('Saved data', saveInfo)
     }
 
     const openFigure = async (e?: Event) => {
+        console.log('Opening figure', outputFile)
         if (!(await fs.exists(outputFile))) {
             window.createToast('No data to open', 'danger')
             return

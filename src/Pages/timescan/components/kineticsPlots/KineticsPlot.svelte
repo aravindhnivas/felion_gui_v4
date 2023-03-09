@@ -230,7 +230,7 @@
 
     const load_data = async () => {
         const processed_file = await path.join(processed_dir, $processed_filename)
-        
+
         if (!(await fs.exists(processed_file))) {
             await dialog.message(`${processed_file} does not exist`, { type: 'error' })
             return
@@ -756,6 +756,13 @@
                     if (!(await fs.exists(processed_dir)))
                         return window.createToast(`Directory does not exist`, 'danger')
                     await shell.open(processed_dir)
+                }}
+            />
+            <button
+                class="i-material-symbols-refresh"
+                on:click={async () => {
+                    file_available.processed = await check_processed_file($processed_filename)
+                    window.createToast(`Processed file checked`, 'success')
                 }}
             />
         </div>

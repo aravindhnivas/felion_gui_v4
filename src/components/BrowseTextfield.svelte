@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Textfield } from '$src/components'
     import IconButton, { Icon } from '@smui/icon-button'
-    export let value: string | number = ''
+    export let value: string = ''
     export let label: string = ''
     export let browseBtn: boolean = true
     export let dir: boolean = true
@@ -48,6 +48,13 @@
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
     <Textfield disabled={lock ?? false} bind:value {label} {type} />
+    <button
+        class="i-material-symbols-folder-open-outline"
+        on:click={async () => {
+            if (!(await fs.exists(value))) return window.createToast(`Directory does not exist`, 'danger')
+            await shell.open(value)
+        }}
+    />
     {#if updateMode !== null}
         <div
             role="presentation"
