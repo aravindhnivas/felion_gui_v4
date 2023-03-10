@@ -118,8 +118,8 @@
     let weighted_mean = ''
 
     const compute_rate_constant = async () => {
-        if (!graph_plotted.number_densities) return await dialog.message('Please plot the number density first')
-        if (!polyOrder) return await dialog.message('Please enter a polynomial order')
+        if (!graph_plotted.number_densities) return toast.error('Please plot the number density first', {position: 'bottom-center'})
+        if (!polyOrder) return toast.error('Please enter a polynomial order', {position: 'bottom-center'})
 
         rate_constant_data_loaded = false
         const dataFromPython: void | {
