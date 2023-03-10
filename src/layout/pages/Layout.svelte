@@ -40,7 +40,6 @@
             if (!id?.on) return
             try {
                 const width = id.clientWidth
-                console.log('width', width)
                 relayout(id, { width })
             } catch (error) {
                 console.log('could not relayout', error)
