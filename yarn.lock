@@ -3557,6 +3557,11 @@ svelte-preprocess@^5.0.0, svelte-preprocess@^5.0.1:
     sorcery "^0.11.0"
     strip-indent "^3.0.0"
 
+svelte-split-pane@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/svelte-split-pane/-/svelte-split-pane-0.1.2.tgz#aae94c583fdcf80e3ceaefc31755f3c49886e6a8"
+  integrity sha512-JluEydC9v2DetyhlwCF3CdqAkET8XPHP7WeWbl4lVLOg55avDOhoS5U6BRhvWd104HOqhUcCSz+7Nveyjmzjeg==
+
 svelte2tsx@^0.5.12:
   version "0.5.23"
   resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.5.23.tgz#e20c464b3250f97902994d3784a57e87ca86a849"

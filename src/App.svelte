@@ -14,13 +14,10 @@
     import Kinetics from './Pages/Kinetics.svelte'
     import Misc from './Pages/Misc.svelte'
     import Settings from './Pages/Settings.svelte'
-    // import Test from './Pages/Test.svelte'
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
     import { LOGGER } from '$src/Pages/settings/utils/stores'
 
-    // console.warn({ LOGGER })
-    // LOGGER.info('App starting')
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
     const PageComponents = {
@@ -29,10 +26,6 @@
         Timescan,
         THz,
     }
-
-    // if (import.meta.env.MODE === 'development') {
-    //     navItems.push('Test')
-    // }
 
     const toastOpts = { reversed: true, intro: { y: 100 } }
     let mounted = false

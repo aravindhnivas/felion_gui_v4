@@ -49,7 +49,16 @@ export default async function <T>({ e, target, pyfile, args, general }: Type) {
             })
         } else {
             if (!get(pyServerReady)) {
-                return window.handleError('felionpy server not running')
+                const result = await dialog.ask('Start the server ?', {
+                    type: 'error',
+                    title: 'felionpy server not running',
+                })
+                console.log(result)
+                if (!result) return
+
+                const startServerButton = document.getElementById('startServerButton')
+                if (!startServerButton) return
+                startServerButton.click()
             }
             dataFromPython = await computefromServer({
                 target,

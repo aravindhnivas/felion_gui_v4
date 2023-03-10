@@ -759,7 +759,7 @@
                 }}
             />
             <button
-                class="i-material-symbols-refresh"
+                class="i-mdi-refresh"
                 on:click={async () => {
                     file_available.processed = await check_processed_file($processed_filename)
                     window.createToast(`Processed file checked`, 'success')

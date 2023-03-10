@@ -7,6 +7,7 @@
     import { onMount } from 'svelte'
     import { activePage } from '$src/sveltewritables'
     import { persistentWritable } from '$src/js/persistentStore'
+    import HSplitPane from 'svelte-split-pane/src/HSplitPane.svelte'
 
     const active = persistentWritable('MISC_active_tab', 'Unit Conversion')
     const navItems = ['Unit Conversion', 'Configs']
@@ -28,27 +29,32 @@
 
         <div class="misc_container">
             <div class="unit_conversion__container" style:display={$active == 'Unit Conversion' ? 'grid' : 'none'}>
-                <EnergyConversion />
-
-                <div class="box number_density__container">
-                    <NumberDensity
-                        on:getValue={(e) => {
-                            nHe = e.detail.nHe
-                        }}
-                    >
-                        <svelte:fragment slot="header">
-                            <div class="align">
-                                <h2>Number Density</h2>
-                                {#if nHe}
-                                    <h2 class="align h-center" style="user-select: text;">
-                                        {nHe} cm-3
-                                    </h2>
-                                {/if}
-                                <hr />
-                            </div>
-                        </svelte:fragment>
-                    </NumberDensity>
-                </div>
+                <HSplitPane minLeftPaneSize="20%" minRightPaneSize="40%">
+                    <left slot="left">
+                        <EnergyConversion />
+                    </left>
+                    <right slot="right">
+                        <div class="box number_density__container">
+                            <NumberDensity
+                                on:getValue={(e) => {
+                                    nHe = e.detail.nHe
+                                }}
+                            >
+                                <svelte:fragment slot="header">
+                                    <div class="align">
+                                        <h2>Number Density</h2>
+                                        {#if nHe}
+                                            <h2 class="align h-center" style="user-select: text;">
+                                                {nHe} cm-3
+                                            </h2>
+                                        {/if}
+                                        <hr />
+                                    </div>
+                                </svelte:fragment>
+                            </NumberDensity>
+                        </div>
+                    </right>
+                </HSplitPane>
             </div>
             {#if $active == 'Configs'}
                 <Configs />
@@ -83,7 +89,8 @@
                 overflow: hidden;
 
                 gap: 1em;
-                grid-template-columns: 1fr 2fr;
+                // grid-template-columns: 1fr 2fr;
+                width: 100%;
 
                 .number_density__container {
                     overflow: hidden;
@@ -93,6 +100,11 @@
                     // max-height: calc(100vh - 10rem);
                 }
             }
+        }
+        right {
+            overflow: hidden;
+            height: 100%;
+            display: flex;
         }
     }
 </style>
