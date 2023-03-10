@@ -2,6 +2,7 @@
     import { slide } from 'svelte/transition'
     import { Textfield, VirtualCheckList } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
+    import VSplitPane from 'svelte-split-pane/src/VSplitPane.svelte'
 
     export let filetype = '*.*'
     export let markedFile = ''
@@ -108,9 +109,10 @@
         markedFile = markedFile === filename ? '' : filename
         dispatch('markedFile', { markedFile })
     }
+    let refresh = false
 
     $: fileSelected = fileChecked
-    let refresh = false
+    $: panel_size = fullfiles.length ? (otherfolders.length ? 90 : 100) : 10
 </script>
 
 <div class="top__div px-1 mb-3 box {className}">
@@ -157,19 +159,9 @@
     </MenuSurface>
 </div>
 
-<div
-    class="main__container"
-    id="{uniqueID}-{filetype}_filebrowser"
-    style:grid-template-rows={fullfiles.length
-        ? otherfolders.length
-            ? 'auto 6fr 1fr'
-            : 'auto 1fr'
-        : otherfolders.length
-        ? 'auto auto 1fr'
-        : 'auto 1fr'}
->
+<div class="main__container" id="{uniqueID}-{filetype}_filebrowser">
     <div class="file-dir">
-        <div class="i-mdi-keyboard-arrow-right" />
+        <div class="i-mdi-folder-open-outline text-xs" />
         <div class="folder_name__div">
             {#await path.basename(currentLocation) then name}
                 <div>{name}</div>
@@ -195,33 +187,44 @@
             {#await getfiles(currentLocation)}
                 <div class="mdc-typography--subtitle1 align center">...loading</div>
             {:then _}
-                {#if fullfiles.length}
-                    <VirtualCheckList
-                        on:fileselect
-                        bind:fileChecked
-                        {fileSelected}
-                        items={fullfiles}
-                        {markedFile}
-                        on:click={get_marked_file}
-                    />
-                {:else if fullfiles.length <= 0}
-                    <div>No {filetype} here! or try reload files</div>
-                {/if}
-                {#if otherfolders.length}
-                    <div style="overflow-y: auto;">
-                        {#each otherfolders as folder (folder.id)}
-                            <div
-                                role="presentation"
-                                class="align"
-                                on:click={() => changeDirectory(folder.name)}
-                                transition:slide|local
-                            >
-                                <div class="i-mdi-keyboard-arrow-right" />
-                                <div class="mdc-typography--subtitle1" style="cursor: pointer;">{folder.name}</div>
+                <VSplitPane
+                    minTopPaneSize="10%"
+                    topPanelSize={panel_size + '%'}
+                    minDownPaneSize={otherfolders.length ? '5%' : '0%'}
+                    downPanelSize={100 - panel_size + '%'}
+                >
+                    <top slot="top">
+                        {#if fullfiles.length}
+                            <VirtualCheckList
+                                on:fileselect
+                                bind:fileChecked
+                                {fileSelected}
+                                items={fullfiles}
+                                {markedFile}
+                                on:click={get_marked_file}
+                            />
+                        {:else if fullfiles.length <= 0}
+                            <div>No {filetype} here! or try reload files</div>
+                        {/if}
+                    </top>
+
+                    <down slot="down">
+                        {#if otherfolders.length}
+                            <div style="overflow-y: auto; height: 100%;">
+                                {#each otherfolders as folder (folder.id)}
+                                    <div class="align" transition:slide|local>
+                                        <div class="i-mdi-folder-outline text-xs" />
+                                        <span
+                                            role="presentation"
+                                            style="cursor: pointer;"
+                                            on:click={() => changeDirectory(folder.name)}>{folder.name}</span
+                                        >
+                                    </div>
+                                {/each}
                             </div>
-                        {/each}
-                    </div>
-                {/if}
+                        {/if}
+                    </down>
+                </VSplitPane>
             {:catch error}
                 <div>{error}</div>
             {/await}
@@ -242,10 +245,12 @@
         grid-auto-flow: row;
         overflow-y: hidden;
         gap: 0.1em;
+        grid-template-rows: auto 1fr;
     }
     .file-dir {
-        display: grid;
         gap: 0.5em;
+        display: grid;
+        align-items: center;
         grid-template-columns: auto 1fr;
     }
     .folder_name__div {
