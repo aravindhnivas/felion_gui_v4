@@ -33,7 +33,6 @@ export default defineConfig({
                 'svelte/transition',
                 {
                     axios: [
-                        // default imports
                         ['default', 'axios'], // import { default as axios } from 'axios',
                     ],
                     'ts-try': ['tryF', 'isError'],
@@ -74,7 +73,6 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     winbox: ['winbox/src/js/winbox'],
-                    interactjs: ['interactjs'],
                     yaml: ['yaml'],
                     'lodash-es': ['lodash-es'],
                     plotly: ['plotly.js-basic-dist'],

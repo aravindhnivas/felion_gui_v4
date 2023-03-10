@@ -4,11 +4,9 @@
     import NumberDensity from './misc/NumberDensity.svelte'
     import Tab, { Label } from '@smui/tab'
     import TabBar from '@smui/tab-bar'
-    import { onMount } from 'svelte'
     import { activePage } from '$src/sveltewritables'
     import { persistentWritable } from '$src/js/persistentStore'
     import HSplitPane from 'svelte-split-pane/src/HSplitPane.svelte'
-
     const active = persistentWritable('MISC_active_tab', 'Unit Conversion')
     const navItems = ['Unit Conversion', 'Configs']
     let display = 'none'

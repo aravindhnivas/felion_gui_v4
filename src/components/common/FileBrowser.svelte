@@ -8,6 +8,8 @@
     export let fileChecked = []
     export let fullfileslist: string[] = []
     export let currentLocation = ''
+    let className = ''
+    export { className as class }
 
     const dispatch = createEventDispatcher()
 
@@ -111,7 +113,7 @@
     let refresh = false
 </script>
 
-<div class="top__div px-1 mb-3 box">
+<div class="top__div px-1 mb-3 box {className}">
     <div class="mr-auto">
         <button class="i-mdi-arrow-back" on:click={() => changeDirectory('..')} />
         <button
