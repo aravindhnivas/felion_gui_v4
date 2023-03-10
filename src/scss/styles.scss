@@ -185,5 +185,7 @@ svelte-virtual-list-viewport {
 div.wrapper {
     overflow: hidden;
     gap: 1em 0;
-    div.separator {background-color: #e1e1e1;}
+    div.separator {
+        background-color: #cacaca;
+    }
 }
