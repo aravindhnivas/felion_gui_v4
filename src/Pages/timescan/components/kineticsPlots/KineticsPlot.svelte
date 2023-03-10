@@ -698,12 +698,13 @@
 
         const filename_rates = `rates_${temperature}K_func_of_number_density.txt`
         const filename_rate_constants = `rate_constants_${temperature}K_func_of_number_density.txt`
-
         await save_txt_file(filename_rates, data_rates)
         await save_txt_file(filename_rate_constants, data_rate_constants)
     }
 
     const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
+
+    $: if (active) check_processed_file($processed_filename).then((res) => (file_available.processed = res))
 </script>
 
 <SeparateWindow
