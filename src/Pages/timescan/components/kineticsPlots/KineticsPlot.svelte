@@ -185,11 +185,11 @@
         if (!data_loaded) return false
 
         if (!temperature) {
-            await dialog.message('Invalid temperature.', { type: 'error' })
+            window.createToast('Invalid temperature.', 'danger')
             return false
         }
         if (!rate_coefficient_label) {
-            await dialog.message('Invalid rate coefficient.', { type: 'error' })
+            window.createToast('Invalid rate coefficient.', 'danger')
             return false
         }
 

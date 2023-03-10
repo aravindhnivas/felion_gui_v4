@@ -35,7 +35,7 @@
 
     const updateFiles = async () => {
         if (!(await fs.exists($currentLocation))) {
-            return window.createToast('Invalid location', 'danger', { target: 'left' })
+            return window.createToast('Invalid location', 'danger', { position: 'bottom-left' })
         }
         // if (!(await fs.exists(configDir))) {
         //     console.log('creating config dir')
@@ -72,7 +72,7 @@
 
         totalMassKey.forEach(({ mass }) => {
             const newData: Timescan.PlotData = structuredClone(currentDataBackup)[mass]
-            if (!newData) return window.createToast(`${mass} not found`, 'danger', { target: 'left' })
+            if (!newData) return window.createToast(`${mass} not found`, 'danger', { position: 'bottom-left' })
             newData.x = newData.x.slice(timestartIndexScan)
             newData.y = newData.y.slice(timestartIndexScan)
             newData['error_y']['array'] = newData['error_y']['array'].slice(timestartIndexScan)
@@ -193,7 +193,7 @@
 
         if (useTaggedFile) {
             if (tagFile.length === 0) {
-                return window.createToast('Please select/write a tag name', 'danger', { target: 'left' })
+                return window.createToast('Please select/write a tag name', 'danger', { position: 'bottom-left' })
             }
             contents[selectedFile].tag[tagFile] = paramsData
         } else {
@@ -222,10 +222,11 @@
         const content = await fs.readTextFile(paramsFile)
         const data = tryF(() => JSON.parse(content))
         if (isError(data))
-            return window.createToast('no data found while reading  params file', 'danger', { target: 'left' })
+            return window.createToast('no data found while reading  params file', 'danger', { position: 'bottom-left' })
 
         const contents = data[selectedFile]
-        if (!contents) return window.createToast('no contents in the data in params file', 'danger', { target: 'left' })
+        if (!contents)
+            return window.createToast('no contents in the data in params file', 'danger', { position: 'bottom-left' })
 
         if (contents.tag) {
             tagOptions = Object.keys(contents.tag)
@@ -235,14 +236,16 @@
         let setContents = {}
         if (useTaggedFile) {
             if (!contents.tag?.[tagFile]) {
-                return window.createToast('no data available for this tag', 'danger', { target: 'left' })
+                return window.createToast('no data available for this tag', 'danger', { position: 'bottom-left' })
             }
             setContents = contents.tag[tagFile]
         } else {
             setContents = contents?.default ?? contents
         }
         if (!setContents)
-            return window.createToast('no contents available while reading params file', 'danger', { target: 'left' })
+            return window.createToast('no contents available while reading params file', 'danger', {
+                position: 'bottom-left',
+            })
         params_load(setContents)
     }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SvelteToast } from '@zerodevx/svelte-toast'
+    // import { SvelteToast } from '@zerodevx/svelte-toast'
     import Navbar from '$src/layout/main//Navbar.svelte'
     import Footer from '$src/layout/main/Footer.svelte'
     import PreModal from '$src/lib/notifier/PreModal.svelte'
@@ -17,49 +17,30 @@
     import PageLayout from '$src/layout/pages/PageLayout.svelte'
     import { events_listeners } from '$src/lib/event_listeneres'
     import { LOGGER } from '$src/Pages/settings/utils/stores'
+    import { Toaster } from 'svelte-french-toast'
 
     const pageIDs = ['Normline', 'Masspec', 'Timescan', 'THz']
     const navItems = ['Home', ...pageIDs, 'Kinetics', 'Powerfile', 'Misc', 'Settings']
-    const PageComponents = {
-        Normline,
-        Masspec,
-        Timescan,
-        THz,
-    }
-
-    const toastOpts = { reversed: true, intro: { y: 100 } }
-    let mounted = false
-
+    const PageComponents = { Normline, Masspec, Timescan, THz }
     onMount(async () => {
         const unlisteners = await events_listeners()
-        mounted = true
         LOGGER.info('App mounted')
-        console.warn('App mounted')
+        window.createToast('App mounted', 'success')
         return () => {
             unlisteners.forEach((unlisten) => unlisten())
-            console.log('App destroyed')
             LOGGER.clear()
         }
     })
 </script>
 
+<Toaster />
 <PreModal />
-<div class="toast_container">
-    <SvelteToast options={toastOpts} />
-    <div id="leftToaster">
-        <SvelteToast target="right" options={{ initial: 0, intro: { y: 100 } }} />
-    </div>
-    <div id="rightToaster">
-        <SvelteToast target="left" options={{ intro: { y: 100 } }} />
-    </div>
-</div>
 <ConfirmAlert />
 
 <div class="layout">
     <Navbar {navItems} />
     <div id="pageContainer" style="overflow: hidden;">
         <Home />
-        <!-- {#if mounted} -->
         {#each pageIDs as id}
             <PageLayout component={PageComponents[id]} {id} />
         {/each}
@@ -67,11 +48,6 @@
         <Powerfile />
         <Misc />
         <Settings />
-
-        <!-- {#if import.meta.env.MODE === 'development'}
-                <Test />
-                {/if} -->
-        <!-- {/if} -->
     </div>
     <Footer />
 </div>

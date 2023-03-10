@@ -34,7 +34,7 @@
 
     // console.log({ filename, configDir })
     const toastOpts = {
-        target: 'left',
+        position: 'bottom-left',
     }
 
     export let save_data = async () => {

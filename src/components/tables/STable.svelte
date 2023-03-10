@@ -89,7 +89,7 @@
                                 on:click={() => {
                                     if (rows.length === 0) return window.createToast('Table is empty', 'warning')
                                     rows = []
-                                    window.createToast('Table cleared', 'danger')
+                                    window.createToast('Table cleared', 'warning')
                                     dispatch('tableCleared')
                                 }}>Clear</button
                             ></Cell

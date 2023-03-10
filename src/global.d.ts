@@ -1,4 +1,4 @@
-import type { SvelteToastOptions } from '@zerodevx/svelte-toast'
+import type { ToastOptions } from 'svelte-french-toast'
 
 const felix_opo_data_from_python = <const>['SA', 'pow', 'base', 'average', 'average_per_photon', 'average_rel']
 declare global {

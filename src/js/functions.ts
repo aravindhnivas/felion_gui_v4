@@ -1,14 +1,14 @@
 import { mainPreModal } from '$src/sveltewritables'
 import { writable } from 'svelte/store'
-import { toast } from '@zerodevx/svelte-toast'
-import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores'
+// import { toast } from '@zerodevx/svelte-toast'
+// import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores'
 import bulmaQuickview from 'bulma-extensions/bulma-quickview/dist/js/bulma-quickview'
 import { tempdir, platform } from '@tauri-apps/api/os'
 import { getVersion } from '@tauri-apps/api/app'
 import { LOGGER } from '$src/Pages/settings/utils/stores'
 export const activateChangelog = writable(false)
 export { plot, subplot, plotlyClick, plotlyEventsInfo } from './plot'
-
+import toast, { type ToastOptions } from 'svelte-french-toast'
 export const currentVersion = writable('')
 
 type ToastThemeOpts = {
@@ -30,20 +30,26 @@ const toastTheme: ToastThemeOpts = <const>{
     },
 }
 
-export const callback_toast = (message: string, theme: keyof ToastThemeOpts = 'info', options?: SvelteToastOptions) => {
-    toast.push(message, {
-        theme: toastTheme[theme],
-        ...options,
-    })
-}
+// export const callback_toast = (message: string, theme: keyof ToastThemeOpts = 'info', options?: SvelteToastOptions) => {
+//     toast.push(message, {
+//         theme: toastTheme[theme],
+//         ...options,
+//     })
+// }
 
 type toastType = keyof ToastThemeOpts
-export const createToast = (description: string, type: toastType = 'info', opts: SvelteToastOptions = {}) => {
-    toast.push(description, {
-        theme: toastTheme[type],
-        pausable: true,
-        ...opts,
-    })
+export const createToast = (
+    description: string,
+    type: toastType = 'info',
+    opts: ToastOptions = { position: 'bottom-center' }
+) => {
+    if (type === 'success') {
+        toast.success(description, opts)
+    } else if (type === 'danger') {
+        toast.error(description, opts)
+    } else if (type === 'info' || type === 'warning') {
+        toast(description, opts)
+    }
 }
 
 export const handleError = (error: unknown) => {

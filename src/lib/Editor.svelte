@@ -130,7 +130,7 @@
         reportRead = true
         if (!showInfo) return
 
-        window.createToast(`${await path.basename(reportFile)} file read`)
+        window.createToast(`${await path.basename(reportFile)} file read`, 'success')
     }
 
     let autoRead = false
