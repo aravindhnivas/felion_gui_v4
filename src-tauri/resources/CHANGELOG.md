@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.8.6
+
+- code improvements on kinetics plots
+- new toast notification
+
 ## v4.8.5
 
 - major bug fixes on kinetics plots
