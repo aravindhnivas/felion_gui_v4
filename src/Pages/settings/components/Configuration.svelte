@@ -73,13 +73,18 @@
     export const start_and_check_felionpy = async () => {
         if (!$developerMode && !$python_asset_ready)
             return serverInfo.error('felionpy is not installed. Maybe check-felionpy-assets?')
+
         const out = await startServer()
         if (out) serverInfo.info(out)
         serverInfo.info(`PID: ${JSON.stringify($currentPortPID)}`)
         await updateServerInfo(1500)
         if ($pyServerReady) await getPyVersion()
     }
-
+    // toast.promise(sleep(10000), {
+    //     loading: 'Saving...',
+    //     success: 'Settings saved!',
+    //     error: 'Could not save.',
+    // })
     onMount(async () => {
         try {
             LOGGER.info('Configuration mounted')
@@ -196,7 +201,12 @@
                     id="startServerButton"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
-                        await start_and_check_felionpy()
+                        // await start_and_check_felionpy()
+                        toast.promise(start_and_check_felionpy(), {
+                            loading: 'Starting felionpy server...',
+                            success: 'Server started!',
+                            error: 'Could not start server.',
+                        })
                         toggle_loading(currentTarget)
                     }}
                     disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}

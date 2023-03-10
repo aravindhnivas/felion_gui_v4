@@ -18,7 +18,7 @@ export async function startServer() {
     if (get(pyServerReady)) return window.createToast('server already running', 'danger')
     serverInfo.warn('starting felionpy server at port: ' + get(pyServerPORT))
 
-    if(get(currentPortPID).length > 0) {
+    if (get(currentPortPID).length > 0) {
         await killPID()
     }
 
@@ -33,8 +33,9 @@ export async function startServer() {
 
     const [err, pyChild] = await oO(py.spawn())
     if (err) {
-        window.handleError(err)
-        return
+        toast.error(err as string)
+        // window.handleError(err)
+        return Promise.reject(err)
     }
 
     pyChildProcess.set(pyChild)
@@ -43,7 +44,7 @@ export async function startServer() {
 
     py.on('close', () => {
         pyServerReady.set(false)
-        currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`)) // remove pid from list   
+        currentPortPID.update((ports) => ports.filter((p) => p !== `${get(pyChildProcess).pid}`)) // remove pid from list
         serverInfo.warn('server closed')
     })
 
@@ -67,9 +68,8 @@ export async function startServer() {
 
 export async function stopServer() {
     try {
-        
         if (!get(pyServerReady)) {
-            if(get(currentPortPID).length > 0) {
+            if (get(currentPortPID).length > 0) {
                 await killPID()
             }
             serverInfo.warn('Server already stopped')
@@ -83,7 +83,6 @@ export async function stopServer() {
         pyServerReady.set(false)
 
         return Promise.resolve(true)
-
     } catch (error) {
         if (error instanceof Error) {
             window.handleError(error)
