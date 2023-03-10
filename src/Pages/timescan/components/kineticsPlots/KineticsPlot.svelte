@@ -118,8 +118,9 @@
     let weighted_mean = ''
 
     const compute_rate_constant = async () => {
-        if (!graph_plotted.number_densities) return toast.error('Please plot the number density first', {position: 'bottom-center'})
-        if (!polyOrder) return toast.error('Please enter a polynomial order', {position: 'bottom-center'})
+        if (!graph_plotted.number_densities)
+            return toast.error('Please plot the number density first', { position: 'bottom-center' })
+        if (!polyOrder) return toast.error('Please enter a polynomial order', { position: 'bottom-center' })
 
         rate_constant_data_loaded = false
         const dataFromPython: void | {
@@ -173,7 +174,7 @@
             title: `${rate_coefficient_label} as a function of number density (constant)`,
             xaxis: { title: 'number density [cm <sup>-3</sup>]', tickformat: '.0e' },
             yaxis: {
-                title: `${rate_coefficient_label} [s <sup>-1</sup> cm <sup>${3 * polyOrder}</sup>]`,
+                title: `${rate_coefficient_label} [s <sup>-1</sup> cm <sup>${3 * Number(polyOrder)}</sup>]`,
                 tickformat: '.0e',
             },
         }
@@ -670,6 +671,7 @@
 
         const filename_temp_rate_constants = `rate_constants_func_of_temperature.txt`
         await save_txt_file(filename_temp_rate_constants, data_temp_rate_constants)
+        window.createToast(`Saved ${filename_temp_rate_constants} file`, 'success')
     }
 
     const save_fn_of_ND_to_txt_file = async () => {
@@ -695,11 +697,11 @@
                 `${number_densities.val[i]}\t${number_densities.std[i]}\t${current_temp_rate_constants.val[i]}\t${current_temp_rate_constants.std[i]}\n`,
             ]
         }
-
         const filename_rates = `rates_${temperature}K_func_of_number_density.txt`
         const filename_rate_constants = `rate_constants_${temperature}K_func_of_number_density.txt`
         await save_txt_file(filename_rates, data_rates)
         await save_txt_file(filename_rate_constants, data_rate_constants)
+        window.createToast('Rate constants files are saved', 'success')
     }
 
     const autoChangeName = persistentWritable('kinetics_processing_auto_change_name', true)
