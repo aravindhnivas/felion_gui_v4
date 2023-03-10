@@ -63,8 +63,7 @@
             .filter((file) => Object.hasOwn(file, 'children'))
             .map((file) => ({ name: file.name, id: window.getID() }))
             .sort((a, b) => (a.name > b.name ? 1 : -1))
-
-        console.log('Folder updated')
+        // console.log('Folder updated')
 
         dispatch('chdir', {
             action: 'chdir',
@@ -89,9 +88,8 @@
         } else {
             fullfiles = fullfiles.sort((a, b) => (a.name < b.name ? 1 : -1))
         }
-        // console.log(fullfiles)
-        // fileSelected = fileChecked
     }
+
     $: sort_files(sortFile)
 
     const changeDirectory = async (goto) => {
@@ -101,7 +99,6 @@
     $: if (currentLocation) {
         fileChecked = []
     }
-
     const get_marked_file = (e) => {
         selectAll = false
         if (!(e.ctrlKey && filetype.includes('felix'))) return
@@ -110,7 +107,6 @@
         dispatch('markedFile', { markedFile })
     }
     let refresh = false
-
     $: fileSelected = fileChecked
     $: panel_size = fullfiles.length ? (otherfolders.length ? 90 : 100) : 10
 </script>
@@ -148,13 +144,17 @@
     </div>
 
     <MenuSurface
-        style="background: var(--background-color);"
+        style="background: var(--background-color); width: 100%;"
         bind:this={searchSurface}
-        anchorCorner="TOP_LEFT"
-        anchorMargin={{ top: 0, right: 50, bottom: 0, left: 0 }}
+        anchorCorner="BOTTOM_START"
     >
         <div class="p-2">
-            <Textfield on:keyup={searchfile} bind:value={searchKey} label="Search {filetype} files" />
+            <Textfield
+                style="width: 100%;"
+                on:keyup={searchfile}
+                bind:value={searchKey}
+                label="Search {filetype} files"
+            />
         </div>
     </MenuSurface>
 </div>
