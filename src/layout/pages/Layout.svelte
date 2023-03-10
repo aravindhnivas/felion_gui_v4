@@ -4,7 +4,6 @@
     import { graph_detached } from '$src/js/plot'
     import { BrowseTextfield, Modal, FileBrowser } from '$src/components'
     import HSplitPane from 'svelte-split-pane/src/HSplitPane.svelte'
-    // import VSplitPane from 'svelte-split-pane/src/VSplitPane.svelte'
 
     export let id: string
     export let display = 'none'
@@ -46,7 +45,6 @@
             }
         })
     }
-
     setContext('lookForGraph', lookForGraph)
     setContext('changeGraphDivWidth', changeGraphDivWidth)
 
@@ -62,6 +60,8 @@
             divider?.removeEventListener('mouseup', changeGraphDivWidth)
         }
     })
+
+    $: if (display !== 'none') changeGraphDivWidth()
 </script>
 
 <section {id} style:display>
