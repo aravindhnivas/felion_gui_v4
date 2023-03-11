@@ -74,8 +74,9 @@ export const save_to_db = async (file_location) => {
     const [err] = await oO(fs.copyFile(src_file, dest_file))
     if (err) return toast.error(err as string)
 
-    await get(DB).execute(
-        `CREATE TABLE IF NOT EXISTS massfiles (
+    const [err1] = await oO(
+        get(DB).execute(
+            `CREATE TABLE IF NOT EXISTS massfiles (
             filename TEXT PRIMARY KEY, 
             IE TEXT, 
             source TEXT, 
@@ -85,19 +86,24 @@ export const save_to_db = async (file_location) => {
             keywords TEXT, 
             notes TEXT
         )`
+        )
     )
+    if (err1) return toast.error(err1 as string)
 
     const { filename, IE, source, precursor, temperature, pressure, keywords, notes } = get(entry_values)
 
-    await get(DB).execute(
-        `INSERT OR REPLACE INTO massfiles (
+    const [err2] = await oO(
+        get(DB).execute(
+            `INSERT OR REPLACE INTO massfiles (
             filename, IE, source, precursor, temperature, pressure, keywords, notes
         ) VALUES 
         (
             '${filename}', '${IE}', '${source}', '${precursor}', 
             '${temperature}', '${pressure}', '${keywords}', '${notes}'
         )`
+        )
     )
+    if (err2) return toast.error(err2 as string)
 
     return toast.success('File saved to database')
 }
@@ -106,6 +112,7 @@ export const status = fsm('disconnected', {
     disconnected: {
         submit: 'connecting',
     },
+
     connecting: {
         _enter() {
             fs.exists(get(DBlocation)).then((res) => {
@@ -115,12 +122,8 @@ export const status = fsm('disconnected', {
                     try {
                         if (get(DB)) await get(DB).close()
                         const loc = `sqlite:${db_file}`
-                        console.log(loc)
                         DB.set(await Database.load(loc))
-                        console.warn({ DB: get(DB) })
-                        if (get(DB)) console.log('db loaded')
-                        else console.warn('db not loaded')
-                        this.success()
+                        return get(DB) ? this.success() : this.error()
                     } catch (error) {
                         toast.error(error)
                         this.error()
@@ -130,14 +133,54 @@ export const status = fsm('disconnected', {
         },
 
         success: 'connected',
+
         error() {
             return 'retry'
         },
     },
+
     retry: {
         submit: 'connecting',
     },
+
     connected: {
         submit: 'connecting',
     },
 })
+
+export const clear_db = async () => {
+    if (get(status) !== 'connected') return
+    const clear = await dialog.confirm('Are you sure you want to clear the database?', { title: 'Clear database' })
+    if (!clear) return
+    const [err] = await oO(get(DB).execute(`DELETE FROM massfiles`))
+    if (err) return window.handleError(err)
+
+    if (await fs.exists(get(DBlocation))) {
+        const db_file_location = await path.join(get(DBlocation), 'massfiles')
+        const [err] = await oO(fs.removeDir(db_file_location, { recursive: true }))
+        if (err) return window.handleError(err)
+    }
+
+    toast.success('Database cleared')
+}
+
+export const delete_from_db = async (filename) => {
+    if (get(status) !== 'connected') return
+
+    const delete_file = await dialog.confirm(`Are you sure you want to delete ${filename} ?`, {
+        title: 'Delete file',
+    })
+    if (!delete_file) return
+
+    const [err] = await oO(get(DB).execute(`DELETE FROM massfiles WHERE filename = '${filename}'`))
+    if (err) return window.handleError(err)
+
+    if (await fs.exists(get(DBlocation))) {
+        const db_filename = await path.join(get(DBlocation), 'massfiles', filename)
+        if (!(await fs.exists(db_filename))) return toast.error('File does not exist')
+        const [err] = await oO(fs.removeFile(db_filename))
+        if (err) return window.handleError(err)
+    }
+
+    toast.success('File deleted')
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DB, fields, DBlocation } from './stores'
+    import { DB, fields, DBlocation, clear_db, delete_from_db } from './stores'
     import { Textfield, SegBtn, Radio, Checkbox } from '$src/components'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
@@ -83,8 +83,9 @@
         if (dataFromPython === null) return
         const logScale = true
 
-        // const {precursor, } = current_filelist
-        plot(`masspec`, 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
+        const { precursor, temperature, source, pressure } = current_filelist as MASSDBRowType
+        const title = `${precursor} at ${temperature} K from ${source} ion source at ${pressure} mbar`
+        plot(title, 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
     }
     $: if (filename && plotID) plotMasspec()
 </script>
@@ -109,6 +110,7 @@
             {#each Object.keys(search_fields) as label (label)}
                 <Textfield {label} bind:value={search_fields[label]} />
             {/each}
+
             <button
                 class="button is-link ml-auto"
                 on:click={async ({ currentTarget }) => {
@@ -117,6 +119,8 @@
                     toggle_loading(currentTarget)
                 }}>Submit</button
             >
+
+            <!-- <button class="button is-danger" on:click={clear_db}> Clear database </button> -->
         </div>
     </div>
 
@@ -124,6 +128,16 @@
         <div class="align">
             <h3>Search results: found {found_lists.length} files</h3>
             <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
+            {#if filename}
+                <button
+                    class="button is-danger"
+                    on:click={async () => {
+                        await delete_from_db(filename)
+                    }}
+                >
+                    Delete file from database
+                </button>
+            {/if}
         </div>
 
         {#if $sqlMode}
