@@ -34,7 +34,10 @@
                 toggle_loading(currentTarget)
                 await save_to_db(file_location)
                 toggle_loading(currentTarget)
-            }}>Save</button
+            }}
         >
+            <span>Save</span>
+            <i class="i-mdi-database-arrow-down text-xs" />
+        </button>
     </svelte:fragment>
 </SeparateWindow>
