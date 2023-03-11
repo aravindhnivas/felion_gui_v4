@@ -4,6 +4,8 @@
 
 - New feature: Masspectrum sqlite database (massfiles.db) added
 
+---
+
 ## v4.8.6
 
 - code improvements on kinetics plots
