@@ -1,5 +1,12 @@
 import fsm from 'svelte-fsm'
+
+export const fields = {
+    required: ['IE', 'source', 'precursor', 'temperature', 'pressure'],
+    optional: ['keywords', 'notes'],
+}
+
 // export const entry_values = persistentWritable('masspec-db-entry-values', {
+
 export const entry_values = writable({
     filename: '',
     IE: '',
@@ -9,7 +16,6 @@ export const entry_values = writable({
     pressure: '',
     keywords: '',
     notes: '',
-    required: ['filename', 'IE', 'source', 'precursor', 'temperature', 'pressure'],
 
     reset: () => {
         entry_values.update((v) => {
@@ -34,7 +40,12 @@ export const DBlocation = persistentWritable<string>(
 export const save_to_db = async (file_location) => {
     if (get(status) !== 'connected') return
 
-    for (const field of get(entry_values).required) {
+    if (!get(entry_values).filename) {
+        await dialog.message('Please select a file', { title: 'Missing file', type: 'warning' })
+        return
+    }
+
+    for (const field of fields.required) {
         if (!get(entry_values)[field]) {
             await dialog.message(`Please fill in the ${field} field`, { title: 'Missing field', type: 'warning' })
             return
