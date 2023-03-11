@@ -51,6 +51,7 @@
     "svelte-clipboard": "^1.0.0",
     "svelte-flatlist": "^0.2.6",
     "svelte-french-toast": "^1.0.3",
+    "svelte-fsm": "^1.2.0",
     "svelte-markdown": "^0.2.3",
     "svelte-material-ui": "^6.2.0",
     "svelte-preprocess": "^5.0.1",

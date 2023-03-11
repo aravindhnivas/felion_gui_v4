@@ -1,12 +1,13 @@
 <script lang="ts">
     import { showConfirm } from '$src/lib/alert/store'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import { Switch, ButtonBadge } from '$src/components'
+    import { Switch, ButtonBadge, SeparateWindow } from '$src/components'
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
     import { readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
+    import Database from './masspec/components/Database.svelte'
     export let id = 'Masspec'
     export let display = 'grid'
     export let saveLocationToDB = true
@@ -94,13 +95,11 @@
         if (filetype == 'mass' && massfiles) {
             const dataFromPython = await readMassFile(massfiles, btnID)
             if (dataFromPython === null) return
-            edata = dataFromPython
             plot('Mass spectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale, true)
             // graphPlotted = true
             return
         }
     }
-
     const linearlogCheck = () => {
         const layout: Partial<Plotly.Layout> = {
             yaxis: { title: 'Counts', type: logScale ? 'log' : undefined },
@@ -108,11 +107,12 @@
         const plotHTML = document.getElementById(plotID)
         if (plotHTML?.data) relayout(plotID, layout)
     }
-
     let fullfileslist: string[] = []
     let logScale = true
-    let edata
+    let DB_active = false
 </script>
+
+<Database bind:DB_active filenames={fullfileslist} file_location={currentLocation} />
 
 <Layout {display} {filetype} {id} bind:currentLocation bind:fileChecked bind:fullfileslist>
     <svelte:fragment slot="buttonContainer">
@@ -121,12 +121,12 @@
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
             <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Open in Matplotlib" />
             <Switch style="margin: 0 1em;" on:change={linearlogCheck} bind:selected={logScale} label="Log" />
+            <button class="button is-warning ml-auto" on:click={() => (DB_active = true)}>Database</button>
         </div>
     </svelte:fragment>
 
     <svelte:fragment slot="plotContainer">
         <div id={plotID} class="graph__div" />
-        <!-- <MasspecEchart {edata} /> -->
     </svelte:fragment>
 
     <svelte:fragment slot="config">
