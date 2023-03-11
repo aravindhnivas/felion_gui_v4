@@ -3,8 +3,8 @@
     import { BrowseTextfield } from '$src/components'
 </script>
 
-<BrowseTextfield class="three_col_browse" label="Database location" bind:value={$DBlocation} lock={true} />
-<div class="flex ml-auto">
+<div class="flex">
+    <BrowseTextfield class="three_col_browse" label="Database location" bind:value={$DBlocation} lock={true} />
     <button class="button is-link" class:is-loading={$status === 'connecting'} on:click={status.submit}
         >{$status}</button
     >

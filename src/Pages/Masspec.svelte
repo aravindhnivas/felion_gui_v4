@@ -121,7 +121,10 @@
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
             <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Open in Matplotlib" />
             <Switch style="margin: 0 1em;" on:change={linearlogCheck} bind:selected={logScale} label="Log" />
-            <button class="button is-warning ml-auto" on:click={() => (DB_active = true)}>Database</button>
+            <button class="button is-warning ml-auto" on:click={() => (DB_active = true)}>
+                <span>Database</span>
+                <i class="i-mdi-database-arrow-down text-xs" />
+            </button>
         </div>
     </svelte:fragment>
 

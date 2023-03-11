@@ -1,20 +1,25 @@
 <script lang="ts">
-    import { fields } from './stores'
-    import { Textfield, SegBtn, Radio } from '$src/components'
+    import { DB, fields, DBlocation } from './stores'
+    import { Textfield, SegBtn, Radio, Checkbox } from '$src/components'
+    import { plot } from '$src/js/functions'
+    import { readMassFile } from '../../mass'
 
     export let active = false
 
     let choices = [...fields.required, ...fields.optional].map((key) => {
-        if (key.includes('precursor')) return { name: key, selected: true }
+        if (key.includes('source')) return { name: key, selected: true }
         return { name: key, selected: false }
     })
     let search_fields = {}
-    $: console.log(search_fields)
+    // $: console.log(search_fields)
 
     const update_search_field = (choices) => {
+        // search_fields = {}
         for (const choice of choices) {
             if (choice.selected) {
-                search_fields[choice.name] = ''
+                search_fields[choice.name] ||= ''
+            } else {
+                delete search_fields[choice.name]
             }
         }
     }
@@ -23,40 +28,145 @@
         update_search_field(choices)
     })
 
-    let filename = '1'
+    interface MASSDBRowType {
+        filename: string
+        temperature: string
+        precursor: string
+        pressure: string
+        IE: string
+        source: string
+        keywords: string
+        notes: string
+    }
+
+    let filename = ''
+    let found_lists: MASSDBRowType[] = []
+    $: current_filelist = found_lists?.find((row) => row.filename === filename) || {}
+    $: fileOpts = found_lists.map((row) => row.filename) || []
+    // $: console.log({ current_filelist })
+    const searchQuery = async (defaultCMD: string = null) => {
+        found_lists = []
+
+        if (defaultCMD) {
+            const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(defaultCMD))
+            if (err) return toast.error(err)
+            found_lists = rows
+            if (found_lists.length > 0) filename = found_lists[0].filename
+            return console.log(found_lists)
+        }
+
+        let command = 'SELECT * from massfiles WHERE'
+        const substr = $exact_match ? '' : '%'
+
+        Object.keys(search_fields).forEach((key, ind) => {
+            if (search_fields[key]) {
+                command += ` ${key} ${$exact_match ? '=' : 'LIKE'} '${substr}${search_fields[key]}${substr}'`
+                if (ind < Object.keys(search_fields).length - 1) command += ' AND'
+            }
+        })
+        console.warn(command)
+        const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(command))
+        if (err) return toast.error(err)
+        if (rows.length === 0) return toast.error('No results found.', { duration: 3000 })
+        found_lists = rows
+        if (found_lists.length > 0) filename = found_lists[0].filename
+        // await plotMasspec()
+        toast.success('Query completed. Found ' + found_lists.length + ' results.', { duration: 3000 })
+    }
+    const plotID = 'masspec-db-plot'
+    const sqlMode = persistentWritable('search_sql_mode', false)
+    const exact_match = persistentWritable('search_sql_mode', false)
+
+    const plotMasspec = async () => {
+        const massfile = await path.join($DBlocation, 'massfiles', filename)
+        const dataFromPython = await readMassFile([massfile])
+        if (dataFromPython === null) return
+        const logScale = true
+
+        // const {precursor, } = current_filelist
+        plot(`masspec`, 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
+    }
+    $: if (filename && plotID) plotMasspec()
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
-    <!-- <h1 style="width: 100%">Search mode</h1> -->
     <span>Select fields to include in search</span>
+
     <SegBtn {choices} style="width: 100%;" on:selected={(e) => update_search_field(e.detail)} />
 
     <div class="align border-solid border-1 rounded-xl p-5">
-        {#each Object.keys(search_fields) as label (label)}
-            <Textfield {label} bind:value={search_fields[label]} />
-        {/each}
+        <span>Enter search keywords on resp. selected fields</span>
+
+        <Checkbox bind:value={$exact_match} label="match exact word" />
+
+        <div
+            class="align"
+            on:keyup={async (e) => {
+                if (e.key !== 'Enter') return
+                await searchQuery()
+            }}
+        >
+            {#each Object.keys(search_fields) as label (label)}
+                <Textfield {label} bind:value={search_fields[label]} />
+            {/each}
+            <button
+                class="button is-link ml-auto"
+                on:click={async ({ currentTarget }) => {
+                    toggle_loading(currentTarget)
+                    await searchQuery()
+                    toggle_loading(currentTarget)
+                }}>Submit</button
+            >
+        </div>
     </div>
 
     <div class="align box my-5 border-solid border-1">
-        <h3 style="width: 100%">Search results</h3>
-
-        <div class="output__main__div">
-            <div class="left">
-                <Radio
-                    bind:value={filename}
-                    options={[1, 2, 3]}
-                    on:change={() => {
-                        console.log('masspec:db:change')
-                    }}
-                />
-            </div>
-
-            <div class="right">
-                <h3>{filename}</h3>
-            </div>
+        <div class="align">
+            <h3>Search results: found {found_lists.length} files</h3>
+            <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
         </div>
+
+        {#if $sqlMode}
+            <Textfield
+                style="width: 100%;"
+                label="Sqlite3 query"
+                value="SELECT * from massfiles WHERE source LIKE '%storage%'"
+                on:keyup={async (e) => {
+                    if (e.key !== 'Enter') return
+
+                    const value = e.target.value
+                    await searchQuery(value)
+                }}
+            />
+        {/if}
+
+        {#if found_lists.length}
+            <div class="output__main__div">
+                <div class="left">
+                    <Radio bind:value={filename} options={fileOpts} />
+                </div>
+
+                <div>
+                    {#each Object.keys(current_filelist) as label (label)}
+                        <div class="mr-2">{label}:</div>
+                    {/each}
+                </div>
+                <div>
+                    {#each Object.keys(current_filelist) as label (label)}
+                        <div>{current_filelist[label]}</div>
+                    {/each}
+                </div>
+            </div>
+        {:else}
+            <div class="output__main__div">
+                <span>No results</span>
+            </div>
+        {/if}
     </div>
-    <div class="graph_div" id="masspec-db-plot">Graph here</div>
+
+    {#if filename}
+        <div class="graph_div" id={plotID} />
+    {/if}
 </div>
 
 <style lang="scss">
@@ -68,13 +178,11 @@
         align-items: center;
 
         .output__main__div {
-            display: grid;
-            grid-auto-flow: column;
-            gap: 0.5em;
-            grid-template-columns: auto 1fr;
             width: 100%;
-            min-height: 300px;
-
+            display: grid;
+            gap: 0.5em;
+            grid-auto-flow: column;
+            grid-template-columns: auto auto 1fr;
             .left {
                 display: flex;
                 padding-right: 2em;
@@ -86,8 +194,6 @@
         .graph_div {
             width: 100%;
             height: 100%;
-            min-height: 500px;
-            border: solid 1px black;
         }
     }
 </style>

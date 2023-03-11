@@ -3382,6 +3382,12 @@ svelte@^3.56.0:
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.56.0.tgz#0fe159e2e342cc3d430c7ff219315d1ea681c7b4"
   integrity sha512-LvXiJbjdvJKwB/0CQyYpDX0q+hFqCyWmybzC2G6eK1tJJA/RSRCytTfNmjHv+RHlLuA70vWG7nXp6gbeErYvRA==
 
+"tauri-plugin-sql-api@https://github.com/tauri-apps/tauri-plugin-sql":
+  version "0.0.0"
+  resolved "https://github.com/tauri-apps/tauri-plugin-sql#b945c7a74ed207771420f7f0809d20ba66d55f70"
+  dependencies:
+    "@tauri-apps/api" "^1.2.0"
+
 text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"

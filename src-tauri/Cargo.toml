@@ -21,6 +21,8 @@ reqwest = { version = "0.11", features = ["json", "stream"] }
 error-chain = "0.12.4"
 tokio = { version = "1.24.2", features = ["full"] }
 futures-util = "0.3.25"
+tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev", features = ["sqlite"] }
+# features = ["sqlite"] # or "postgres", or "mysql"
 
 [features]
 # by default Tauri runs in production mode

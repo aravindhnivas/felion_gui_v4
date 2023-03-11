@@ -1,18 +1,26 @@
 <script lang="ts">
-    import { save_to_db, status } from './db/stores'
+    import { save_to_db, status, DB } from './db/stores'
     import { SeparateWindow } from '$src/components'
     import { EntryMode, SearchMode, Header } from './db/'
+    // import Database from 'tauri-plugin-sql-api'
 
     export let DB_active = false
     export let file_location = ''
     export let filenames: string[] = []
+
+    // let DB = writable<Database | null>(null)
     let searchMode = false
-    onMount(() => {
-        if ($status !== 'connected') status.submit()
+
+    onMount(async () => {
+        if ($status !== 'connected') return status.submit()
+    })
+
+    onDestroy(async () => {
+        if ($DB) await $DB.close()
     })
 </script>
 
-<SeparateWindow bind:active={DB_active} title="Database" graphMode={false} maximize={false}>
+<SeparateWindow bind:active={DB_active} title="Database" graphMode={false}>
     <svelte:fragment slot="header_content__slot">
         <Header />
     </svelte:fragment>
@@ -36,8 +44,7 @@
                 toggle_loading(currentTarget)
             }}
         >
-            <span>Save</span>
-            <i class="i-mdi-database-arrow-down text-xs" />
+            Save
         </button>
     </svelte:fragment>
 </SeparateWindow>
