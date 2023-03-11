@@ -42,7 +42,7 @@
     let found_lists: MASSDBRowType[] = []
     $: current_filelist = found_lists?.find((row) => row.filename === filename) || {}
     $: fileOpts = found_lists.map((row) => row.filename) || []
-
+    $: console.log(current_filelist)
     const searchQuery = async (defaultCMD: string = null) => {
         if ($status !== 'connected') return toast.error('Database not connected.')
 
@@ -168,7 +168,7 @@
                 </div>
                 <div>
                     {#each Object.keys(current_filelist) as label (label)}
-                        <div>{current_filelist[label]}</div>
+                        <div>{current_filelist[label] || '-'}</div>
                     {/each}
                 </div>
             </div>
