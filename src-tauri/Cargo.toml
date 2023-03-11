@@ -1,12 +1,12 @@
 [package]
 name = "feliongui"
-version = "4.9.0"
+version = "4.9.1"
 description = "FELion spectrum analyser for FELIX data"
 authors = ["A.N. Marimuthu"]
 license = "MIT"
 repository = ""
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.59"
 
 [build-dependencies]
 tauri-build = {version = "1.2", features = [] }
@@ -14,13 +14,13 @@ tauri-build = {version = "1.2", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = {version = "1.2.3", features = ["dialog-all", "fs-all", "os-all", "path-all", "process-relaunch", "shell-all", "updater", "window-close"] }
+tauri = {version = "1.2.4", features = ["dialog-all", "fs-all", "os-all", "path-all", "process-relaunch", "shell-all", "updater", "window-close"] }
 portpicker = "0.1.1"
 tauri-plugin-window-state = "0.1"
 reqwest = { version = "0.11", features = ["json", "stream"] }
 error-chain = "0.12.4"
-tokio = { version = "1.24.2", features = ["full"] }
-futures-util = "0.3.25"
+tokio = { version = "1.26.0", features = ["full"] }
+futures-util = "0.3.27"
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev", features = ["sqlite"] }
 # features = ["sqlite"] # or "postgres", or "mysql"
 
