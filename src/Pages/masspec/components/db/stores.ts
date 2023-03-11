@@ -36,7 +36,7 @@ export const save_to_db = async (file_location) => {
 
     for (const field of get(entry_values).required) {
         if (!get(entry_values)[field]) {
-            toast.error(`Please fill in the ${field} field`)
+            await dialog.message(`Please fill in the ${field} field`, { title: 'Missing field', type: 'warning' })
             return
         }
     }
