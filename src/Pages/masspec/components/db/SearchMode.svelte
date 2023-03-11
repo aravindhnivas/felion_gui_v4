@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DB, fields, DBlocation, delete_from_db } from './stores'
+    import { DB, fields, DBlocation, delete_from_db, status } from './stores'
     import { Textfield, SegBtn, Radio, Checkbox } from '$src/components'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
@@ -43,8 +43,10 @@
     let found_lists: MASSDBRowType[] = []
     $: current_filelist = found_lists?.find((row) => row.filename === filename) || {}
     $: fileOpts = found_lists.map((row) => row.filename) || []
-    // $: console.log({ current_filelist })
+
     const searchQuery = async (defaultCMD: string = null) => {
+        if ($status !== 'connected') return toast.error('Database not connected.')
+
         found_lists = []
 
         if (defaultCMD) {
