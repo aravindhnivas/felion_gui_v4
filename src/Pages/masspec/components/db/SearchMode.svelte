@@ -45,7 +45,7 @@
     // $: console.log(current_filelist)
     const searchQuery = async (defaultCMD: string = null) => {
         if ($status !== 'connected') return toast.error('Database not connected.')
-
+        filename = ''
         found_lists = []
 
         if (defaultCMD) {
@@ -134,6 +134,7 @@
                     class="button is-danger"
                     on:click={async () => {
                         await delete_from_db(filename)
+                        await searchQuery()
                     }}
                 >
                     Delete file from database
