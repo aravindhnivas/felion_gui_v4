@@ -10,11 +10,10 @@
         if (key.includes('source')) return { name: key, selected: true }
         return { name: key, selected: false }
     })
+
     let search_fields = {}
-    // $: console.log(search_fields)
 
     const update_search_field = (choices) => {
-        // search_fields = {}
         for (const choice of choices) {
             if (choice.selected) {
                 search_fields[choice.name] ||= ''
