@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DB, fields, DBlocation, clear_db, delete_from_db } from './stores'
+    import { DB, fields, DBlocation, delete_from_db } from './stores'
     import { Textfield, SegBtn, Radio, Checkbox } from '$src/components'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
@@ -75,7 +75,7 @@
     }
     const plotID = 'masspec-db-plot'
     const sqlMode = persistentWritable('search_sql_mode', false)
-    const exact_match = persistentWritable('search_sql_mode', false)
+    const exact_match = persistentWritable('exact_match_masspec_db', false)
 
     const plotMasspec = async () => {
         const massfile = await path.join($DBlocation, 'massfiles', filename)
