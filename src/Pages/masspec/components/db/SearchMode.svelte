@@ -1,7 +1,6 @@
 <script lang="ts">
     import { fields } from './stores'
     import { Textfield, SegBtn, Radio } from '$src/components'
-    // import HSplitPane from 'svelte-split-pane/src/HSplitPane.svelte'
 
     export let active = false
 
@@ -9,10 +8,8 @@
         if (key.includes('precursor')) return { name: key, selected: true }
         return { name: key, selected: false }
     })
-    // $: search_fields = choices.filter((choice) => choice.selected).map((choice) => ({ ...choice, value: '' }))
-    $: console.log(search_fields)
-
     let search_fields = {}
+    $: console.log(search_fields)
 
     const update_search_field = (choices) => {
         for (const choice of choices) {
@@ -30,7 +27,7 @@
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
-    <h1 style="width: 100%">Search mode</h1>
+    <!-- <h1 style="width: 100%">Search mode</h1> -->
     <span>Select fields to include in search</span>
     <SegBtn {choices} style="width: 100%;" on:selected={(e) => update_search_field(e.detail)} />
 
@@ -45,7 +42,13 @@
 
         <div class="output__main__div">
             <div class="left">
-                <Radio bind:value={filename} options={[1, 2, 3]} />
+                <Radio
+                    bind:value={filename}
+                    options={[1, 2, 3]}
+                    on:change={() => {
+                        console.log('masspec:db:change')
+                    }}
+                />
             </div>
 
             <div class="right">
@@ -74,9 +77,9 @@
 
             .left {
                 display: flex;
+                padding-right: 2em;
                 flex-direction: column;
                 border-right: solid 1px white;
-                padding-right: 2em;
             }
         }
 
@@ -84,7 +87,6 @@
             width: 100%;
             height: 100%;
             min-height: 500px;
-            // background-color: beige;
             border: solid 1px black;
         }
     }
