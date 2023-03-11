@@ -170,7 +170,7 @@ export const delete_from_db = async (filename) => {
     const delete_file = await dialog.confirm(`Are you sure you want to delete ${filename} ?`, {
         title: 'Delete file',
     })
-    if (!delete_file) return
+    if (!delete_file) return toast.error('File not deleted')
 
     const [err] = await oO(get(DB).execute(`DELETE FROM massfiles WHERE filename = '${filename}'`))
     if (err) return window.handleError(err)
