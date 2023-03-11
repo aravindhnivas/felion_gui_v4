@@ -12,13 +12,13 @@ export const fields = {
 
 export const entry_values = writable({
     filename: '',
-    IE: '1',
+    IE: '',
     source: 'storage',
-    precursor: '1',
-    temperature: '1',
-    pressure: '1',
-    keywords: '1',
-    notes: '1',
+    precursor: '',
+    temperature: '',
+    pressure: '',
+    keywords: '',
+    notes: '',
 
     reset: () => {
         entry_values.update((v) => {
@@ -170,6 +170,7 @@ export const delete_from_db = async (filename) => {
     const delete_file = await dialog.confirm(`Are you sure you want to delete ${filename} ?`, {
         title: 'Delete file',
     })
+
     if (!delete_file) return toast.error('File not deleted')
 
     const [err] = await oO(get(DB).execute(`DELETE FROM massfiles WHERE filename = '${filename}'`))
