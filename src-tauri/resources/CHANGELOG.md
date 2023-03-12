@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.9.2
+
+- Masspec DB bug fix
+- multiple file selection on masspec DB
+
 ## v4.9.1
 
 - Package updates
