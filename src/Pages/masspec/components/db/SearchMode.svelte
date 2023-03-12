@@ -1,6 +1,6 @@
 <script lang="ts">
     import { DB, fields, DBlocation, delete_from_db, status } from './stores'
-    import { Textfield, SegBtn, Radio, Checkbox, VirtualCheckList } from '$src/components'
+    import { Textfield, SegBtn, Checkbox, VirtualCheckList } from '$src/components'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
 
@@ -198,19 +198,6 @@
             </div>
         {/if}
     </div>
-
-    <!-- {#if found_lists.length && !fileChecked.length}
-        <h3>Select filenames to plot</h3>
-    {/if} -->
-    <!-- <button
-        class="button is-link"
-        on:click={async ({ currentTarget }) => {
-            if (!fileChecked.length) return toast.error('No files selected', { duration: 3000 })
-            toggle_loading(currentTarget)
-            await oO(plotMasspec())
-            toggle_loading(currentTarget)
-        }}>Plot selected files</button
-    > -->
     <div class="graph_div" id={plotID} />
 </div>
 
