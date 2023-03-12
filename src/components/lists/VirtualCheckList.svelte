@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { createEventDispatcher, onMount } from 'svelte'
     import List, { Item, Meta, Label } from '@smui/list'
     import Checkbox from '@smui/checkbox'
@@ -7,12 +7,12 @@
 
     let className = ''
     export { className as class }
-
     export let items = []
-    export let markedFile = ''
     export let fileChecked = []
     export let fileSelected = []
     export let ul$style = ''
+    export let markedFile = ''
+    export let markfiletype = ''
 
     const dispatch = createEventDispatcher()
     const dispatch_fileselect_event = (event) => {
@@ -24,8 +24,8 @@
     // $: console.warn({ items })
     // $: console.warn({ fileSelected })
     // $: console.info({ fileChecked })
-    function selectRange(event, lastfile) {
-        if (!(event.shiftKey && fileSelected.length > 0)) return
+    function selectRange(lastfile) {
+        // if (!(event.shiftKey && fileSelected.length > 0)) return
         // console.log('range select', fullfileslist)
         // console.log(event.shiftKey, event.target)
         const _from = fullfileslist.indexOf(fileSelected.at(-1))
@@ -50,21 +50,19 @@
     <VirtualList {items} let:item>
         {@const highlight = markedFile == item.name}
         <Item
-            on:click={(e) => {
-                selectRange(e, item.name)
+            on:click={({ shiftKey, ctrlKey }) => {
+                if (shiftKey && fileSelected.length > 0) {
+                    selectRange(item.name)
+                }
+                if (ctrlKey && item.name.includes(markfiletype)) {
+                    markedFile = markedFile === item.name ? '' : item.name
+                }
             }}
             class="mr-3"
             style="border-radius: 1em; border: {highlight ? 'solid 1px #ffc107' : ''}; height: 40px;"
         >
-            <Label class={highlight ? 'marked-file' : ''}>{item.name}</Label>
-            <Meta
-                ><Checkbox
-                    bind:group={fileSelected}
-                    value={item.name}
-                    on:click
-                    on:change={dispatch_fileselect_event}
-                /></Meta
-            >
+            <Label on:click class={highlight ? 'marked-file' : ''}>{item.name}</Label>
+            <Meta><Checkbox bind:group={fileSelected} value={item.name} on:change={dispatch_fileselect_event} /></Meta>
         </Item>
     </VirtualList>
 </List>

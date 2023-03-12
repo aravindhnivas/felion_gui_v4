@@ -5,7 +5,6 @@
     import VSplitPane from 'svelte-split-pane/src/VSplitPane.svelte'
 
     export let filetype = '*.*'
-    export let markedFile = ''
     export let fileChecked = []
     export let fullfileslist: string[] = []
     export let currentLocation = ''
@@ -99,13 +98,7 @@
     $: if (currentLocation) {
         fileChecked = []
     }
-    const get_marked_file = (e) => {
-        selectAll = false
-        if (!(e.ctrlKey && filetype.includes('felix'))) return
-        const filename = e.target.value
-        markedFile = markedFile === filename ? '' : filename
-        dispatch('markedFile', { markedFile })
-    }
+
     let refresh = false
     $: fileSelected = fileChecked
     $: panel_size = fullfiles.length ? (otherfolders.length ? 90 : 100) : 10
@@ -200,8 +193,7 @@
                                 bind:fileChecked
                                 {fileSelected}
                                 items={fullfiles}
-                                {markedFile}
-                                on:click={get_marked_file}
+                                markfiletype="felix"
                             />
                         {:else if fullfiles.length <= 0}
                             <div>No {filetype} here! or try reload files</div>

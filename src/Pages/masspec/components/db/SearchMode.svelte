@@ -25,6 +25,7 @@
 
     onMount(() => {
         update_search_field(choices)
+        if (import.meta.env.PROD) $sqlMode = false
     })
 
     interface MASSDBRowType {
@@ -38,21 +39,19 @@
         notes: string
     }
 
-    // $: filename = fileChecked[0] || ''
     let found_lists: MASSDBRowType[] = []
     $: current_filelist = found_lists?.find((row) => row.filename === markedFile) || {}
     $: fileOpts = found_lists.map((row) => ({ name: row.filename, id: window.getID() })) || []
-    // $: console.log(current_filelist)
+
     const searchQuery = async (defaultCMD: string = null) => {
         if ($status !== 'connected') return toast.error('Database not connected.')
-        // filename = ''
         found_lists = []
 
         if (defaultCMD) {
             const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(defaultCMD))
             if (err) return toast.error(err)
             found_lists = rows
-            if (found_lists.length > 0) fileChecked[0] = markedFile = found_lists[0].filename
+            if (found_lists.length > 0) markedFile = found_lists[0].filename
             return console.log(found_lists)
         }
 
@@ -70,32 +69,27 @@
         if (err) return toast.error(err)
         if (rows.length === 0) return toast.error('No results found.', { duration: 3000 })
         found_lists = rows
-        if (found_lists.length > 0) fileChecked[0] = markedFile = found_lists[0].filename
+        if (found_lists.length > 0) markedFile = found_lists[0].filename
         toast.success('Query completed. Found ' + found_lists.length + ' results.', { duration: 3000 })
     }
 
     const plotID = 'masspec-db-plot'
     const sqlMode = persistentWritable('search_sql_mode', false)
+    const SQLcommand = persistentWritable('SQLcommand', "SELECT * from massfiles WHERE source LIKE '%storage%'")
     const exact_match = persistentWritable('exact_match_masspec_db', false)
 
     const plotMasspec = async () => {
         const massfile = await Promise.all(fileChecked.map(async (f) => await path.join($DBlocation, 'massfiles', f)))
         const dataFromPython = await readMassFile(massfile)
         if (dataFromPython === null) return
-
         const logScale = true
         plot('Masspectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
+        window.createToast('Plotting completed.', 'success', { duration: 3000 })
     }
 
     let fileChecked = []
-    $: if (fileChecked.length && plotID) plotMasspec()
     $: fileSelected = fileChecked
     let markedFile = ''
-
-    const get_marked_file = ({ ctrlKey, target: { value } }) => {
-        if (!ctrlKey) return
-        markedFile = markedFile === value ? '' : value
-    }
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
@@ -105,7 +99,6 @@
 
     <div class="align border-solid border-1 rounded-xl p-5">
         <span>Enter search keywords on resp. selected fields</span>
-
         <Checkbox bind:value={$exact_match} label="match exact word" />
 
         <div
@@ -127,8 +120,6 @@
                     toggle_loading(currentTarget)
                 }}>Submit</button
             >
-
-            <!-- <button class="button is-danger" on:click={clear_db}> Clear database </button> -->
         </div>
     </div>
 
@@ -137,7 +128,7 @@
             <h3>Search results</h3>
             {#if found_lists.length}
                 <h3>: found {found_lists.length} files</h3>
-                <span><kbd>Ctrl</kbd> + <kbd>left-click</kbd> to mark and view file info</span>
+                <span><kbd>Ctrl</kbd> + <kbd>left-click</kbd> on filename to mark and view file info</span>
             {/if}
             <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
             {#if markedFile}
@@ -159,10 +150,9 @@
             <Textfield
                 style="width: 100%;"
                 label="Sqlite3 query"
-                value="SELECT * from massfiles WHERE source LIKE '%storage%'"
+                bind:value={$SQLcommand}
                 on:keyup={async (e) => {
                     if (e.key !== 'Enter') return
-
                     const value = e.target.value
                     await searchQuery(value)
                 }}
@@ -172,15 +162,23 @@
         {#if found_lists.length}
             <div class="output__main__div">
                 <div class="left">
-                    <!-- <Radio bind:value={filename} options={fileOpts} /> -->
                     <VirtualCheckList
                         on:fileselect
                         bind:fileChecked
                         items={fileOpts}
                         {fileSelected}
-                        {markedFile}
-                        on:click={get_marked_file}
+                        markfiletype="mass"
+                        bind:markedFile
                     />
+                    <button
+                        class="button is-link mt-5"
+                        on:click={async ({ currentTarget }) => {
+                            if (!fileChecked.length) return toast.error('No files selected', { duration: 3000 })
+                            toggle_loading(currentTarget)
+                            await oO(plotMasspec())
+                            toggle_loading(currentTarget)
+                        }}>Plot selected files</button
+                    >
                 </div>
 
                 <div>
@@ -201,6 +199,18 @@
         {/if}
     </div>
 
+    <!-- {#if found_lists.length && !fileChecked.length}
+        <h3>Select filenames to plot</h3>
+    {/if} -->
+    <!-- <button
+        class="button is-link"
+        on:click={async ({ currentTarget }) => {
+            if (!fileChecked.length) return toast.error('No files selected', { duration: 3000 })
+            toggle_loading(currentTarget)
+            await oO(plotMasspec())
+            toggle_loading(currentTarget)
+        }}>Plot selected files</button
+    > -->
     <div class="graph_div" id={plotID} />
 </div>
 

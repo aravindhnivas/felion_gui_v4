@@ -71,7 +71,6 @@
                 <div class="left_container__div box background-body">
                     <FileBrowser
                         class="background-body"
-                        on:markedFile
                         on:fileselect
                         bind:currentLocation
                         {filetype}

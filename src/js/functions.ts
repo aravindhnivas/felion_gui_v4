@@ -38,17 +38,13 @@ const toastTheme: ToastThemeOpts = <const>{
 // }
 
 type toastType = keyof ToastThemeOpts
-export const createToast = (
-    description: string,
-    type: toastType = 'info',
-    opts: ToastOptions = { position: 'bottom-center' }
-) => {
+export const createToast = (description: string, type: toastType = 'info', opts: ToastOptions = {}) => {
     if (type === 'success') {
         toast.success(description, opts)
     } else if (type === 'danger') {
         toast.error(description, opts)
     } else if (type === 'info' || type === 'warning') {
-        toast(description, opts)
+        toast(description, { position: 'bottom-center', ...opts })
     }
 }
 
