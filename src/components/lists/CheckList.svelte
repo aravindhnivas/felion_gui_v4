@@ -18,6 +18,8 @@
                 <Label>{item.name}</Label>
                 <Meta><Checkbox bind:group={fileChecked} value={item.name} on:click /></Meta>
             </Item>
+        {:else}
+            <span>No files</span>
         {/each}
     </List>
 </div>

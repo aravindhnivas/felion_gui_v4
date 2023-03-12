@@ -33,7 +33,7 @@ export const customStore = <T>(defaultValue: T) => {
 }
 
 export const getfiles = async (location: string, filter: string) => {
-    if (!(await fs.exists(location))) return [{ name: '', id: window.getID() }]
+    if (!(await fs.exists(location))) return []
     const dirs = await fs.readDir(location)
     return dirs
         .map((f) => f.name)

@@ -59,13 +59,15 @@
     <div class="align mb-2">
         <button class="button is-link ml-auto" on:click={async () => await loadFiles()}>fetch files</button>
     </div>
-    <div class="align" style="justify-content: center;">
+    <div class="align" style="justify-content: center; align-items: baseline;">
         {#each felixPlotCheckboxes as { label, options, value, id } (id)}
             <div style="margin-bottom: 1em;" transition:fade>
                 <div class="checkboxes_header">
                     {label}
                 </div>
+                <!-- {#if options.length > 0} -->
                 <CheckList class="modal_checkboxes__div" bind:fileChecked={value} bind:items={options} />
+                <!-- {/if} -->
             </div>
         {/each}
     </div>
