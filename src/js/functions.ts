@@ -44,7 +44,7 @@ export const createToast = (description: string, type: toastType = 'info', opts:
     } else if (type === 'danger') {
         toast.error(description, opts)
     } else if (type === 'info' || type === 'warning') {
-        toast(description, { position: 'bottom-center', ...opts })
+        toast(description, { position: 'bottom-center', duration: 3000, ...opts })
     }
 }
 
