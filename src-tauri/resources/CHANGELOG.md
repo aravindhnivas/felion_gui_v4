@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v4.9.3
+
+- Single instance lock added (only one instance of the app can run at a time)
+- Masspec DB auto close on app close
+- Masspec DB bug fix when plotting
+
 ## v4.9.2
 
 - Masspec DB bug fix
