@@ -57,7 +57,7 @@
 
 <div style="padding-bottom: 1em;">
     <div class="align mb-2">
-        <button class="button is-link ml-auto" on:click={async () => await loadFiles()}>reload files</button>
+        <button class="button is-link ml-auto" on:click={async () => await loadFiles()}>fetch files</button>
     </div>
     <div class="align" style="justify-content: center;">
         {#each felixPlotCheckboxes as { label, options, value, id } (id)}
