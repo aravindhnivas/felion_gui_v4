@@ -64,13 +64,14 @@
                 if (ind < Object.keys(search_fields).length - 1) command += ' AND'
             }
         })
-        console.warn(command)
+
         const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(command))
-        if (err) return toast.error(err)
-        if (rows.length === 0) return toast.error('No results found.', { duration: 3000 })
+        if (err) return window.createToast(err, 'danger')
+
+        if (rows.length === 0) return window.createToast('No results found.', 'danger')
         found_lists = rows
         if (found_lists.length > 0) markedFile = found_lists[0].filename
-        toast.success('Query completed. Found ' + found_lists.length + ' results.', { duration: 3000 })
+        window.createToast('Query completed. Found ' + found_lists.length + ' results.', 'success')
     }
 
     const plotID = 'masspec-db-plot'
@@ -82,14 +83,24 @@
         const massfile = await Promise.all(fileChecked.map(async (f) => await path.join($DBlocation, 'massfiles', f)))
         const dataFromPython = await readMassFile(massfile)
         if (dataFromPython === null) return
-        const logScale = true
+        // const logScale = true
         plot('Masspectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
-        window.createToast('Plotting completed.', 'success', { duration: 3000 })
+        window.createToast('Plotting completed.', 'success')
     }
 
     let fileChecked = []
     $: fileSelected = fileChecked
     let markedFile = ''
+
+    let logScale = true
+    const linearlogCheck = () => {
+        const plotHTML = document.getElementById(plotID)
+        if (!plotHTML) return
+        const layout: Partial<Plotly.Layout> = {
+            yaxis: { title: 'Counts', type: logScale ? 'log' : undefined },
+        }
+        if (plotHTML?.data) relayout(plotID, layout)
+    }
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
@@ -198,7 +209,9 @@
             </div>
         {/if}
     </div>
+
     {#if fileChecked.length}
+        <Checkbox bind:value={logScale} label="log scale" on:change={linearlogCheck} />
         <div class="graph_div" id={plotID} />
     {/if}
 </div>
