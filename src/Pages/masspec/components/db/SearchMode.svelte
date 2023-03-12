@@ -198,7 +198,9 @@
             </div>
         {/if}
     </div>
-    <div class="graph_div" id={plotID} />
+    {#if fileChecked.length}
+        <div class="graph_div" id={plotID} />
+    {/if}
 </div>
 
 <style lang="scss">
