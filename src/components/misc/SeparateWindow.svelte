@@ -15,7 +15,7 @@
     export let x = 'center'
     export let y = 'center'
     export let background = '#634e96'
-    export let graphWindow: WinBox
+    export let graphWindow: WinBox = null
     export let windowReady = false
     export let maximize = true
     export let graphMode = true

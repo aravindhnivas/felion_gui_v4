@@ -1,6 +1,6 @@
 <script lang="ts">
     import { DB, fields, DBlocation, delete_from_db, status } from './stores'
-    import { Textfield, SegBtn, Radio, Checkbox } from '$src/components'
+    import { Textfield, SegBtn, Radio, Checkbox, VirtualCheckList } from '$src/components'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
 
@@ -38,21 +38,21 @@
         notes: string
     }
 
-    let filename = ''
+    // $: filename = fileChecked[0] || ''
     let found_lists: MASSDBRowType[] = []
-    $: current_filelist = found_lists?.find((row) => row.filename === filename) || {}
-    $: fileOpts = found_lists.map((row) => row.filename) || []
+    $: current_filelist = found_lists?.find((row) => row.filename === markedFile) || {}
+    $: fileOpts = found_lists.map((row) => ({ name: row.filename, id: window.getID() })) || []
     // $: console.log(current_filelist)
     const searchQuery = async (defaultCMD: string = null) => {
         if ($status !== 'connected') return toast.error('Database not connected.')
-        filename = ''
+        // filename = ''
         found_lists = []
 
         if (defaultCMD) {
             const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(defaultCMD))
             if (err) return toast.error(err)
             found_lists = rows
-            if (found_lists.length > 0) filename = found_lists[0].filename
+            if (found_lists.length > 0) fileChecked[0] = markedFile = found_lists[0].filename
             return console.log(found_lists)
         }
 
@@ -70,25 +70,32 @@
         if (err) return toast.error(err)
         if (rows.length === 0) return toast.error('No results found.', { duration: 3000 })
         found_lists = rows
-        if (found_lists.length > 0) filename = found_lists[0].filename
-        // await plotMasspec()
+        if (found_lists.length > 0) fileChecked[0] = markedFile = found_lists[0].filename
         toast.success('Query completed. Found ' + found_lists.length + ' results.', { duration: 3000 })
     }
+
     const plotID = 'masspec-db-plot'
     const sqlMode = persistentWritable('search_sql_mode', false)
     const exact_match = persistentWritable('exact_match_masspec_db', false)
 
     const plotMasspec = async () => {
-        const massfile = await path.join($DBlocation, 'massfiles', filename)
-        const dataFromPython = await readMassFile([massfile])
+        const massfile = await Promise.all(fileChecked.map(async (f) => await path.join($DBlocation, 'massfiles', f)))
+        const dataFromPython = await readMassFile(massfile)
         if (dataFromPython === null) return
-        const logScale = true
 
-        const { precursor, temperature, source, pressure } = current_filelist as MASSDBRowType
-        const title = `${precursor} at ${temperature} K from ${source} ion source at ${pressure} mbar`
-        plot(title, 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
+        const logScale = true
+        plot('Masspectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
     }
-    $: if (filename && plotID) plotMasspec()
+
+    let fileChecked = []
+    $: if (fileChecked.length && plotID) plotMasspec()
+    $: fileSelected = fileChecked
+    let markedFile = ''
+
+    const get_marked_file = ({ ctrlKey, target: { value } }) => {
+        if (!ctrlKey) return
+        markedFile = markedFile === value ? '' : value
+    }
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
@@ -129,11 +136,11 @@
         <div class="align">
             <h3>Search results: found {found_lists.length} files</h3>
             <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
-            {#if filename}
+            {#if markedFile}
                 <button
                     class="button is-danger"
                     on:click={async () => {
-                        await delete_from_db(filename)
+                        await delete_from_db(markedFile)
                         await searchQuery()
                     }}
                 >
@@ -159,7 +166,15 @@
         {#if found_lists.length}
             <div class="output__main__div">
                 <div class="left">
-                    <Radio bind:value={filename} options={fileOpts} />
+                    <!-- <Radio bind:value={filename} options={fileOpts} /> -->
+                    <VirtualCheckList
+                        on:fileselect
+                        bind:fileChecked
+                        items={fileOpts}
+                        {fileSelected}
+                        {markedFile}
+                        on:click={get_marked_file}
+                    />
                 </div>
 
                 <div>
@@ -180,9 +195,7 @@
         {/if}
     </div>
 
-    {#if filename}
-        <div class="graph_div" id={plotID} />
-    {/if}
+    <div class="graph_div" id={plotID} />
 </div>
 
 <style lang="scss">
@@ -201,6 +214,8 @@
             grid-template-columns: auto auto 1fr;
             .left {
                 display: flex;
+                overflow: auto;
+                max-height: 300px;
                 padding-right: 2em;
                 flex-direction: column;
                 border-right: solid 1px white;

@@ -7,6 +7,7 @@
 
     let className = ''
     export { className as class }
+
     export let items = []
     export let markedFile = ''
     export let fileChecked = []
