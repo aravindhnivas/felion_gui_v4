@@ -2,12 +2,10 @@
     import { DBlocation, status } from './stores'
     import { BrowseTextfield } from '$src/components'
 
-    onMount(() => {
+    onMount(async () => {
+        const sep = await path.sep
         if ($DBlocation) return
-        $DBlocation =
-            window.currentPlatform === 'win32'
-                ? '\\\\felixdisk.science.ru.nl\\felixshare2\\22pole_iontrap-exchange\\Students\\Aravindh\\MasspecDB'
-                : '//felixdisk.science.ru.nl/felixshare2/22pole_iontrap-exchange/Students/Aravindh/MasspecDB'
+        $DBlocation = `${sep}${sep}felixstorage.science.ru.nl${sep}felixstorage${sep}groups${sep}fis${sep}FELion${sep}Students${sep}Aravindh${sep}MasspecDB`
     })
 </script>
 
