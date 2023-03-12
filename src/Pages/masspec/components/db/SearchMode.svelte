@@ -7,7 +7,7 @@
     export let active = false
 
     let choices = [...fields.required, ...fields.optional].map((key) => {
-        if (key.includes('source')) return { name: key, selected: true }
+        if (key.includes('precursor')) return { name: key, selected: true }
         return { name: key, selected: false }
     })
 
