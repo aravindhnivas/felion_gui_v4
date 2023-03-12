@@ -134,17 +134,23 @@
 
     <div class="align box my-5 border-solid border-1">
         <div class="align">
-            <h3>Search results: found {found_lists.length} files</h3>
+            <h3>Search results</h3>
+            {#if found_lists.length}
+                <h3>: found {found_lists.length} files</h3>
+                <span><kbd>Ctrl</kbd> + <kbd>left-click</kbd> to mark and view file info</span>
+            {/if}
             <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
             {#if markedFile}
                 <button
                     class="button is-danger"
                     on:click={async () => {
                         await delete_from_db(markedFile)
+
+                        fileChecked = fileChecked.filter((f) => f !== markedFile)
                         await searchQuery()
                     }}
                 >
-                    Delete file from database
+                    Delete marked file from database
                 </button>
             {/if}
         </div>

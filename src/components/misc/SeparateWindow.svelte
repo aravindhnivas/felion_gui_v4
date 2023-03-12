@@ -20,7 +20,10 @@
     export let maximize = true
     export let graphMode = true
     export let autoHide = true
+    // export let onCloseFn = null
     export let mainContent$style = 'overflow: auto; padding: 0 1em 1em 1em;'
+
+    const dispatch = createEventDispatcher()
 
     async function openGraph() {
         await tick()
@@ -38,6 +41,17 @@
             onclose: function () {
                 active = false
                 windowReady = false
+                dispatch('close')
+
+                // const fn_type = onCloseFn.constructor.name
+                // if (!onCloseFn) return false
+                // if (fn_type === 'AsyncFunction') {
+                //     onCloseFn().then(() => {
+                //         console.log('onCloseFn finished')
+                //     })
+                // } else {
+                //     onCloseFn()
+                // }
                 return false
             },
             onfocus: function () {
@@ -77,7 +91,6 @@
     let fullWidth = true
 
     onMount(lookForGraph)
-
     onDestroy(() => {
         try {
             if (active && graphWindow) {
@@ -88,7 +101,6 @@
             console.warn("Couldn't close the window", error)
         }
     })
-
     let clientWidth = 0
     let currentWidth = 700
     $: graphWidth = fullWidth ? clientWidth - 50 : currentWidth

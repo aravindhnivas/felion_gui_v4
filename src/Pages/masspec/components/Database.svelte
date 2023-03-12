@@ -12,18 +12,36 @@
     const searchMode = persistentWritable('masspec-db-searchMode', false)
 
     onMount(async () => {
-        if ($status !== 'connected') return status.submit()
+        if (DB_active && $status === 'disconnected') return status.connect()
     })
 
     onDestroy(async () => {
-        if ($DB) {
-            await $DB.close()
-            console.warn('masspec database closed')
-        }
+        if (!$DB) return
+        await $DB.close()
     })
+
+    $: if (DB_active) {
+        if ($status === 'connected') status.check()
+        if ($status === 'disconnected') status.connect()
+        console.log('DB window activated', { $DB })
+        if ($DB) toast.success('Database connected.')
+    }
 </script>
 
-<SeparateWindow bind:active={DB_active} title="Database" graphMode={false}>
+<!-- {#if DB_active} -->
+<SeparateWindow
+    bind:active={DB_active}
+    title="Database"
+    graphMode={false}
+    on:close={async () => {
+        console.warn('Closing event for masspec DB')
+        if (!$DB) return
+        await $DB.close()
+        $DB = null
+        console.warn('masspec database closed')
+        console.log({ $DB })
+    }}
+>
     <svelte:fragment slot="header_content__slot">
         <Header />
     </svelte:fragment>
@@ -55,3 +73,4 @@
         </button>
     </svelte:fragment>
 </SeparateWindow>
+<!-- {/if} -->

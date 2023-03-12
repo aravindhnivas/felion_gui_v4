@@ -6,7 +6,7 @@ authors = ["A.N. Marimuthu"]
 license = "MIT"
 repository = ""
 edition = "2021"
-rust-version = "1.59"
+rust-version = "1.68"
 
 [build-dependencies]
 tauri-build = {version = "1.2", features = [] }
@@ -23,6 +23,7 @@ tokio = { version = "1.26.0", features = ["full"] }
 futures-util = "0.3.27"
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev", features = ["sqlite"] }
 # features = ["sqlite"] # or "postgres", or "mysql"
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 
 [features]
 # by default Tauri runs in production mode

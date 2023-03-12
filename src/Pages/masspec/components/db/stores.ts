@@ -8,9 +8,8 @@ export const fields = {
     optional: ['keywords', 'notes'],
 }
 
-// export const entry_values = persistentWritable('masspec-db-entry-values', {
-
-export const entry_values = writable({
+export const entry_values = persistentWritable('masspec-db-entry-values', {
+    // export const entry_values = writable({
     filename: '',
     IE: '',
     source: 'storage',
@@ -54,15 +53,15 @@ export const save_to_db = async (file_location) => {
         }
     }
 
-    const db_file_location = await path.join(get(DBlocation), 'massfiles')
+    const db_massfiles_loc = await path.join(get(DBlocation), 'massfiles')
 
-    if (!(await fs.exists(db_file_location))) {
-        const [err] = await oO(fs.createDir(db_file_location))
+    if (!(await fs.exists(db_massfiles_loc))) {
+        const [err] = await oO(fs.createDir(db_massfiles_loc))
         if (err) return toast.error(err as string)
     }
 
     const src_file = await path.join(file_location, get(entry_values).filename)
-    const dest_file = await path.join(db_file_location, get(entry_values).filename)
+    const dest_file = await path.join(db_massfiles_loc, get(entry_values).filename)
     if (await fs.exists(dest_file)) {
         const overwrite = await dialog.confirm('Do you want to overwrite the file?', {
             title: 'File already exists',
@@ -110,14 +109,17 @@ export const save_to_db = async (file_location) => {
 
 export const status = fsm('disconnected', {
     disconnected: {
-        submit: 'connecting',
+        _enter() {
+            console.log('db disconnected')
+        },
+        connect: 'connecting',
     },
 
     connecting: {
         _enter() {
+            console.log('connecting to db')
             fs.exists(get(DBlocation)).then((res) => {
                 if (!res) return this.error()
-
                 path.join(get(DBlocation), 'masspec.db').then(async (db_file) => {
                     try {
                         if (get(DB)) await get(DB).close()
@@ -138,13 +140,16 @@ export const status = fsm('disconnected', {
             return 'retry'
         },
     },
-
     retry: {
-        submit: 'connecting',
+        connect: 'connecting',
     },
-
     connected: {
-        submit: 'connecting',
+        connect: 'connecting',
+
+        check() {
+            console.log('checking db connection')
+            if (!get(DB)) return 'disconnected'
+        },
     },
 })
 
@@ -156,8 +161,8 @@ export const clear_db = async () => {
     if (err) return window.handleError(err)
 
     if (await fs.exists(get(DBlocation))) {
-        const db_file_location = await path.join(get(DBlocation), 'massfiles')
-        const [err] = await oO(fs.removeDir(db_file_location, { recursive: true }))
+        const db_massfiles_loc = await path.join(get(DBlocation), 'massfiles')
+        const [err] = await oO(fs.removeDir(db_massfiles_loc, { recursive: true }))
         if (err) return window.handleError(err)
     }
 
