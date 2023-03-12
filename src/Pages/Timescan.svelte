@@ -201,7 +201,7 @@
             >
             <ButtonBadge
                 on:click={(e) => plotData({ e: e, filetype: 'scan', tkplot: 'plot' })}
-                label="Open in Matplotlib"
+                label="Produce Figure"
             />
             <Switch on:change={linearlogCheck} bind:selected={logScale} label="Log" />
         </div>

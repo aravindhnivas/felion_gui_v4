@@ -223,7 +223,11 @@
             <Checkbox bind:value={saveInMHz} label="saveInMHz" />
             <Checkbox bind:value={showRawData} label="showRawData" />
             <Checkbox bind:value={showall} label="show all" />
-            <button class="button is-link" on:click={(e) => (open_matplotlib = true)}>Open in Matplotlib</button>
+            <button class="button is-link gap-2" on:click={() => (open_matplotlib = true)}>
+                <span>Produce Figure</span>
+                <i class="i-logos-matplotlib-icon text-xs" />
+            </button>
+            <!-- <button class="button is-link" on:click={(e) => (open_matplotlib = true)}>Produce Figure</button> -->
         </div>
     </svelte:fragment>
 

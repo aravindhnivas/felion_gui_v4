@@ -236,13 +236,15 @@
         on:click={(e) => plotData({ e: e, filetype: 'baseline' })}
         label="Create Baseline"
     />
-
     <button class="button is-link" id="felix_plotting_btn" on:click={(e) => plotData({ e: e, filetype: 'felix' })}>
         FELIX Plot
     </button>
-
     <TextSwitch style="width:7em" bind:value={deltaFELIX} label="Delta" step="0.5" />
-    <button class="button is-link" on:click={() => (active = true)}> Open in Matplotlib</button>
+    <button class="button is-link gap-2" on:click={() => (active = true)}>
+        <span>Produce Figure</span>
+        <i class="i-logos-matplotlib-icon text-xs" />
+    </button>
+
     <button class="button is-link" on:click={() => (theoryRow = !theoryRow)}>Add Theory</button>
     <button
         class="button is-link"

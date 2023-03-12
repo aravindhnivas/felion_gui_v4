@@ -119,7 +119,7 @@
         <div class="align " style="align-items: center;">
             <button class="button is-link" id={btnID} on:click={(e) => plotData({ e: e })}> Masspec Plot</button>
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
-            <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Open in Matplotlib" />
+            <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Produce Figure" />
             <Switch style="margin: 0 1em;" on:change={linearlogCheck} bind:selected={logScale} label="Log" />
             <button class="button is-warning ml-auto" on:click={() => (DB_active = true)}>
                 <span>Database</span>
