@@ -24,7 +24,7 @@
         if ($status === 'connected') status.check()
         if ($status === 'disconnected') status.connect()
         console.log('DB window activated', { $DB })
-        if ($DB) toast.success('Database connected.')
+        if ($DB) window.createToast('Database connected.', 'success')
     }
 </script>
 

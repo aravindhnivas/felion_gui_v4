@@ -44,12 +44,12 @@
     $: fileOpts = found_lists.map((row) => ({ name: row.filename, id: window.getID() })) || []
 
     const searchQuery = async (defaultCMD: string = null) => {
-        if ($status !== 'connected') return toast.error('Database not connected.')
+        if ($status !== 'connected') return window.createToast('Database not connected.', 'danger')
         found_lists = []
 
         if (defaultCMD) {
             const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(defaultCMD))
-            if (err) return toast.error(err)
+            if (err) return window.createToast(err, 'danger')
             found_lists = rows
             if (found_lists.length > 0) markedFile = found_lists[0].filename
             return console.log(found_lists)
@@ -184,7 +184,7 @@
                     <button
                         class="button is-link mt-5"
                         on:click={async ({ currentTarget }) => {
-                            if (!fileChecked.length) return toast.error('No files selected', { duration: 3000 })
+                            if (!fileChecked.length) return window.createToast('No files selected', 'danger')
                             toggle_loading(currentTarget)
                             await oO(plotMasspec())
                             toggle_loading(currentTarget)

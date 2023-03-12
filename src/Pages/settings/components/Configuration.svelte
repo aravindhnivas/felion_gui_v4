@@ -80,11 +80,7 @@
         await updateServerInfo(1500)
         if ($pyServerReady) await getPyVersion()
     }
-    // toast.promise(sleep(10000), {
-    //     loading: 'Saving...',
-    //     success: 'Settings saved!',
-    //     error: 'Could not save.',
-    // })
+
     onMount(async () => {
         try {
             LOGGER.info('Configuration mounted')
@@ -201,7 +197,6 @@
                     id="startServerButton"
                     on:click={async ({ currentTarget }) => {
                         toggle_loading(currentTarget)
-                        // await start_and_check_felionpy()
                         toast.promise(start_and_check_felionpy(), {
                             loading: 'Starting felionpy server...',
                             success: 'Server started!',

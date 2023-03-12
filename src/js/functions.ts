@@ -30,13 +30,6 @@ const toastTheme: ToastThemeOpts = <const>{
     },
 }
 
-// export const callback_toast = (message: string, theme: keyof ToastThemeOpts = 'info', options?: SvelteToastOptions) => {
-//     toast.push(message, {
-//         theme: toastTheme[theme],
-//         ...options,
-//     })
-// }
-
 type toastType = keyof ToastThemeOpts
 export const createToast = (description: string, type: toastType = 'info', opts: ToastOptions = {}) => {
     if (type === 'success') {

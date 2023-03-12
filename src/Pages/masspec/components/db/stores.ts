@@ -1,5 +1,5 @@
 import fsm from 'svelte-fsm'
-import Database from 'tauri-plugin-sql-api'
+import Database, { type QueryResult } from 'tauri-plugin-sql-api'
 
 export const DB = writable<Database>(null)
 
@@ -56,8 +56,8 @@ export const save_to_db = async (file_location) => {
     const db_massfiles_loc = await path.join(get(DBlocation), 'massfiles')
 
     if (!(await fs.exists(db_massfiles_loc))) {
-        const [err] = await oO(fs.createDir(db_massfiles_loc))
-        if (err) return toast.error(err as string)
+        const [err] = await oO<void, string>(fs.createDir(db_massfiles_loc))
+        if (err) return window.createToast(err, 'danger')
     }
 
     const src_file = await path.join(file_location, get(entry_values).filename)
@@ -70,10 +70,10 @@ export const save_to_db = async (file_location) => {
         if (!overwrite) return
     }
 
-    const [err] = await oO(fs.copyFile(src_file, dest_file))
-    if (err) return toast.error(err as string)
+    const [err] = await oO<void, string>(fs.copyFile(src_file, dest_file))
+    if (err) return window.createToast(err, 'danger')
 
-    const [err1] = await oO(
+    const [err1] = await oO<QueryResult, string>(
         get(DB).execute(
             `CREATE TABLE IF NOT EXISTS massfiles (
             filename TEXT PRIMARY KEY, 
@@ -87,11 +87,11 @@ export const save_to_db = async (file_location) => {
         )`
         )
     )
-    if (err1) return toast.error(err1 as string)
+    if (err1) return window.createToast(err1, 'danger')
 
     const { filename, IE, source, precursor, temperature, pressure, keywords, notes } = get(entry_values)
 
-    const [err2] = await oO(
+    const [err2] = await oO<QueryResult, string>(
         get(DB).execute(
             `INSERT OR REPLACE INTO massfiles (
             filename, IE, source, precursor, temperature, pressure, keywords, notes
@@ -102,9 +102,9 @@ export const save_to_db = async (file_location) => {
         )`
         )
     )
-    if (err2) return toast.error(err2 as string)
-
-    return toast.success('File saved to database')
+    if (err2) return window.createToast(err2, 'danger')
+    window.createToast('File saved to database', 'success')
+    return
 }
 
 export const status = fsm('disconnected', {
@@ -126,8 +126,8 @@ export const status = fsm('disconnected', {
                         const loc = `sqlite:${db_file}`
                         DB.set(await Database.load(loc))
                         return get(DB) ? this.success() : this.error()
-                    } catch (error) {
-                        toast.error(error)
+                    } catch (err) {
+                        window.createToast(err, 'danger')
                         this.error()
                     }
                 })
@@ -165,8 +165,7 @@ export const clear_db = async () => {
         const [err] = await oO(fs.removeDir(db_massfiles_loc, { recursive: true }))
         if (err) return window.handleError(err)
     }
-
-    toast.success('Database cleared')
+    window.createToast('Database cleared', 'success')
 }
 
 export const delete_from_db = async (filename) => {
@@ -176,17 +175,16 @@ export const delete_from_db = async (filename) => {
         title: 'Delete file',
     })
 
-    if (!delete_file) return toast.error('File not deleted')
+    if (!delete_file) return window.createToast('File not deleted', 'danger')
 
     const [err] = await oO(get(DB).execute(`DELETE FROM massfiles WHERE filename = '${filename}'`))
     if (err) return window.handleError(err)
 
     if (await fs.exists(get(DBlocation))) {
         const db_filename = await path.join(get(DBlocation), 'massfiles', filename)
-        if (!(await fs.exists(db_filename))) return toast.error('File does not exist')
+        if (!(await fs.exists(db_filename))) return window.createToast('File does not exist', 'danger')
         const [err] = await oO(fs.removeFile(db_filename))
         if (err) return window.handleError(err)
     }
-
-    toast.success('File deleted')
+    window.createToast('File deleted', 'success')
 }

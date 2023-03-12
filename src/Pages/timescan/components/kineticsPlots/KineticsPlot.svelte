@@ -119,8 +119,8 @@
 
     const compute_rate_constant = async () => {
         if (!graph_plotted.number_densities)
-            return toast.error('Please plot the number density first', { position: 'bottom-center' })
-        if (!polyOrder) return toast.error('Please enter a polynomial order', { position: 'bottom-center' })
+            return window.createToast('Please plot the number density first', 'danger')
+        if (!polyOrder) return window.createToast('Please enter a polynomial order', 'danger')
 
         rate_constant_data_loaded = false
         const dataFromPython: void | {

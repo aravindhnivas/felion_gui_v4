@@ -10,6 +10,7 @@ import {
 import { serverInfo } from '$src/Pages/settings/utils/stores'
 import { python_asset_ready } from '$src/Pages/settings/utils/stores'
 import { killPID } from '$src/Pages/settings/utils/network'
+import type { Child } from '@tauri-apps/api/shell'
 
 export const currentPortPID = persistentWritable<string[]>('pyserver-pid', [])
 
@@ -31,10 +32,9 @@ export async function startServer() {
     console.log(get(pyProgram), pyArgs)
     const py = new shell.Command(get(pyProgram), pyArgs)
 
-    const [err, pyChild] = await oO(py.spawn())
+    const [err, pyChild] = await oO<Child, string>(py.spawn())
     if (err) {
-        toast.error(err as string)
-        // window.handleError(err)
+        window.createToast(err, 'danger')
         return Promise.reject(err)
     }
 
