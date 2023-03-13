@@ -15,7 +15,7 @@ import {
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import { isEmpty, round } from 'lodash-es'
-import { startServer, stopServer } from '$src/lib/pyserver/felionpyServer'
+import { startServer, start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
 // import axios from 'axios'
 import { auto_download_and_install_assets } from './assets-status'
@@ -120,12 +120,7 @@ export function unZIP(installation_request = true) {
         install_update_without_promt.set(true)
 
         if (get(pyServerReady)) {
-            const stopServerButton = document.getElementById('stopServerButton')
-            if (stopServerButton) {
-                stopServerButton.click()
-            } else {
-                await stopServer()
-            }
+            await stopServer()
         }
 
         await remove_asset_folder()
@@ -164,14 +159,8 @@ export function unZIP(installation_request = true) {
 
             outputbox.warn('UNZIP process closed')
             python_asset_ready_to_install.set(false)
-
             await sleep(1000)
-            const startServerButton = document.getElementById('startServerButton')
-            if (startServerButton) {
-                startServerButton.click()
-            } else {
-                await startServer()
-            }
+            await start_and_check_felionpy_with_toast()
             setTimeout(() => footerMsg.set({ msg: '', status: 'idle' }), 1 * 60 * 1000)
         })
 

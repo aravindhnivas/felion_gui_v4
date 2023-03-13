@@ -3,7 +3,10 @@ import computePy_func from '$lib/pyserver/computePy'
 import { asset_download_required } from './stores'
 
 export async function getPyVersion(e?: ButtonClickEvent) {
-    if(!get(pyServerReady)) return window.createToast('start felionpy server first!', 'danger')
+    if(!get(pyServerReady)) {
+        window.createToast('start felionpy server first!', 'danger')
+        return Promise.reject('start felionpy server first!')
+    }
     const dataFromPython = await computePy_func<{ python: string; felionlib: string }>({
         e,
         target: e?.currentTarget,
@@ -13,8 +16,7 @@ export async function getPyVersion(e?: ButtonClickEvent) {
 
     if (!dataFromPython) {
         window.createToast('Could not access pyfile', 'danger')
-        console.warn({ dataFromPython })
-        return
+        return Promise.reject('Could not access pyfile')
     }
 
     pyVersion.set(dataFromPython.python)
@@ -23,4 +25,6 @@ export async function getPyVersion(e?: ButtonClickEvent) {
     if (get(felionlibVersion) < import.meta.env.VITE_FELIONPY_MIN_VERSION) {
         asset_download_required.set(true)
     }
+
+    return Promise.resolve(dataFromPython)
 }

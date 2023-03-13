@@ -10,76 +10,24 @@
         developerMode,
         pyServerReady,
         felionlibVersion,
+        serverCurrentStatus,
     } from '$lib/pyserver/stores'
     import { LOGGER, serverInfo, python_asset_ready } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
     import Badge from '@smui-extra/badge'
-    import { startServer, stopServer, currentPortPID } from '$src/lib/pyserver/felionpyServer'
+    import {
+        stopServer,
+        currentPortPID,
+        fetchServerROOT,
+        checkServerProblem,
+        updateServerInfo,
+        start_and_check_felionpy_with_toast,
+    } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
-    // import { toggle_loading } from '../utils/misc'
     import { check_felionpy_assets_status } from '../utils/assets-status'
     import { install_felionpy_from_zipfile } from '../utils/download-assets'
-    // import axios from 'axios'
-
-    // let showServerControls: boolean
-    let serverCurrentStatus: OutputBoxtype = { value: '', type: 'info' }
-
-    const dispatch_server_status = ({ closed }) => {
-        if (closed) {
-            serverCurrentStatus = { value: 'server closed', type: 'danger' }
-            dispatch('serverStatusChanged', { closed: true })
-            return
-        }
-
-        serverCurrentStatus = { value: `server running: port(${$pyServerPORT})`, type: 'success' }
-        dispatch('serverStatusChanged', { closed: false })
-    }
-
-    const fetchServerROOT = async (delay = 0) => {
-        if (delay > 0) await sleep(delay)
-
-        const [_err, rootpage] = await oO(axios.get<{ string }>(`http://localhost:${$pyServerPORT}/`))
-        if (_err) return serverInfo.error(`failed to fetch rootpage /`)
-
-        $pyServerReady = true
-
-        serverInfo.success(rootpage.data)
-        dispatch_server_status({ closed: false })
-    }
-
-    const updateServerInfo = async (delay = 0) => {
-        serverCurrentStatus = { value: 'checking server status...', type: 'info' }
-        serverInfo.info(serverCurrentStatus.value)
-
-        if (delay > 0) await sleep(delay)
-
-        if (!$pyServerReady) {
-            serverCurrentStatus = { value: 'server closed', type: 'danger' }
-            return
-        }
-        const status = await checkNetstat()
-        if (!status) {
-            dispatch_server_status({ closed: true })
-            return
-        }
-
-        await fetchServerROOT(delay)
-    }
-
-    const dispatch = createEventDispatcher()
-
-    export const start_and_check_felionpy = async () => {
-        if (!$developerMode && !$python_asset_ready)
-            return serverInfo.error('felionpy is not installed. Maybe check-felionpy-assets?')
-
-        const out = await startServer()
-        if (out) serverInfo.info(out)
-        serverInfo.info(`PID: ${JSON.stringify($currentPortPID)}`)
-        await updateServerInfo(1500)
-        if ($pyServerReady) await getPyVersion()
-    }
 
     onMount(async () => {
         try {
@@ -99,8 +47,8 @@
         <div class="tag is-warning">
             {$pyVersion ? `Python ${$pyVersion} (felionlib ${$felionlibVersion})` : 'Python undefined'}
         </div>
-        <div class="tag is-{serverCurrentStatus.type}">
-            {serverCurrentStatus.value}
+        <div class="tag is-{$serverCurrentStatus.type}">
+            {$serverCurrentStatus.value}
         </div>
 
         {#if $developerMode}
@@ -111,7 +59,12 @@
             <button class="button is-link" on:click={() => ($developerMode = !$developerMode)}>
                 Developer mode: {$developerMode}
             </button>
-            <button class="button is-link" on:click={getPyVersion}>getPyVersion</button>
+            <button
+                class="button is-link"
+                on:click={async (e) => {
+                    await oO(getPyVersion(e))
+                }}>getPyVersion</button
+            >
         </div>
 
         {#if $developerMode}
@@ -191,20 +144,11 @@
                 {#if $developerMode}
                     <Switch bind:selected={$serverDebug} label="debug mode" />
                 {/if}
-
                 <button
                     class="button is-link"
                     id="startServerButton"
-                    on:click={async ({ currentTarget }) => {
-                        toggle_loading(currentTarget)
-                        toast.promise(start_and_check_felionpy(), {
-                            loading: 'Starting felionpy server...',
-                            success: 'Server started!',
-                            error: 'Could not start server.',
-                        })
-                        toggle_loading(currentTarget)
-                    }}
-                    disabled={$pyServerReady && serverCurrentStatus.value.includes('running')}
+                    on:click={start_and_check_felionpy_with_toast}
+                    disabled={$pyServerReady && $serverCurrentStatus.value.includes('running')}
                 >
                     STARTserver
                     {#if !$pyServerReady}
@@ -212,18 +156,18 @@
                     {/if}
                 </button>
 
-                {#if $pyServerReady && serverCurrentStatus.value.includes('running')}
-                    <button
-                        class="button is-danger"
-                        id="stopServerButton"
-                        on:click={async () => {
-                            await stopServer()
-                            await updateServerInfo()
-                        }}
-                    >
-                        STOPserver
-                    </button>
+                {#if $pyServerReady && $serverCurrentStatus.value.includes('running')}
+                    <button class="button is-danger" id="stopServerButton" on:click={stopServer}> STOPserver </button>
                 {/if}
+                <button
+                    class="button is-warning ml-auto"
+                    id="fixServerButton"
+                    on:click={async () => {
+                        await checkServerProblem()
+                    }}
+                >
+                    Check server PROBLEM
+                </button>
             </div>
             <div class="align">
                 <button

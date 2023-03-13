@@ -1,5 +1,6 @@
 import computefromServer from './computefromServer'
 import computefromSubprocess from './computefromSubprocess'
+import { start_and_check_felionpy_with_toast } from './felionpyServer'
 import { pyServerReady, get, developerMode, pyProgram } from './stores'
 // import { startServer } from './felionpyServer'
 // import { confirm } from '@tauri-apps/api/dialog'
@@ -56,9 +57,7 @@ export default async function <T>({ e, target, pyfile, args, general }: Type) {
                 console.log(result)
                 if (!result) return
 
-                const startServerButton = document.getElementById('startServerButton')
-                if (!startServerButton) return
-                startServerButton.click()
+                await start_and_check_felionpy_with_toast()
             }
             dataFromPython = await computefromServer({
                 target,

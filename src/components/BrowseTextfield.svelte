@@ -1,13 +1,13 @@
 <script lang="ts">
     import { Textfield } from '$src/components'
     import IconButton, { Icon } from '@smui/icon-button'
-    export let value: string = ''
+    export let value: typeof type = ''
     export let label: string = ''
     export let browseBtn: boolean = true
     export let dir: boolean = true
     export let filetype: string = ''
     export let lock: boolean | null = null
-    export let type: string = 'text'
+    export let type: string | number = 'text'
     export let updateMode: boolean | null = null
     export let style: string = ''
 
@@ -47,7 +47,7 @@
     {#if browseBtn}
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
-    <Textfield disabled={lock ?? false} bind:value {label} {type} />
+    <Textfield disabled={lock ?? false} bind:value {label} input$type={type} />
     <button
         class="i-material-symbols-folder-open-outline"
         on:click={async () => {

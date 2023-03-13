@@ -23,6 +23,7 @@ export const currentTab = persistentWritable('settingsActiveTab', 'Configuration
 export const serverDebug = persistentWritable('serverDebug', false)
 export const pythonPath = persistentWritable('pythonPath', '')
 export const pythonScript = persistentWritable('pythonScript', '')
+export const serverCurrentStatus = persistentWritable<OutputBoxtype>('serverCurrentStatus', { value: '', type: 'info' })
 
 export const pyChildProcess = writable<Child>(null)
 export { get }

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentTab } from '$lib/pyserver/stores'
+    import { currentTab, serverCurrentStatus } from '$lib/pyserver/stores'
     import Changelog from '$src/components/misc/Changelog.svelte'
     import { Configuration, About, Update, Credits, Console } from './settings/components/'
     import { Badge } from '$src/components'
@@ -7,7 +7,7 @@
     import { updateInterval } from '$src/sveltewritables'
     import { check_felionpy_assets_status } from './settings/utils/assets-status'
     import { unZIP } from './settings/utils/download-assets'
-
+    import { start_and_check_felionpy } from '$src/lib/pyserver/felionpyServer'
     const tabs = ['Configuration', 'Update', 'About', 'Credits', 'Console']
     const id = 'Settings'
 
@@ -22,6 +22,7 @@
         display = localStorage.getItem('active_tab') === id ? 'block' : 'none'
         updateBadge = document.getElementById(`settings-badge-Update`)
         configBadge = document.getElementById(`settings-badge-Configuration`)
+        console.log(configBadge)
         navbarBadgeSettings = document.getElementById(`navbar-badge-${id}`)
     })
 
@@ -33,7 +34,6 @@
         }
     })
 
-    let start_and_check_felionpy: () => Promise<void> = null
     let check_for_update: () => Promise<void> = null
 
     const warningStatuses = [false, false]
@@ -42,23 +42,20 @@
         const no_active_status = warningStatuses.every((element) => element === false)
         navbarBadgeSettings.style.backgroundColor = no_active_status ? '' : 'var(--color-danger)'
     }
-    // $: console.log('update interval', $updateInterval)
+
     $: if (import.meta.env.PROD && $updateInterval) {
         if (updateIntervalCycle) {
-            console.warn('Update interval cleared')
             clearInterval(updateIntervalCycle)
         }
         updateIntervalCycle = setInterval(async () => {
-            // if ($install_dialog_active) return window.createToast('Please wait for the installation to finish')
             await check_for_update()
         }, $updateInterval * 60 * 1000)
         console.warn('Update interval set')
     }
+
     onMount(async () => {
         LOGGER.info('Settings page mounted')
         if (import.meta.env.DEV) return
-        // updateIntervalCycle = setInterval(check_for_update, $updateInterval * 60 * 1000)
-
         if ($assets_installation_required) {
             const [_err] = await oO(unZIP(false))
         }
@@ -67,6 +64,14 @@
         await start_and_check_felionpy()
         await check_for_update()
     })
+
+    const serverStatusUpdate = (closed) => {
+        console.log('server closed', closed)
+        configBadge.style.backgroundColor = closed ? 'var(--color-danger)' : ''
+        warningStatuses[0] = closed
+        updateSettingStatus()
+    }
+    $: configBadge && serverStatusUpdate($serverCurrentStatus?.value?.includes('closed'))
 </script>
 
 <Changelog />
@@ -90,16 +95,7 @@
         </div>
 
         <div class="mainContainer box">
-            <Configuration
-                bind:start_and_check_felionpy
-                on:serverStatusChanged={({ detail: { closed } }) => {
-                    console.log('server closed', closed)
-                    configBadge.style.backgroundColor = closed ? 'var(--color-danger)' : ''
-                    warningStatuses[0] = closed
-                    updateSettingStatus()
-                }}
-            />
-
+            <Configuration />
             <Update
                 bind:check_for_update
                 on:updateStatusChange={(e) => {
