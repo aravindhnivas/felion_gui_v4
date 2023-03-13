@@ -134,9 +134,13 @@ export const status = fsm('disconnected', {
             })
         },
 
-        success: 'connected',
+        success() {
+            window.createToast('Database connected.', 'success')
+            return 'connected'
+        },
 
         error() {
+            window.createToast('Database connection failed.', 'danger')
             return 'retry'
         },
     },

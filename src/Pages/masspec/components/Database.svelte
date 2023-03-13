@@ -9,7 +9,7 @@
     export let filenames: string[] = []
 
     // let DB = writable<Database | null>(null)
-    const searchMode = persistentWritable('masspec-db-searchMode', false)
+    const searchMode = persistentWritable('masspec-db-searchMode', true)
 
     onMount(async () => {
         if (DB_active && $status === 'disconnected') return status.connect()
@@ -20,12 +20,12 @@
         await $DB.close()
     })
 
-    $: if (DB_active) {
+    const update_db_status = () => {
         if ($status === 'connected') status.check()
         if ($status === 'disconnected') status.connect()
-        console.log('DB window activated', { $DB })
-        if ($DB) window.createToast('Database connected.', 'success')
     }
+
+    $: if (DB_active) update_db_status()
 </script>
 
 <!-- {#if DB_active} -->
