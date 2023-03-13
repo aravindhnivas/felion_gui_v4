@@ -45,6 +45,7 @@
             }
         })
     }
+
     setContext('lookForGraph', lookForGraph)
     setContext('changeGraphDivWidth', changeGraphDivWidth)
 

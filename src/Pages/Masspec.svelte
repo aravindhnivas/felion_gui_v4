@@ -115,16 +115,23 @@
 <Database bind:DB_active filenames={fullfileslist} file_location={currentLocation} />
 
 <Layout {display} {filetype} {id} bind:currentLocation bind:fileChecked bind:fullfileslist>
+    <svelte:fragment slot="toggle_row">
+        <button
+            aria-label={'Common masspectrum Database (felixstorage network drive)'}
+            data-cooltipz-dir={'right'}
+            class="button is-warning ml-auto"
+            on:click={() => (DB_active = true)}
+        >
+            <span>Database</span>
+            <i class="i-mdi-database-arrow-down text-xs" />
+        </button>
+    </svelte:fragment>
     <svelte:fragment slot="buttonContainer">
         <div class="align " style="align-items: center;">
             <button class="button is-link" id={btnID} on:click={(e) => plotData({ e: e })}> Masspec Plot</button>
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
             <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Produce Figure" />
             <Switch style="margin: 0 1em;" on:change={linearlogCheck} bind:selected={logScale} label="Log" />
-            <button class="button is-warning ml-auto" on:click={() => (DB_active = true)}>
-                <span>Database</span>
-                <i class="i-mdi-database-arrow-down text-xs" />
-            </button>
         </div>
     </svelte:fragment>
 
