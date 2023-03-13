@@ -47,7 +47,7 @@
     {#if browseBtn}
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
-    <Textfield disabled={lock ?? false} bind:value {label} input$type={type} />
+    <Textfield disabled={lock ?? false} bind:value {label} input$type={type} on:change />
     <button
         class="i-material-symbols-folder-open-outline"
         on:click={async () => {

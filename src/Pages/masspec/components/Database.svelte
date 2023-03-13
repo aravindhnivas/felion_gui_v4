@@ -28,7 +28,6 @@
     $: if (DB_active) update_db_status()
 </script>
 
-<!-- {#if DB_active} -->
 <SeparateWindow
     bind:active={DB_active}
     title="Database"
@@ -47,30 +46,36 @@
     </svelte:fragment>
 
     <svelte:fragment slot="main_content__slot">
-        <EntryMode active={!$searchMode} {filenames} />
-        <SearchMode active={$searchMode} />
+        {#if $status === 'connected'}
+            <EntryMode active={!$searchMode} {filenames} />
+            <SearchMode active={$searchMode} />
+        {/if}
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
-        <button class="button is-link" on:click={() => ($searchMode = !$searchMode)}>
-            Switch to {$searchMode ? 'Entry mode' : 'Search mode'}
-        </button>
+        {#if $status === 'connected'}
+            <button class="button is-link" on:click={() => ($searchMode = !$searchMode)}>
+                Switch to {$searchMode ? 'Entry mode' : 'Search mode'}
+            </button>
+        {/if}
     </svelte:fragment>
     <svelte:fragment slot="footer_content__slot">
-        {#if import.meta.env.DEV}
-            <button class="button is-danger" on:click={clear_db}> Clear database </button>
-        {/if}
+        {#if $status === 'connected'}
+            {#if import.meta.env.DEV}
+                <button class="button is-danger" on:click={clear_db}> Clear database </button>
+            {/if}
 
-        <button
-            class="button is-link"
-            on:click={async ({ currentTarget }) => {
-                toggle_loading(currentTarget)
-                await save_to_db(file_location)
-                toggle_loading(currentTarget)
-            }}
-        >
-            Save
-        </button>
+            <button
+                class="button is-link"
+                on:click={async ({ currentTarget }) => {
+                    toggle_loading(currentTarget)
+                    await save_to_db(file_location)
+                    toggle_loading(currentTarget)
+                }}
+            >
+                Save
+            </button>
+        {/if}
     </svelte:fragment>
 </SeparateWindow>
 <!-- {/if} -->

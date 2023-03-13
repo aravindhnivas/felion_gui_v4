@@ -16,7 +16,8 @@
         class="three_col_browse"
         label="Database location {$status !== 'connected' ? '(Mount drive to connect to database)' : ''}"
         bind:value={$DBlocation}
-        lock={true}
+        on:change={status.connect}
+        lock={$status === 'connected'}
     />
     <button class="button is-link" class:is-loading={$status === 'connecting'} on:click={status.connect}
         >{$status}</button
@@ -28,7 +29,9 @@
     {/if}
 </div>
 
-<div class="flex" style="gap: 0.5em;">
-    <span class="tag is-warning">TABLE: massfiles</span>
-    <span class="tag is-warning">FILE: masspec.db</span>
-</div>
+{#if $status === 'connected'}
+    <div class="flex" style="gap: 0.5em;">
+        <span class="tag is-warning">TABLE: massfiles</span>
+        <span class="tag is-warning">FILE: masspec.db</span>
+    </div>
+{/if}

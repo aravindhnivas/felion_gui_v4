@@ -132,92 +132,92 @@
             >
         </div>
     </div>
-
-    <div class="align box my-5 border-solid border-1">
-        <div class="align">
-            <h3>Search results</h3>
-            {#if found_lists.length}
+    {#if found_lists.length}
+        <div class="align box my-5 border-solid border-1">
+            <div class="align">
+                <h3>Search results</h3>
                 <h3>: found {found_lists.length} files</h3>
                 <span><kbd>Ctrl</kbd> + <kbd>left-click</kbd> on filename to mark and view file info</span>
-            {/if}
-            <Checkbox
-                aria-label={'SQL SELECT commands'}
-                data-cooltipz-dir={'left'}
-                class="ml-auto"
-                bind:value={$sqlMode}
-                label="SQL command mode"
-            />
-            {#if markedFile}
-                <button
-                    class="button is-danger"
-                    on:click={async () => {
-                        await delete_from_db(markedFile)
 
-                        fileChecked = fileChecked.filter((f) => f !== markedFile)
-                        await searchQuery()
+                <Checkbox
+                    aria-label={'SQL SELECT commands'}
+                    data-cooltipz-dir={'left'}
+                    class="ml-auto"
+                    bind:value={$sqlMode}
+                    label="SQL command mode"
+                />
+                {#if markedFile}
+                    <button
+                        class="button is-danger"
+                        on:click={async () => {
+                            await delete_from_db(markedFile)
+
+                            fileChecked = fileChecked.filter((f) => f !== markedFile)
+                            await searchQuery()
+                        }}
+                    >
+                        Delete marked file from database
+                    </button>
+                {/if}
+            </div>
+
+            {#if $sqlMode}
+                <Textfield
+                    style="width: 100%;"
+                    label="Sqlite3 query"
+                    bind:value={$SQLcommand}
+                    on:keyup={async (e) => {
+                        if (e.key !== 'Enter') return
+                        const value = e.target.value
+                        await searchQuery(value)
                     }}
-                >
-                    Delete marked file from database
-                </button>
+                />
+            {/if}
+
+            {#if found_lists.length}
+                <div class="output__main__div">
+                    <div class="left">
+                        <VirtualCheckList
+                            on:fileselect
+                            bind:fileChecked
+                            items={fileOpts}
+                            {fileSelected}
+                            markfiletype="mass"
+                            bind:markedFile
+                        />
+                        <button
+                            class="button is-link mt-5"
+                            on:click={async ({ currentTarget }) => {
+                                if (!fileChecked.length) return window.createToast('No files selected', 'danger')
+                                toggle_loading(currentTarget)
+                                await oO(plotMasspec())
+                                toggle_loading(currentTarget)
+                            }}>Plot selected files</button
+                        >
+                    </div>
+
+                    <div>
+                        {#each Object.keys(current_filelist) as label (label)}
+                            <div class="mr-2">{label}:</div>
+                        {/each}
+                    </div>
+                    <div>
+                        {#each Object.keys(current_filelist) as label (label)}
+                            <div>{current_filelist[label] || '-'}</div>
+                        {/each}
+                    </div>
+                </div>
+            {:else}
+                <div class="output__main__div">
+                    <span>No results</span>
+                </div>
             {/if}
         </div>
 
-        {#if $sqlMode}
-            <Textfield
-                style="width: 100%;"
-                label="Sqlite3 query"
-                bind:value={$SQLcommand}
-                on:keyup={async (e) => {
-                    if (e.key !== 'Enter') return
-                    const value = e.target.value
-                    await searchQuery(value)
-                }}
-            />
+        {#if fileChecked.length}
+            <Checkbox bind:value={logScale} label="log scale" on:change={linearlogCheck} />
+            <div class="graph_div" id={plotID} />
         {/if}
-
-        {#if found_lists.length}
-            <div class="output__main__div">
-                <div class="left">
-                    <VirtualCheckList
-                        on:fileselect
-                        bind:fileChecked
-                        items={fileOpts}
-                        {fileSelected}
-                        markfiletype="mass"
-                        bind:markedFile
-                    />
-                    <button
-                        class="button is-link mt-5"
-                        on:click={async ({ currentTarget }) => {
-                            if (!fileChecked.length) return window.createToast('No files selected', 'danger')
-                            toggle_loading(currentTarget)
-                            await oO(plotMasspec())
-                            toggle_loading(currentTarget)
-                        }}>Plot selected files</button
-                    >
-                </div>
-
-                <div>
-                    {#each Object.keys(current_filelist) as label (label)}
-                        <div class="mr-2">{label}:</div>
-                    {/each}
-                </div>
-                <div>
-                    {#each Object.keys(current_filelist) as label (label)}
-                        <div>{current_filelist[label] || '-'}</div>
-                    {/each}
-                </div>
-            </div>
-        {:else}
-            <div class="output__main__div">
-                <span>No results</span>
-            </div>
-        {/if}
-    </div>
-
-    {#if fileChecked.length}
-        <Checkbox bind:value={logScale} label="log scale" on:change={linearlogCheck} />
-        <div class="graph_div" id={plotID} />
     {/if}
 </div>
 
