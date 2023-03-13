@@ -53,7 +53,7 @@
 
     <svelte:fragment slot="left_footer_content__slot">
         <button class="button is-link" on:click={() => ($searchMode = !$searchMode)}>
-            Toggle {$searchMode ? 'Entry mode' : 'Search mode'}
+            Switch to {$searchMode ? 'Entry mode' : 'Search mode'}
         </button>
     </svelte:fragment>
     <svelte:fragment slot="footer_content__slot">
