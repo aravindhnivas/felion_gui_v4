@@ -2990,10 +2990,10 @@ pkg-types@^1.0.1, pkg-types@^1.0.2:
     mlly "^1.1.1"
     pathe "^1.1.0"
 
-plotly.js-basic-dist@^2.18.2:
-  version "2.18.2"
-  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-2.18.2.tgz#d44836e087d6d6413b9f711074772388f19ecadd"
-  integrity sha512-0eF3nteaXZMbsDaHHWdgddYdKS7VL5MyP7yaqTnS2S+aWAXHJhsKVUeuk9/Zd31cSMHOuk6Zv9NUQaPyyB9GIA==
+plotly.js-basic-dist@^2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-2.19.0.tgz#435e459dbcfafcc8cc4047ddd5ed479579a1d042"
+  integrity sha512-qYgQqsT7yJjUjrVmLiZSUwQBX0McSj5b15qkDH6SGoLCBJW/sQhyoEI/b8DZr85hKX4zagcTWaVCMpITuLb76g==
 
 postcss@^8.4.21:
   version "8.4.21"
@@ -3251,10 +3251,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-check@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-3.1.2.tgz#333233dc67b36f67271f849f337de494ff77986a"
-  integrity sha512-8nIPXPe8TiUiWPCAoegU+l1NaL5DKLnN6+H1dJqbjkD6IkhpDTMj2q8Z88lhCOsq1F3E7st5/Vn7eGeGkSo/aA==
+svelte-check@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-3.1.4.tgz#79481ee89dce0a6251153696f85a66699ef556fd"
+  integrity sha512-25Lb46ZS4IK/XpBMe4IBMrtYf23V8alqBX+szXoccb7uM0D2Wqq5rMRzYBONZnFVuU1bQG3R50lyIT5eRewv2g==
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.17"
     chokidar "^3.4.1"
