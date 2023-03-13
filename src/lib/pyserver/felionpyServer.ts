@@ -68,22 +68,15 @@ export async function startServer() {
     return Promise.resolve('server started')
 }
 
-export async function stopServer() {
+export async function stopServer({update_info = true}={}) {
     try {
-        if (!get(pyServerReady)) {
-            if (get(currentPortPID).length > 0) {
-                await killPID()
-            }
-            serverInfo.warn('Server already stopped')
-            return
-        }
-
-        if (get(pyChildProcess).kill) {
-            await get(pyChildProcess).kill()
-        }
+        if (!get(pyServerReady)) return await killPID({update_info})
+        if (!get(pyChildProcess).kill)  return serverInfo.error('pyChildProcess not found')
+        await get(pyChildProcess).kill()
 
         pyServerReady.set(false)
-        await updateServerInfo()
+        if (update_info) await updateServerInfo()
+
         return Promise.resolve(true)
     } catch (error) {
         if (error instanceof Error) {

@@ -15,9 +15,8 @@ import {
 import { platform } from '@tauri-apps/api/os'
 import { invoke } from '@tauri-apps/api'
 import { isEmpty, round } from 'lodash-es'
-import { startServer, start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
+import { start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
 import { footerMsg } from '$src/layout/main/footer_utils/stores'
-// import axios from 'axios'
 import { auto_download_and_install_assets } from './assets-status'
 
 let assets_downloading = false
@@ -120,7 +119,7 @@ export function unZIP(installation_request = true) {
         install_update_without_promt.set(true)
 
         if (get(pyServerReady)) {
-            await stopServer()
+            await stopServer({update_info: false})
         }
 
         await remove_asset_folder()

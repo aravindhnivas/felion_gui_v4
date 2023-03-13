@@ -1,4 +1,4 @@
-import { currentPortPID } from '$src/lib/pyserver/felionpyServer'
+import { currentPortPID, updateServerInfo } from '$src/lib/pyserver/felionpyServer'
 import { pyServerPORT, pyServerReady } from '$src/lib/pyserver/stores'
 import { serverInfo } from './stores'
 
@@ -38,7 +38,7 @@ export const checkNetstat = async () => {
     return true
 }
 
-export const killPID = async () => {
+export const killPID = async ({update_info = true}={}) => {
     
     const fullports = get(currentPortPID)
 
@@ -50,19 +50,24 @@ export const killPID = async () => {
             darwin: ['-9', port],
             linux: ['-9', port],
         }
+    
         const currentplatform = await platform()
         const command = currentplatform === 'win32' ? `taskkill-${await platform()}` : 'taskkill-darwin'
         const [_err, output] = await oO(new shell.Command(command, args[await platform()]).execute())
 
         if (_err) return window.handleError(_err)
         currentPortPID.update((ports) => ports.filter((p) => p !== port))
+    
         if (output.stderr) {
             return serverInfo.error(output.stdout)
         }
+        
         serverInfo.success(output.stdout)
     }
+
     for (const port of fullports) {
         await kill(port)
     }
     pyServerReady.set(false)
+    if(update_info) await updateServerInfo()
 }
