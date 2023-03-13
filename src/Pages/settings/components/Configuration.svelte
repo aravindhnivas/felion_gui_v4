@@ -12,7 +12,7 @@
         felionlibVersion,
         serverCurrentStatus,
     } from '$lib/pyserver/stores'
-    import { LOGGER, serverInfo, python_asset_ready } from '../utils/stores'
+    import { LOGGER, serverInfo } from '../utils/stores'
     import { BrowseTextfield, Switch, Textfield, OutputBox } from '$src/components'
     import { getPyVersion } from '../utils/checkPython'
     import { checkNetstat, killPID } from '../utils/network'
@@ -22,7 +22,6 @@
         currentPortPID,
         fetchServerROOT,
         checkServerProblem,
-        updateServerInfo,
         start_and_check_felionpy_with_toast,
     } from '$src/lib/pyserver/felionpyServer'
     import { invoke } from '@tauri-apps/api/tauri'
