@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v4.9.4
+
+- Masspec DB bug fix
+- Masspec DB code improvements
+- Bug fix on server start and stop
+
 ## v4.9.3
 
 - Single instance lock added (only one instance of the app can run at a time)
