@@ -105,12 +105,11 @@
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
     <span>Select fields to include in search</span>
-
     <SegBtn {choices} style="width: 100%;" on:selected={(e) => update_search_field(e.detail)} />
 
     <div class="align border-solid border-1 rounded-xl p-5">
-        <span>Enter search keywords on resp. selected fields</span>
-        <Checkbox bind:value={$exact_match} label="match exact word" />
+        <span>Enter search keywords on selected fields</span>
+        <Checkbox class="align" bind:value={$exact_match} label="match exact word(s)" />
 
         <div
             class="align"
@@ -141,7 +140,13 @@
                 <h3>: found {found_lists.length} files</h3>
                 <span><kbd>Ctrl</kbd> + <kbd>left-click</kbd> on filename to mark and view file info</span>
             {/if}
-            <Checkbox class="ml-auto" bind:value={$sqlMode} label="SQL command mode" />
+            <Checkbox
+                aria-label={'SQL SELECT commands'}
+                data-cooltipz-dir={'left'}
+                class="ml-auto"
+                bind:value={$sqlMode}
+                label="SQL command mode"
+            />
             {#if markedFile}
                 <button
                     class="button is-danger"

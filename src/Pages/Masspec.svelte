@@ -117,9 +117,10 @@
 <Layout {display} {filetype} {id} bind:currentLocation bind:fileChecked bind:fullfileslist>
     <svelte:fragment slot="toggle_row">
         <button
-            aria-label={'Common masspectrum Database (felixstorage network drive)'}
+            aria-label={'Common masspectrum Database (FIS network)'}
             data-cooltipz-dir={'right'}
-            class="button is-warning ml-auto"
+            class="button is-link"
+            style="background-color: #ffb84c8c;"
             on:click={() => (DB_active = true)}
         >
             <span>Database</span>

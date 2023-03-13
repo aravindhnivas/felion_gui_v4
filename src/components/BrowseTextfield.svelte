@@ -43,7 +43,7 @@
     }
 </script>
 
-<div class={className} {style}>
+<div class={className} {style} {...$$restProps}>
     {#if browseBtn}
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
