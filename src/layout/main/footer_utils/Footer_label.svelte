@@ -1,44 +1,44 @@
 <script lang="ts">
     import { pyServerReady } from '$lib/pyserver/stores'
+    import { start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
     import {
         python_asset_ready,
-        python_asset_ready_to_install,
         installing_python_assets,
+        python_asset_ready_to_install,
     } from '$src/Pages/settings/utils/stores'
     import { activePage } from '$src/sveltewritables'
 </script>
 
-<div class="navbar-item" style="gap: 0.5em;">
-    {#if !$pyServerReady}
-        <div
-            role="presentation"
-            class="tag is-danger"
-            style="cursor: pointer;"
-            on:click={() => {
-                $activePage = 'Settings'
-            }}
-        >
-            python server not ready
-        </div>
-    {/if}
+<div class="navbar-item py-0" style="gap: 0.5em;">
+    <div aria-label="click to {$pyServerReady ? 'stop' : 'start'} python server" data-cooltipz-dir="top">
+        {#if !$pyServerReady}
+            <button
+                class="i-mdi-server-off bg-red text-xs"
+                on:click={async () => {
+                    await start_and_check_felionpy_with_toast()
+                }}
+            />
+        {:else}
+            <button
+                class="i-mdi-server bg-green-300 text-xs"
+                on:click={async () => {
+                    await stopServer()
+                    window.createToast('python server stopped', 'success')
+                }}
+            />
+        {/if}
+    </div>
 
     {#if !$python_asset_ready}
-        <div
-            role="presentation"
-            class="tag is-danger"
-            style="cursor: pointer;"
-            on:click={() => {
-                $activePage = 'Settings'
-            }}
-        >
-            python assets are missing
+        <div aria-label="python assets missing" data-cooltipz-dir="top">
+            <button class="i-subway-missing bg-red text-xs" on:click={() => ($activePage = 'Settings')} />
         </div>
     {/if}
 
     {#if $python_asset_ready_to_install && !$installing_python_assets}
         <div
             role="presentation"
-            class="tag is-warning"
+            class="tag is-warning gap-2"
             style="cursor: pointer;"
             aria-label={'click to install'}
             data-cooltipz-dir={'top'}
@@ -47,7 +47,8 @@
                 if (installBtn) installBtn.click()
             }}
         >
-            felionpy assets ready to install
+            <span style="color: black;">felionpy assets ready to install</span>
+            <i class="i-ic-baseline-install-desktop" />
         </div>
     {/if}
 </div>
