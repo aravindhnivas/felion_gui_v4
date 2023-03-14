@@ -120,7 +120,7 @@
             aria-label={'Common masspectrum Database (FIS network)'}
             data-cooltipz-dir={'right'}
             class="button is-link"
-            style="background-color: #ffb84c8c;"
+            style="background-color: #ffb84c36;"
             on:click={() => (DB_active = true)}
         >
             <span>Database</span>

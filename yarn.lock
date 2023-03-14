@@ -2696,16 +2696,6 @@ lodash@^4.17.21:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
-lord-icon-element@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/lord-icon-element/-/lord-icon-element-4.0.3.tgz#a10a2965f1bbf583b86e88d86ea34daa37c896d8"
-  integrity sha512-/WFartBG/So19mHRx0+ax6zbCWwvTZyCeTp5JHPg2fucaXONHbfB/uKto6sZrQh6YohpZywO0+6F96EcnVKp6Q==
-
-lottie-web@^5.10.2:
-  version "5.10.2"
-  resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.10.2.tgz#a1c952b6734759fcd369eba73b6b7e3d9a76ce0b"
-  integrity sha512-d0PFIGiwuMsJYaF4uPo+qG8dEorlI+xFI2zrrFtE1bGO4WoLIz+NjremxEq1swpR7juR10aeOtmNh3d6G3ub0A==
-
 lower-case@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-2.0.2.tgz#6fa237c63dbdc4a82ca0fd882e4722dc5e634e28"

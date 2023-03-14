@@ -62,13 +62,6 @@
         },
 
         {
-            primary: 'Lordicons',
-            secondary: ['Animated icons by Lordicon.com'],
-            link: 'https://lordicon.com/',
-            id: window.getID(),
-        },
-
-        {
             primary: 'Animate.css',
             secondary: ['Just-add-water CSS animations'],
             id: window.getID(),

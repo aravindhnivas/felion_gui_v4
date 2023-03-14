@@ -7,14 +7,14 @@
         {#if $footerMsg.status === 'running'}
             <div class="icon-footer">
                 <span>{$footerMsg.msg}</span>
-                <lord-icon trigger="loop" src="/assets/icons/lottie/loader.json" />
+                <i class="i-line-md-uploading-loop" />
             </div>
         {/if}
 
         {#if $footerMsg.status === 'done'}
             <div class="icon-footer">
                 <span>Download completed</span>
-                <lord-icon trigger="hover" src="/assets/icons/lottie/confetti.json" />
+                <i class="i-material-symbols-download-done-sharp" />
             </div>
         {/if}
     </div>
