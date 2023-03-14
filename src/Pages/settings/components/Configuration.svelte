@@ -87,13 +87,7 @@
         {/if}
 
         {#if import.meta.env.DEV}
-            <BrowseTextfield
-                class="three_col_browse"
-                label="felionpy"
-                bind:value={$felionpy}
-                dir={false}
-                lock={$developerMode}
-            />
+            <BrowseTextfield class="three_col_browse" label="felionpy" bind:value={$felionpy} dir={false} lock={true} />
         {/if}
 
         <button
