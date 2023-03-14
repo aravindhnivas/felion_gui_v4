@@ -1,6 +1,7 @@
 <script lang="ts">
     import { pyServerReady } from '$lib/pyserver/stores'
     import { start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
+    import { check_felionpy_assets_status } from '$src/Pages/settings/utils/assets-status'
     import {
         python_asset_ready,
         installing_python_assets,
@@ -30,8 +31,13 @@
     </div>
 
     {#if !$python_asset_ready}
-        <div aria-label="python assets missing" data-cooltipz-dir="top">
-            <button class="i-subway-missing bg-red text-xs" on:click={() => ($activePage = 'Settings')} />
+        <div aria-label="click to check python assets" data-cooltipz-dir="top">
+            <button
+                class="i-subway-missing bg-red text-xs"
+                on:click={async () => {
+                    await check_felionpy_assets_status()
+                }}
+            />
         </div>
     {/if}
 
