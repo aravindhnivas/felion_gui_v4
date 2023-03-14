@@ -126,12 +126,13 @@
                 />
 
                 <BrowseTextfield
-                    type="number"
-                    bind:value={$pyServerPORT}
-                    label="serverPORT"
-                    browseBtn={false}
                     lock={true}
+                    type="number"
+                    browseBtn={false}
+                    label="serverPORT"
+                    folder_icon={false}
                     style="display: flex;"
+                    bind:value={$pyServerPORT}
                 />
 
                 {#if $developerMode}
