@@ -8,13 +8,13 @@
     export let filetype: string = ''
     export let lock: boolean | null = null
     export let type: string | number = 'text'
-    export let updateMode: boolean | null = null
     export let style: string = ''
+    export let updateMode: boolean | null = null
 
     let className: string = ''
     export { className as class }
+    export let folder_icon = true
 
-    // console.warn(mdiIcons)
     const dispatch = createEventDispatcher()
     const update = async (e: { currentTarget: HTMLElement }) => {
         e.currentTarget.classList.add('animate__rotateIn')
@@ -48,13 +48,15 @@
         <button disabled={lock ?? false} class="button is-link" on:click={browse_folder}>Browse</button>
     {/if}
     <Textfield disabled={lock ?? false} bind:value {label} input$type={type} on:change />
-    <button
-        class="i-material-symbols-folder-open-outline"
-        on:click={async () => {
-            if (!(await fs.exists(value))) return window.createToast(`Directory does not exist`, 'danger')
-            await shell.open(value)
-        }}
-    />
+    {#if folder_icon}
+        <button
+            class="i-material-symbols-folder-open-outline"
+            on:click={async () => {
+                if (!(await fs.exists(value))) return window.createToast(`Directory does not exist`, 'danger')
+                await shell.open(value)
+            }}
+        />
+    {/if}
     {#if updateMode !== null}
         <div
             role="presentation"
