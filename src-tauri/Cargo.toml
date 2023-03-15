@@ -1,6 +1,6 @@
 [package]
 name = "feliongui"
-version = "4.9.3"
+version = "4.9.4"
 description = "FELion spectrum analyser for FELIX data"
 authors = ["A.N. Marimuthu"]
 license = "MIT"

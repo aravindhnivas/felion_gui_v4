@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v4.9.4(UNRELEASED)
+## v4.9.4
 
 - Masspec DB bug fix
 - Masspec DB code improvements
