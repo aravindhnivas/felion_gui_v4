@@ -1,6 +1,6 @@
 <script lang="ts">
     import { slide } from 'svelte/transition'
-    import { Textfield, VirtualCheckList } from '$src/components'
+    import { Textfield, VirtualCheckList, RefreshButtons } from '$src/components'
     import MenuSurface from '@smui/menu-surface'
     import VSplitPane from 'svelte-split-pane/src/VSplitPane.svelte'
 
@@ -107,15 +107,10 @@
 <div class="top__div px-1 mb-3 box {className}">
     <div class="mr-auto">
         <button class="i-mdi-arrow-back" on:click={() => changeDirectory('..')} />
-        <button
-            class="animate__animated animate__faster i-mdi-refresh"
-            on:click={({ currentTarget }) => {
-                currentTarget.classList.add('animate__rotateIn')
+        <RefreshButtons
+            on:refresh={() => {
                 keepfiles = true
                 refresh = !refresh
-            }}
-            on:animationend={({ currentTarget }) => {
-                currentTarget.classList.remove('animate__rotateIn')
             }}
         />
         <button

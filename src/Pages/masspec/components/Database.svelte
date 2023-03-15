@@ -2,17 +2,13 @@
     import { save_to_db, status, DB, clear_db } from './db/stores'
     import { SeparateWindow } from '$src/components'
     import { EntryMode, SearchMode, Header } from './db/'
-    // import Database from 'tauri-plugin-sql-api'
-
     export let DB_active = false
     export let file_location = ''
     export let filenames: string[] = []
 
-    // let DB = writable<Database | null>(null)
-    const searchMode = persistentWritable('masspec-db-searchMode', true)
-
+    let searchMode = true
     onMount(async () => {
-        if (DB_active && $status === 'disconnected') return status.connect()
+        if (DB_active && $status === 'disconnected') status.connect()
     })
 
     onDestroy(async () => {
@@ -33,12 +29,9 @@
     title="Database"
     graphMode={false}
     on:close={async () => {
-        console.warn('Closing event for masspec DB')
         if (!$DB) return
         await $DB.close()
         $DB = null
-        console.warn('masspec database closed')
-        console.log({ $DB })
     }}
 >
     <svelte:fragment slot="header_content__slot">
@@ -47,15 +40,15 @@
 
     <svelte:fragment slot="main_content__slot">
         {#if $status === 'connected'}
-            <EntryMode active={!$searchMode} {filenames} />
-            <SearchMode active={$searchMode} />
+            <EntryMode active={!searchMode} {filenames} />
+            <SearchMode active={searchMode} />
         {/if}
     </svelte:fragment>
 
     <svelte:fragment slot="left_footer_content__slot">
         {#if $status === 'connected'}
-            <button class="button is-link" on:click={() => ($searchMode = !$searchMode)}>
-                Switch to {$searchMode ? 'Entry mode' : 'Search mode'}
+            <button class="button is-link" on:click={() => (searchMode = !searchMode)}>
+                Switch to {searchMode ? 'Entry mode' : 'Search mode'}
             </button>
         {/if}
     </svelte:fragment>

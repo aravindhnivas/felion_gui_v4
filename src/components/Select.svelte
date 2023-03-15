@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { RefreshButtons } from '$src/components'
+
     export let options: string[] = []
     export let label = ''
     export let value: string[] | string = ''
@@ -69,17 +71,7 @@
         </div>
 
         {#if update}
-            <div
-                role="presentation"
-                class="animate__animated animate__faster"
-                on:animationend={({ currentTarget }) => currentTarget.classList.remove('animate__rotateIn')}
-                on:click={({ currentTarget }) => {
-                    currentTarget.classList.add('animate__rotateIn')
-                    update?.()
-                }}
-            >
-                <div class="i-mdi-refresh" />
-            </div>
+            <RefreshButtons on:refresh={() => update()} />
         {/if}
     </div>
 </div>
