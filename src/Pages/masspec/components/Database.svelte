@@ -20,7 +20,6 @@
         if ($status === 'connected') status.check()
         if ($status === 'disconnected') status.connect()
     }
-
     $: if (DB_active) update_db_status()
 </script>
 

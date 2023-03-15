@@ -5,25 +5,17 @@
         installing_python_assets,
         python_asset_ready_to_install,
     } from '$src/Pages/settings/utils/stores'
-    import { start_and_check_felionpy_with_toast, stopServer } from '$src/lib/pyserver/felionpyServer'
+    import { start_and_check_felionpy_with_toast } from '$src/lib/pyserver/felionpyServer'
     import { check_felionpy_assets_status } from '$src/Pages/settings/utils/assets-status'
 </script>
 
 <div class="navbar-item py-0" style="gap: 0.5em;">
-    <div aria-label="click to {$pyServerReady ? 'stop' : 'start'} python server" data-cooltipz-dir="top">
+    <div aria-label="click to  start python server" data-cooltipz-dir="top">
         {#if !$pyServerReady}
             <button
                 class="i-mdi-server-off bg-red text-xs"
                 on:click={async () => {
                     await start_and_check_felionpy_with_toast()
-                }}
-            />
-        {:else}
-            <button
-                class="i-mdi-server bg-green-300 text-xs"
-                on:click={async () => {
-                    await stopServer()
-                    window.createToast('python server stopped', 'success')
                 }}
             />
         {/if}
