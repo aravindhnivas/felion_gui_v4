@@ -40,6 +40,7 @@
     }
 
     let found_lists: MASSDBRowType[] = []
+
     $: current_filelist = found_lists?.find((row) => row.filename === markedFile) || {}
     $: fileOpts = found_lists.map((row) => ({ name: row.filename, id: window.getID() })) || []
 
@@ -119,7 +120,7 @@
             }}
         >
             {#each Object.keys(search_fields) as label (label)}
-                <Textfield {label} bind:value={search_fields[label]} />
+                <Textfield label={`Enter ${label}`} bind:value={search_fields[label]} variant="outlined" />
             {/each}
 
             <button
