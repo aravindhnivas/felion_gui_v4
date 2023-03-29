@@ -1,14 +1,16 @@
 <script lang="ts">
     import { showConfirm } from '$src/lib/alert/store'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import { Switch, ButtonBadge } from '$src/components'
+    import { Switch, ButtonBadge, STable, Textfield } from '$src/components'
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
-    import { readMassFile } from './masspec/mass'
+    import { detectPeaks, readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
     import Database from './masspec/components/Database.svelte'
     import { DB_active, DB_window, DB } from './masspec/components/db/stores'
+    import Select from '$src/components/Select.svelte'
+    import Table from '$src/components/tables/Table.svelte'
     export let id = 'Masspec'
     export let display = 'grid'
     export let saveLocationToDB = false
@@ -40,6 +42,7 @@
 
     let selected_file = ''
 
+    let plotted_data: { [name: string]: { x: number[]; y: number[] } } = {}
     async function plotData({
         e = undefined,
         filetype = 'mass',
@@ -96,9 +99,25 @@
         if (filetype == 'mass' && massfiles) {
             const dataFromPython = await readMassFile(massfiles, btnID)
             if (dataFromPython === null) return
-            plot('Mass spectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale, true)
+            plot('Mass spectrum', 'm/z', 'Counts', dataFromPython, plotID, logScale, true)
+            console.log({ dataFromPython, massfiles })
+
+            for (const file in dataFromPython) {
+                plotted_data[file] = { x: dataFromPython[file].x, y: dataFromPython[file].y }
+            }
+            added_traces = false
+            peak_detection.filename = fileChecked[0]
             return
         }
+    }
+
+    const normalize_data = () => {
+        if (!normalize_wrt_mz) return
+        const data = plotted_data[peak_detection.filename]
+        const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
+        peak_data = peak_data.map((peak) => {
+            return { ...peak, ynorm: Number((peak.y / data.y[ind]).toFixed(2)) }
+        })
     }
     const linearlogCheck = () => {
         const layout: Partial<Plotly.Layout> = {
@@ -109,6 +128,58 @@
     }
     let fullfileslist: string[] = []
     let logScale = true
+    let peak_detection = {
+        threshold: 30,
+        window: 4,
+        filename: '',
+    }
+
+    let added_traces = false
+    let peak_data: { x: number; y: number; ynorm: number; id: string }[] = []
+
+    const findPeaks = (windowWidth, threshold) => {
+        if (!(peak_detection.filename && windowWidth && threshold)) return
+        const data = plotted_data[peak_detection.filename]
+        const indices = detectPeaks({
+            data: data.y,
+            windowWidth,
+            threshold,
+        })
+        if (fileChecked.length > 0 && added_traces) deleteTraces(plotID, [-1])
+        const peaks = {
+            x: indices.map((i) => data.x[i]),
+            y: indices.map((i) => data.y[i]),
+        }
+        normalize_wrt_mz = peaks.x[0].toString()
+        const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
+        const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(2)))
+        peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
+
+        addTraces(plotID, [
+            { ...peaks, mode: 'markers', name: `Peaks for ${peak_detection.filename}`, marker: { color: 'black' } },
+        ])
+        added_traces = true
+    }
+
+    $: findPeaks(peak_detection.window, peak_detection.threshold)
+    let normalize_wrt_mz = ''
+
+    let IE = ''
+    const save_peak_data = async () => {
+        const filename = `${peak_detection.filename.replace(
+            '.mass',
+            ''
+        )}_peaks_normalized_w.r.t_${normalize_wrt_mz}.txt`
+        let contents = `# m/z\tcounts\tnormalized\n`
+        if (IE) contents += `# IE: ${IE} eV\n`
+
+        peak_data.forEach((peak) => {
+            contents += `${peak.x}\t${peak.y}\t${peak.ynorm}\n`
+        })
+        const [err] = await oO(fs.writeTextFile(await path.join(currentLocation, filename), contents))
+        if (err) return window.createToast(err, 'danger')
+        window.createToast(`${filename} saved`, 'success')
+    }
 </script>
 
 {#if saveLocationToDB}
@@ -142,6 +213,32 @@
 
     <svelte:fragment slot="plotContainer">
         <div id={plotID} class="graph__div" />
+
+        {#if fileChecked.length > 0}
+            <div class="align">
+                <Select bind:value={peak_detection.filename} options={fileChecked} label="Select file to find peaks" />
+                <Textfield
+                    input$type="number"
+                    input$min="1"
+                    label="Threshold (>= counts)"
+                    bind:value={peak_detection.threshold}
+                />
+                <Textfield input$type="number" input$min="1" label="window size" bind:value={peak_detection.window} />
+                <Select
+                    label="Normalize w.r.t"
+                    options={peak_data.map((p) => `${p.x}`)}
+                    bind:value={normalize_wrt_mz}
+                    on:change={normalize_data}
+                />
+                <Textfield label="IE (eV)" bind:value={IE} />
+                <button class="button is-link ml-auto" on:click={async () => await save_peak_data()}>Save data</button>
+            </div>
+            <STable
+                rows={peak_data}
+                headKeys={['m/z', 'counts', `Normalized w.r.t m/z ${normalize_wrt_mz}`]}
+                rowKeys={['x', 'y', 'ynorm']}
+            />
+        {/if}
     </svelte:fragment>
 
     <svelte:fragment slot="config">

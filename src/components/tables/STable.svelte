@@ -69,7 +69,8 @@
                         <Cell style="width: 4em;"># {rows.length}</Cell>
                     {/if}
                     {#each headKeys as key, i (key)}
-                        <Cell on:click={() => sortTable(rowKeys[i])}>
+                        <!-- <Cell on:click={() => sortTable(rowKeys[i])}> -->
+                        <Cell>
                             <div class="header_cell has-background-link">
                                 <span>{key}</span>
                                 {#if sortable}
