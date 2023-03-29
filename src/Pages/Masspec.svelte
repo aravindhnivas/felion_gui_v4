@@ -1,16 +1,17 @@
 <script lang="ts">
     import { showConfirm } from '$src/lib/alert/store'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import { Switch, ButtonBadge, SeparateWindow } from '$src/components'
+    import { Switch, ButtonBadge } from '$src/components'
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
     import { readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
     import Database from './masspec/components/Database.svelte'
+    import { DB_active, DB_window, DB } from './masspec/components/db/stores'
     export let id = 'Masspec'
     export let display = 'grid'
-    export let saveLocationToDB = true
+    export let saveLocationToDB = false
 
     const filetype = 'mass'
     const uniqueID = `${id}-${window.getID()}`
@@ -109,10 +110,12 @@
     }
     let fullfileslist: string[] = []
     let logScale = true
-    let DB_active = false
+    // let DB_active = false
 </script>
 
-<Database bind:DB_active filenames={fullfileslist} file_location={currentLocation} />
+{#if saveLocationToDB}
+    <Database filenames={fullfileslist} file_location={currentLocation} />
+{/if}
 
 <Layout {display} {filetype} {id} bind:currentLocation bind:fileChecked bind:fullfileslist>
     <svelte:fragment slot="toggle_row">
@@ -121,14 +124,17 @@
             data-cooltipz-dir={'right'}
             class="button is-link"
             style="background-color: #ffb84c36;"
-            on:click={() => (DB_active = true)}
+            on:click={() => {
+                if ($DB && $DB_window) return $DB_window.maximize()
+                $DB_active = true
+            }}
         >
             <span>Database</span>
             <i class="i-mdi-database-arrow-down text-xs" />
         </button>
     </svelte:fragment>
     <svelte:fragment slot="buttonContainer">
-        <div class="align " style="align-items: center;">
+        <div class="align" style="align-items: center;">
             <button class="button is-link" id={btnID} on:click={(e) => plotData({ e: e })}> Masspec Plot</button>
             <GetLabviewSettings {currentLocation} {fullfileslist} {fileChecked} />
             <ButtonBadge on:click={(e) => plotData({ e, filetype: 'general' })} label="Produce Figure" />

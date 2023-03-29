@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { save_to_db, status, DB, clear_db } from './db/stores'
+    import { save_to_db, status, DB, clear_db, DB_active, DB_window } from './db/stores'
     import { SeparateWindow } from '$src/components'
     import { EntryMode, SearchMode, Header } from './db/'
-    export let DB_active = false
+    // export let graphWindow = false
     export let file_location = ''
     export let filenames: string[] = []
 
     let searchMode = true
     onMount(async () => {
-        if (DB_active && $status === 'disconnected') status.connect()
+        if ($DB_active && $status === 'disconnected') status.connect()
     })
 
     onDestroy(async () => {
@@ -20,13 +20,14 @@
         if ($status === 'connected') status.check()
         if ($status === 'disconnected') status.connect()
     }
-    $: if (DB_active) update_db_status()
+    $: if ($DB_active) update_db_status()
 </script>
 
 <SeparateWindow
-    bind:active={DB_active}
+    bind:active={$DB_active}
     title="Database"
     graphMode={false}
+    bind:graphWindow={$DB_window}
     on:close={async () => {
         if (!$DB) return
         await $DB.close()

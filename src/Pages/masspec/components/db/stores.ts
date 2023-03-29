@@ -192,3 +192,6 @@ export const delete_from_db = async (filename) => {
     }
     window.createToast('File deleted', 'success')
 }
+
+export const DB_active = writable(false)
+export const DB_window = writable<WinBox>(null)

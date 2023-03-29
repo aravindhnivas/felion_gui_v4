@@ -6,7 +6,7 @@
     onMount(async () => {
         const sep = await path.sep
         if ($DBlocation) return
-        $DBlocation = `${sep}${sep}felixstorage.science.ru.nl${sep}felixstorage${sep}groups${sep}fis${sep}FELion${sep}Students${sep}Aravindh${sep}MasspecDB`
+        $DBlocation = `${sep}${sep}felixstorage.science.ru.nl${sep}felixstorage${sep}groups${sep}fis${sep}FELion${sep}MasspecDB`
         LOGGER.info({ $DBlocation })
     })
 </script>
