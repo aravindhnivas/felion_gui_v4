@@ -77,6 +77,8 @@
         found_lists = rows
         if (found_lists.length > 0) markedFile = found_lists[0].filename
         window.createToast('Query completed. Found ' + found_lists.length + ' results.', 'success')
+        await tick()
+        searchDiv?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
 
     const plotID = 'masspec-db-plot'
@@ -88,9 +90,11 @@
         const massfile = await Promise.all(fileChecked.map(async (f) => await path.join($DBlocation, 'massfiles', f)))
         const dataFromPython = await readMassFile(massfile)
         if (dataFromPython === null) return
-        // const logScale = true
         plot('Masspectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale)
+
         window.createToast('Plotting completed.', 'success')
+        await tick()
+        searchDiv?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
 
     let fileChecked = []
@@ -106,12 +110,12 @@
         }
         if (plotHTML?.data) relayout(plotID, layout)
     }
-
+    let searchDiv: HTMLDivElement
     let set_range = false
     let [range_min, range_max] = ['0', '']
 </script>
 
-<div class:hide={!active} class="main__div p-2" style="overflow: auto;">
+<div bind:this={searchDiv} class:hide={!active} class="main__div p-2" style="overflow: auto;">
     <span>Select fields to include in search</span>
     <SegBtn {choices} style="width: 100%;" on:selected={(e) => update_search_field(e.detail)} />
 
