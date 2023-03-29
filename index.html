@@ -9,8 +9,20 @@
     </head>
 
     <body>
-        <div id="app">loading please wait...</div>
+        <div id="app">
+            <div class="loader__div">loading please wait...</div>
+        </div>
 
+        <style>
+            .loader__div {
+                display: flex;
+                align-items: center;
+                padding: 1em;
+                border: solid 1px white;
+                margin: 1em;
+                border-radius: 1em;
+            }
+        </style>
         <script src="/assets/js/ckeditor.js"></script>
         <script type="module" src="/src/main.ts"></script>
     </body>
