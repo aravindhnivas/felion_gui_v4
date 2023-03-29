@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v4.10.0
+
+- Loading screen added
+- New feature: Masspec normalization
+- Minor bug fixes
+
+---
+
 ## v4.9.4
 
 - Masspec DB bug fix
