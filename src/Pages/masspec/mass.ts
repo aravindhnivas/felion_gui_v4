@@ -30,7 +30,7 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
             console.info('content read: ', name)
             const dataContents = fileContents
                 .split('\n')
-                .filter((line) => !line.includes('#'))
+                .filter((line) => line && !line.includes('#'))
                 .map((line) =>
                     line
                         .trim()
@@ -38,8 +38,11 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
                         .map((data) => parseFloat(data))
                 )
 
-            console.info(name, 'filtered')
-            const [x, y] = dataContents[0].map((_, colIndex) => dataContents.map((row) => row[colIndex]))
+            console.info({dataContents}, name, 'filtered')
+            console.info(dataContents[0])
+            const [x, y] = dataContents[0].map((_, colIndex) => {
+                return dataContents.filter((row) => !isNaN(row[0])).map((row) => row[colIndex])
+            })
             const mode = 'lines'
             const showlegend = true
             console.info(name, 'done\n')

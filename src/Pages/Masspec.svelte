@@ -97,7 +97,6 @@
             const dataFromPython = await readMassFile(massfiles, btnID)
             if (dataFromPython === null) return
             plot('Mass spectrum', 'Mass [u]', 'Counts', dataFromPython, plotID, logScale, true)
-            // graphPlotted = true
             return
         }
     }
@@ -110,7 +109,6 @@
     }
     let fullfileslist: string[] = []
     let logScale = true
-    // let DB_active = false
 </script>
 
 {#if saveLocationToDB}

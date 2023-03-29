@@ -9,7 +9,6 @@ export const fields = {
 }
 
 export const entry_values = persistentWritable('masspec-db-entry-values', {
-    // export const entry_values = writable({
     filename: '',
     IE: '',
     source: 'storage',
@@ -18,7 +17,6 @@ export const entry_values = persistentWritable('masspec-db-entry-values', {
     pressure: '',
     keywords: '',
     notes: '',
-
     reset: () => {
         entry_values.update((v) => {
             v.filename = ''
@@ -33,6 +31,7 @@ export const entry_values = persistentWritable('masspec-db-entry-values', {
         })
     },
 })
+export const masscan_range = writable([])
 
 export const DBlocation = persistentWritable<string>('masspec-db-location', '')
 
@@ -70,9 +69,6 @@ export const save_to_db = async (file_location) => {
         if (!overwrite) return
     }
 
-    const [err] = await oO<void, string>(fs.copyFile(src_file, dest_file))
-    if (err) return window.createToast(err, 'danger')
-
     const [err1] = await oO<QueryResult, string>(
         get(DB).execute(
             `CREATE TABLE IF NOT EXISTS massfiles (
@@ -83,26 +79,34 @@ export const save_to_db = async (file_location) => {
             temperature TEXT, 
             pressure TEXT, 
             keywords TEXT, 
-            notes TEXT
+            notes TEXT,
+            mzfrom INTEGER,
+            mzto INTEGER
         )`
         )
     )
     if (err1) return window.createToast(err1, 'danger')
-
+    console.warn('table created')
     const { filename, IE, source, precursor, temperature, pressure, keywords, notes } = get(entry_values)
 
+    console.log(`${get(masscan_range)[0]}, ${get(masscan_range)[1]}`)
     const [err2] = await oO<QueryResult, string>(
         get(DB).execute(
             `INSERT OR REPLACE INTO massfiles (
-            filename, IE, source, precursor, temperature, pressure, keywords, notes
+            filename, IE, source, precursor, temperature, pressure, keywords, notes, mzfrom, mzto
         ) VALUES 
         (
             '${filename}', '${IE}', '${source}', '${precursor}', 
-            '${temperature}', '${pressure}', '${keywords}', '${notes}'
+            '${temperature}', '${pressure}', '${keywords}', '${notes}',
+            '0', '${get(masscan_range)[1]}'
         )`
         )
     )
     if (err2) return window.createToast(err2, 'danger')
+
+    const [err] = await oO<void, string>(fs.copyFile(src_file, dest_file))
+    if (err) return window.createToast(err, 'danger')
+
     window.createToast('File saved to database', 'success')
     return
 }
@@ -161,7 +165,9 @@ export const clear_db = async () => {
     if (get(status) !== 'connected') return
     const clear = await dialog.confirm('Are you sure you want to clear the database?', { title: 'Clear database' })
     if (!clear) return
-    const [err] = await oO(get(DB).execute(`DELETE FROM massfiles`))
+
+    // const [err] = await oO(get(DB).execute(`DELETE FROM massfiles`))
+    const [err] = await oO(get(DB).execute(`DROP TABLE massfiles`))
     if (err) return window.handleError(err)
 
     if (await fs.exists(get(DBlocation))) {

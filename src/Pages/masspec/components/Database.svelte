@@ -40,7 +40,7 @@
 
     <svelte:fragment slot="main_content__slot">
         {#if $status === 'connected'}
-            <EntryMode active={!searchMode} {filenames} />
+            <EntryMode active={!searchMode} {filenames} {file_location} />
             <SearchMode active={searchMode} />
         {/if}
     </svelte:fragment>

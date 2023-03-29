@@ -1,8 +1,23 @@
 <script lang="ts">
-    import { entry_values } from './stores'
+    import { entry_values, masscan_range } from './stores'
     import { Select, Textfield } from '$src/components'
+    import { readMassFile } from '$src/Pages/masspec/mass'
+
     export let active = false
+    export let file_location: string = ''
     export let filenames: string[] = []
+
+    // let [range_from, range_to] = ['', '']
+
+    const read_file = async (filename: string) => {
+        if (!filename) return
+        const file = await path.join(file_location, filename)
+        const contents = await readMassFile([file])
+        const { x } = contents[filename]
+        $masscan_range = [x[0], x.at(-1)]
+    }
+
+    $: read_file($entry_values.filename)
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
@@ -16,6 +31,10 @@
     <Textfield variant="outlined" label="Enter IE (eV)" bind:value={$entry_values.IE} />
 
     <Select label="Select ion-source type" bind:value={$entry_values.source} options={['storage', 'non-storage']} />
+
+    <div class="tag is-warning ml-auto">
+        Range: {$masscan_range[0]} - {$masscan_range[1]} m/z
+    </div>
 
     <hr />
 

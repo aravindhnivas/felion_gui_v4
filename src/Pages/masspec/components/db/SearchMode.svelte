@@ -1,9 +1,9 @@
 <script lang="ts">
     import { DB, fields, DBlocation, delete_from_db, status } from './stores'
     import { Textfield, SegBtn, Checkbox, VirtualCheckList } from '$src/components'
+    // import Slider from '@smui/slider'
     import { plot } from '$src/js/functions'
     import { readMassFile } from '../../mass'
-
     export let active = false
 
     let choices = [...fields.required, ...fields.optional].map((key) => {
@@ -58,13 +58,17 @@
 
         let command = 'SELECT * from massfiles WHERE'
         const substr = $exact_match ? '' : '%'
-
         Object.keys(search_fields).forEach((key, ind) => {
             if (search_fields[key]) {
                 command += ` ${key} ${$exact_match ? '=' : 'LIKE'} '${substr}${search_fields[key]}${substr}'`
                 if (ind < Object.keys(search_fields).length - 1) command += ' AND'
             }
         })
+
+        if (set_range) {
+            if (range_min) command += ` AND mzfrom >= ${range_min}`
+            if (range_max) command += ` AND mzto <= ${range_max}`
+        }
 
         const [err, rows] = await oO<MASSDBRowType[], string>($DB.select(command))
         if (err) return window.createToast(err, 'danger')
@@ -102,6 +106,9 @@
         }
         if (plotHTML?.data) relayout(plotID, layout)
     }
+
+    let set_range = false
+    let [range_min, range_max] = ['0', '']
 </script>
 
 <div class:hide={!active} class="main__div p-2" style="overflow: auto;">
@@ -122,16 +129,24 @@
             {#each Object.keys(search_fields) as label (label)}
                 <Textfield label={`Enter ${label}`} bind:value={search_fields[label]} variant="outlined" />
             {/each}
-
-            <button
-                class="button is-link ml-auto"
-                on:click={async ({ currentTarget }) => {
-                    toggle_loading(currentTarget)
-                    await searchQuery()
-                    toggle_loading(currentTarget)
-                }}>Submit</button
-            >
         </div>
+
+        <div class="align">
+            <Checkbox bind:value={set_range} label="set m/z range" />
+            {#if set_range}
+                <Textfield style="width: 5em;" label="min" bind:value={range_min} />
+                <Textfield style="width: 5em;" label="max" bind:value={range_max} />
+            {/if}
+        </div>
+
+        <button
+            class="button is-link ml-auto"
+            on:click={async ({ currentTarget }) => {
+                toggle_loading(currentTarget)
+                await searchQuery()
+                toggle_loading(currentTarget)
+            }}>Submit</button
+        >
     </div>
     {#if found_lists.length}
         <div class="align box my-5 border-solid border-1">
@@ -229,6 +244,12 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        .slider__div {
+            width: 500px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+        }
 
         .output__main__div {
             width: 100%;
