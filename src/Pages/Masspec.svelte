@@ -135,31 +135,29 @@
         window: 4,
         filename: '',
     }
-
-    // let added_traces = false
     let peak_data: { x: number; y: number; ynorm: number; id: string }[] = []
 
-    const findPeaks = (windowWidth, threshold) => {
-        if (!(peak_detection.filename && windowWidth && threshold)) return
+    const findPeaks = () => {
         const data = plotted_data[peak_detection.filename]
         const indices = detectPeaks({
             data: data.y,
-            windowWidth,
-            threshold,
+            windowWidth: peak_detection.window,
+            threshold: peak_detection.threshold,
         })
-        // if (fileChecked.length > 0 && added_traces) deleteTraces(plotID, [-1])
+
+        if (indices.length < 1) return
         const peaks = {
             x: indices.map((i) => data.x[i]),
             y: indices.map((i) => data.y[i]),
         }
-        normalize_wrt_mz = peaks.x[0].toString()
+
+        normalize_wrt_mz = peaks.x[0]?.toString()
+        if (!normalize_wrt_mz || isNaN(Number(normalize_wrt_mz))) return
+
         const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
         const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(2)))
         peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
 
-        // addTraces(plotID, [
-        //     { ...peaks, mode: 'markers', name: `Peaks for ${peak_detection.filename}`, marker: { color: 'black' } },
-        // ])
         const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
         const shapes: Partial<Plotly.Shape>[] = indices.map((i) => {
             const x = data.x[i]
@@ -177,12 +175,10 @@
                 },
             }
         })
-
         relayout(plotID, { shapes })
-        // added_traces = true
     }
 
-    $: if (peak_detection.filename && include_peaks) findPeaks(peak_detection.window, peak_detection.threshold)
+    $: if (include_peaks && peak_detection.filename && peak_detection.window && peak_detection.threshold) findPeaks()
     let normalize_wrt_mz = ''
 
     let IE = ''
