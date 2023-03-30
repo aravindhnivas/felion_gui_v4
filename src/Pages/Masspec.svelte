@@ -10,7 +10,10 @@
     import Database from './masspec/components/Database.svelte'
     import { DB_active, DB_window, DB } from './masspec/components/db/stores'
     import Select from '$src/components/Select.svelte'
-    import Table from '$src/components/tables/Table.svelte'
+
+    import colors from '$lib/misc/colors'
+    import Checkbox from '$src/components/Checkbox.svelte'
+
     export let id = 'Masspec'
     export let display = 'grid'
     export let saveLocationToDB = false
@@ -105,8 +108,7 @@
             for (const file in dataFromPython) {
                 plotted_data[file] = { x: dataFromPython[file].x, y: dataFromPython[file].y }
             }
-            added_traces = false
-            peak_detection.filename = fileChecked[0]
+            peak_detection.filename = fileChecked.at(-1)
             return
         }
     }
@@ -134,7 +136,7 @@
         filename: '',
     }
 
-    let added_traces = false
+    // let added_traces = false
     let peak_data: { x: number; y: number; ynorm: number; id: string }[] = []
 
     const findPeaks = (windowWidth, threshold) => {
@@ -145,7 +147,7 @@
             windowWidth,
             threshold,
         })
-        if (fileChecked.length > 0 && added_traces) deleteTraces(plotID, [-1])
+        // if (fileChecked.length > 0 && added_traces) deleteTraces(plotID, [-1])
         const peaks = {
             x: indices.map((i) => data.x[i]),
             y: indices.map((i) => data.y[i]),
@@ -155,13 +157,32 @@
         const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(2)))
         peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
 
-        addTraces(plotID, [
-            { ...peaks, mode: 'markers', name: `Peaks for ${peak_detection.filename}`, marker: { color: 'black' } },
-        ])
-        added_traces = true
+        // addTraces(plotID, [
+        //     { ...peaks, mode: 'markers', name: `Peaks for ${peak_detection.filename}`, marker: { color: 'black' } },
+        // ])
+        const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
+        const shapes: Partial<Plotly.Shape>[] = indices.map((i) => {
+            const x = data.x[i]
+            const y = data.y[i]
+            return {
+                type: 'line',
+                x0: x,
+                y0: y,
+                x1: x,
+                y1: 1,
+                line: {
+                    color: `rgb${colors[fileInd]}`,
+                    width: 1,
+                    dash: 'dashdot',
+                },
+            }
+        })
+
+        relayout(plotID, { shapes })
+        // added_traces = true
     }
 
-    $: findPeaks(peak_detection.window, peak_detection.threshold)
+    $: if (peak_detection.filename && include_peaks) findPeaks(peak_detection.window, peak_detection.threshold)
     let normalize_wrt_mz = ''
 
     let IE = ''
@@ -180,6 +201,7 @@
         if (err) return window.createToast(err, 'danger')
         window.createToast(`${filename} saved`, 'success')
     }
+    let include_peaks = true
 </script>
 
 {#if saveLocationToDB}
@@ -202,6 +224,7 @@
             <i class="i-mdi-database-arrow-down text-xs" />
         </button>
     </svelte:fragment>
+
     <svelte:fragment slot="buttonContainer">
         <div class="align" style="align-items: center;">
             <button class="button is-link" id={btnID} on:click={(e) => plotData({ e: e })}> Masspec Plot</button>
@@ -216,21 +239,35 @@
 
         {#if fileChecked.length > 0}
             <div class="align">
+                <Switch
+                    bind:selected={include_peaks}
+                    label="include peaks"
+                    on:change={() => {
+                        if (!include_peaks) relayout(plotID, { shapes: [] })
+                    }}
+                />
                 <Select bind:value={peak_detection.filename} options={fileChecked} label="Select file to find peaks" />
                 <Textfield
+                    style="width: 7em;"
                     input$type="number"
                     input$min="1"
-                    label="Threshold (>= counts)"
+                    label="threshold count"
                     bind:value={peak_detection.threshold}
                 />
-                <Textfield input$type="number" input$min="1" label="window size" bind:value={peak_detection.window} />
+                <Textfield
+                    style="width: 5em;"
+                    input$type="number"
+                    input$min="1"
+                    label="window size"
+                    bind:value={peak_detection.window}
+                />
                 <Select
                     label="Normalize w.r.t"
                     options={peak_data.map((p) => `${p.x}`)}
                     bind:value={normalize_wrt_mz}
                     on:change={normalize_data}
                 />
-                <Textfield label="IE (eV)" bind:value={IE} />
+                <Textfield style="width: 5em;" label="IE (eV)" bind:value={IE} />
                 <button class="button is-link ml-auto" on:click={async () => await save_peak_data()}>Save data</button>
             </div>
             <STable

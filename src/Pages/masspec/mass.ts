@@ -1,6 +1,6 @@
 import get_files_settings_values from '$src/js/get_files_settings_values'
 import { path, fs } from '@tauri-apps/api'
-
+import colors from '$lib/misc/colors'
 export async function readMassFile(massfiles: string[], btnID: string = '') {
     const loadbtn = document.getElementById(btnID)
     try {
@@ -12,9 +12,10 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
         loadbtn?.classList.toggle('is-loading')
 
         const dataToSend: {
-            [name: string]: { x: number[]; y: number[]; name: string; mode: string; showlegend: boolean }
+            [name: string]: Plotly.Data
         } = {}
 
+        let i = 0
         for (const filename of massfiles) {
             if (!fs.exists(filename)) {
                 window.createToast(`File ${filename} does not exist`, 'danger')
@@ -56,7 +57,8 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
             const trap = fileVariableComputedValues['m04_ao04_sa_delay'] / 1000
 
             const label = `${name}: Res:${res?.toFixed(1)} V; B0: ${b0?.toFixed(0)} ms; trap: ${trap?.toFixed(0)} ms`
-            dataToSend[name] = { x, y, name: label, mode, showlegend }
+            dataToSend[name] = { x, y, name: label, mode, showlegend, line: { color: `rgb${colors[i]}` } }
+            i++
         }
 
         console.info('File read completed')
