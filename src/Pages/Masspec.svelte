@@ -1,7 +1,7 @@
 <script lang="ts">
     import { showConfirm } from '$src/lib/alert/store'
     import Layout from '$src/layout/pages/Layout.svelte'
-    import { Switch, ButtonBadge, STable, Textfield } from '$src/components'
+    import { Switch, ButtonBadge, STable, Textfield, RefreshButtons } from '$src/components'
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
@@ -118,7 +118,7 @@
         const data = plotted_data[peak_detection.filename]
         const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
         peak_data = peak_data.map((peak) => {
-            return { ...peak, ynorm: Number((peak.y / data.y[ind]).toFixed(2)) }
+            return { ...peak, ynorm: Number((peak.y / data.y[ind]).toFixed(fixed_digits ?? 2)) }
         })
     }
     const linearlogCheck = () => {
@@ -155,7 +155,7 @@
         if (!normalize_wrt_mz || isNaN(Number(normalize_wrt_mz))) return
 
         const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
-        const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(2)))
+        const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(fixed_digits ?? 2)))
         peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
 
         const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
@@ -183,7 +183,8 @@
     $: if (include_peaks && peak_detection.filename && peak_detection.window && peak_detection.threshold) findPeaks()
     let normalize_wrt_mz = ''
     let IE = ''
-
+    let fixed_digits = 2
+    let saved_peaks_filename = ''
     const save_peak_data = async () => {
         const filename = `${peak_detection.filename.replace(
             '.mass',
@@ -193,9 +194,10 @@
         if (IE) contents += `# IE: ${IE} eV\n`
 
         peak_data.forEach((peak) => {
-            contents += `${peak.x}\t${peak.y}\t${peak.ynorm}\n`
+            contents += `${peak.x.toFixed(1)}\t${peak.y.toFixed(0)}\t${peak.ynorm}\n`
         })
-        const [err] = await oO(fs.writeTextFile(await path.join(currentLocation, filename), contents))
+        saved_peaks_filename = await path.join(currentLocation, filename)
+        const [err] = await oO(fs.writeTextFile(saved_peaks_filename, contents))
         if (err) return window.createToast(err, 'danger')
         window.createToast(`${filename} saved`, 'success')
     }
@@ -266,7 +268,24 @@
                     on:change={normalize_data}
                 />
                 <Textfield style="width: 5em;" label="IE (eV)" bind:value={IE} />
+                <Textfield
+                    input$min="0"
+                    style="width: 5em;"
+                    label="digits"
+                    bind:value={fixed_digits}
+                    input$type="number"
+                    on:change={() => findPeaks()}
+                />
+                <RefreshButtons on:refresh={() => findPeaks()} />
                 <button class="button is-link ml-auto" on:click={async () => await save_peak_data()}>Save data</button>
+                <button
+                    class="i-material-symbols-folder-open-outline"
+                    on:click={async () => {
+                        if (!(await fs.exists(saved_peaks_filename)))
+                            return window.createToast(`File does not exist`, 'danger')
+                        await shell.open(saved_peaks_filename)
+                    }}
+                />
             </div>
             <STable
                 rows={peak_data}
