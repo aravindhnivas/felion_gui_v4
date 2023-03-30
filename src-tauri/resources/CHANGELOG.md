@@ -5,6 +5,7 @@
 - Masspec peaks plot
   - Optional masspec peaks plot
   - Masspec peaks dasheddot line added
+  - New features added
 
 ## v4.10.0
 
