@@ -184,23 +184,36 @@
     let normalize_wrt_mz = ''
     let IE = ''
     let fixed_digits = 2
-    let saved_peaks_filename = ''
+    let peaks_file = ''
+
+    $: peak_filename = `${peak_detection.filename?.replace('.mass', '')}_peaks_norm_w.r.t_${normalize_wrt_mz}mz${
+        IE ? '_' + IE + 'eV' : ''
+    }.txt`
+    let saveloc = ''
+
+    $: path.join(currentLocation, 'EXPORT').then(async (loc) => {
+        saveloc = loc
+        peaks_file = await path.join(saveloc, peak_filename)
+    })
+
     const save_peak_data = async () => {
-        const filename = `${peak_detection.filename.replace(
-            '.mass',
-            ''
-        )}_peaks_normalized_w.r.t_${normalize_wrt_mz}.txt`
         let contents = `# m/z\tcounts\tnormalized\n`
         if (IE) contents += `# IE: ${IE} eV\n`
 
         peak_data.forEach((peak) => {
             contents += `${peak.x.toFixed(1)}\t${peak.y.toFixed(0)}\t${peak.ynorm}\n`
         })
-        saved_peaks_filename = await path.join(currentLocation, filename)
-        const [err] = await oO(fs.writeTextFile(saved_peaks_filename, contents))
-        if (err) return window.createToast(err, 'danger')
-        window.createToast(`${filename} saved`, 'success')
+
+        if (!(await fs.exists(saveloc))) {
+            const [err] = await oO(fs.createDir(saveloc))
+            if (err) return window.createToast(err as string, 'danger')
+        }
+        const [err] = await oO(fs.writeTextFile(peaks_file, contents))
+        if (err) return window.createToast(err as string, 'danger')
+
+        window.createToast(`${peak_filename} saved`, 'success')
     }
+
     let include_peaks = true
 </script>
 
@@ -267,7 +280,6 @@
                     bind:value={normalize_wrt_mz}
                     on:change={normalize_data}
                 />
-                <Textfield style="width: 5em;" label="IE (eV)" bind:value={IE} />
                 <Textfield
                     input$min="0"
                     style="width: 5em;"
@@ -276,22 +288,34 @@
                     input$type="number"
                     on:change={() => findPeaks()}
                 />
+
+                <Textfield style="width: 5em;" label="IE (eV)" bind:value={IE} />
                 <RefreshButtons on:refresh={() => findPeaks()} />
-                <button class="button is-link ml-auto" on:click={async () => await save_peak_data()}>Save data</button>
+            </div>
+
+            <div class="save_file__div">
+                <Textfield style="width: 100%;" label="peak save filename" value={peak_filename} disabled />
+                <button class="i-material-symbols-save-rounded" on:click={async () => await save_peak_data()} />
                 <button
                     class="i-material-symbols-folder-open-outline"
                     on:click={async () => {
-                        if (!(await fs.exists(saved_peaks_filename)))
-                            return window.createToast(`File does not exist`, 'danger')
-                        await shell.open(saved_peaks_filename)
+                        if (!(await fs.exists(peaks_file))) return window.createToast(`File does not exist`, 'danger')
+                        toast.promise(shell.open(peaks_file), {
+                            loading: 'Opening file',
+                            success: 'File opened',
+                            error: 'Error opening file',
+                        })
                     }}
                 />
             </div>
-            <STable
-                rows={peak_data}
-                headKeys={['m/z', 'counts', `Normalized w.r.t m/z ${normalize_wrt_mz}`]}
-                rowKeys={['x', 'y', 'ynorm']}
-            />
+
+            {#if include_peaks}
+                <STable
+                    rows={peak_data}
+                    headKeys={['m/z', 'counts', `Normalized w.r.t m/z ${normalize_wrt_mz}`]}
+                    rowKeys={['x', 'y', 'ynorm']}
+                />
+            {/if}
         {/if}
     </svelte:fragment>
 
@@ -301,3 +325,11 @@
         </div>
     </svelte:fragment>
 </Layout>
+
+<style>
+    .save_file__div {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+    }
+</style>
