@@ -12,7 +12,7 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
         loadbtn?.classList.toggle('is-loading')
 
         const dataToSend: {
-            [name: string]: Plotly.Data
+            [name: string]: Plotly.PlotData
         } = {}
 
         let i = 0

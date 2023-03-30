@@ -21,10 +21,11 @@ export function plot(
     mainTitle: string,
     xtitle: string,
     ytitle: string,
-    data: DataFromPython,
+    data,
     graphDiv: string,
-    logScale: boolean = false,
-    createPlotlyClickEvent = false
+    logScale = false,
+    createPlotlyClickEvent = false,
+    editable = false
 ) {
     const graph_div = document.getElementById(graphDiv)
     
@@ -43,7 +44,7 @@ export function plot(
     }
 
     try {
-        react(graphDiv, dataPlot, dataLayout, { editable: true })
+        react(graphDiv, dataPlot, dataLayout, { editable })
 
         relayout(graphDiv, {
             width: graph_div.clientWidth,

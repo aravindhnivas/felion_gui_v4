@@ -12,7 +12,6 @@
     import Select from '$src/components/Select.svelte'
 
     import colors from '$lib/misc/colors'
-    import Checkbox from '$src/components/Checkbox.svelte'
 
     export let id = 'Masspec'
     export let display = 'grid'
@@ -102,7 +101,7 @@
         if (filetype == 'mass' && massfiles) {
             const dataFromPython = await readMassFile(massfiles, btnID)
             if (dataFromPython === null) return
-            plot('Mass spectrum', 'm/z', 'Counts', dataFromPython, plotID, logScale, true)
+            plot('Mass spectrum', 'm/z', 'Counts', dataFromPython, plotID, logScale, true, false)
             console.log({ dataFromPython, massfiles })
 
             for (const file in dataFromPython) {
@@ -131,7 +130,7 @@
     let fullfileslist: string[] = []
     let logScale = true
     let peak_detection = {
-        threshold: 30,
+        threshold: 50,
         window: 4,
         filename: '',
     }
@@ -174,6 +173,7 @@
                     color: `rgb${colors[fileInd]}`,
                     width: 1,
                     dash: 'dashdot',
+                    editable: false,
                 },
             }
         })
