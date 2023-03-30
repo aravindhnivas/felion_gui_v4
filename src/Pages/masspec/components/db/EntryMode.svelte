@@ -6,9 +6,7 @@
     export let active = false
     export let file_location: string = ''
     export let filenames: string[] = []
-
-    // let [range_from, range_to] = ['', '']
-
+    
     const read_file = async (filename: string) => {
         if (!filename) return
         const file = await path.join(file_location, filename)
@@ -24,11 +22,11 @@
     <h3 style="width: 100%;">Required entires</h3>
 
     <Select label="filename" options={filenames} bind:value={$entry_values.filename} />
-    <Textfield variant="outlined" label="Enter temperature (K)" bind:value={$entry_values.temperature} />
+    <Textfield label="Enter temperature (K)" bind:value={$entry_values.temperature} />
 
-    <Textfield variant="outlined" label="Enter precursor name" bind:value={$entry_values.precursor} />
-    <Textfield variant="outlined" label="Enter pressure (mBar)" bind:value={$entry_values.pressure} />
-    <Textfield variant="outlined" label="Enter IE (eV)" bind:value={$entry_values.IE} />
+    <Textfield label="Enter precursor name" bind:value={$entry_values.precursor} />
+    <Textfield label="Enter pressure (mBar)" bind:value={$entry_values.pressure} />
+    <Textfield label="Enter IE (eV)" bind:value={$entry_values.IE} />
 
     <Select label="Select ion-source type" bind:value={$entry_values.source} options={['storage', 'non-storage']} />
 
@@ -41,13 +39,11 @@
     <h3 style="width: 100%;">Optional entires</h3>
 
     <Textfield
-        variant="outlined"
         style="width: 100%"
         label="Enter keywords (for instance experiment's target molecule, FELIX shift, etc.)"
         bind:value={$entry_values.keywords}
     />
     <Textfield
-        variant="outlined"
         style="width: 100%"
         label="Enter notes (for instance who performed the experiments or testing after changes in a instrument, etc. )"
         bind:value={$entry_values.notes}
