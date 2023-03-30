@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## UNRELEASED
+## 4.10.1
 
 - Masspec peaks plot
   - New features added
