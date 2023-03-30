@@ -3,9 +3,12 @@
 ## UNRELEASED
 
 - Masspec peaks plot
+  - New features added
+  - Changed initial threshold and peak width value
   - Optional masspec peaks plot
   - Masspec peaks dasheddot line added
-  - New features added
+
+- Plots are changed to non-editable layouts
 
 ## v4.10.0
 
