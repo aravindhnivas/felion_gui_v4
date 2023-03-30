@@ -314,6 +314,7 @@
                     rows={peak_data}
                     headKeys={['m/z', 'counts', `Normalized w.r.t m/z ${normalize_wrt_mz}`]}
                     rowKeys={['x', 'y', 'ynorm']}
+                    sortable={true}
                 />
             {/if}
         {/if}

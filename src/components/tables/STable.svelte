@@ -42,7 +42,9 @@
 
     let sortToggle: { [key: string]: boolean } = {}
     rowKeys.forEach((key: string) => (sortToggle[key] = false))
+
     const sortTable = (key: string) => {
+        if (!sortable) return
         rows = orderBy(rows, key, sortToggle[key] ? 'asc' : 'desc')
     }
 
@@ -69,9 +71,9 @@
                         <Cell style="width: 4em;"># {rows.length}</Cell>
                     {/if}
                     {#each headKeys as key, i (key)}
-                        <!-- <Cell on:click={() => sortTable(rowKeys[i])}> -->
-                        <Cell>
-                            <div class="header_cell has-background-link">
+                        <Cell on:click={() => sortTable(rowKeys[i])}>
+                            <!-- <Cell> -->
+                            <div class="header_cell">
                                 <span>{key}</span>
                                 {#if sortable}
                                     <button
@@ -138,9 +140,10 @@
 <style>
     .header_cell {
         display: flex;
-        border-radius: 0.1em;
+        border-radius: 0.5em;
         padding: 0.1em;
         align-items: center;
         justify-content: center;
+        background-color: #5a419b;
     }
 </style>
