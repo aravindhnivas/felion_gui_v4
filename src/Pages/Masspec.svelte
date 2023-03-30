@@ -213,7 +213,6 @@
 
         window.createToast(`${peak_filename} saved`, 'success')
     }
-
     let include_peaks = true
 </script>
 
@@ -271,7 +270,7 @@
                     style="width: 5em;"
                     input$type="number"
                     input$min="1"
-                    label="window size"
+                    label="peak width"
                     bind:value={peak_detection.window}
                 />
                 <Select
