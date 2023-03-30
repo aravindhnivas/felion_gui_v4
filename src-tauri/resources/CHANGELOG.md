@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## UNRELEASED
+
+- Masspec peaks plot
+  - Optional masspec peaks plot
+  - Masspec peaks dasheddot line added
+
 ## v4.10.0
 
 - Loading screen added

@@ -159,9 +159,11 @@
         peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
 
         const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
+
         const shapes: Partial<Plotly.Shape>[] = indices.map((i) => {
             const x = data.x[i]
             const y = data.y[i]
+
             return {
                 type: 'line',
                 x0: x,
@@ -180,8 +182,8 @@
 
     $: if (include_peaks && peak_detection.filename && peak_detection.window && peak_detection.threshold) findPeaks()
     let normalize_wrt_mz = ''
-
     let IE = ''
+
     const save_peak_data = async () => {
         const filename = `${peak_detection.filename.replace(
             '.mass',
@@ -237,7 +239,7 @@
             <div class="align">
                 <Switch
                     bind:selected={include_peaks}
-                    label="include peaks"
+                    label="peaks"
                     on:change={() => {
                         if (!include_peaks) relayout(plotID, { shapes: [] })
                     }}
