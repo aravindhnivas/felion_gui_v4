@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { opoMode, felixPlotAnnotations } from '../../functions/svelteWritables'
+    import { opoMode, felixPlotAnnotations, normMethod, OPO_fulldata } from '../../functions/svelteWritables'
     import { felix_opo_func } from '../../functions/felix_opo_func'
     import plotIndividualDataIntoGraph from '../../functions/plotIndividualDataIntoGraph'
     import { Select, QuickBrowser, TextSwitch, BrowseTextfield } from '$src/components'
@@ -15,7 +15,7 @@
     export let removeExtraFile: VoidFunction
     export let OPOfilesChecked: string[]
     export let showall = true
-    export let normMethod: string
+    // export let normMethod: string
 
     let className = ''
     export { className as class }
@@ -39,7 +39,6 @@
     $: update_opo_files(OPOLocation, OPOfilesChecked)
 
     let dataReady = false
-    const fullData = {}
 
     function plotData({ e = null, tkplot = 'run', general = false } = {}) {
         removeExtraFile()
@@ -59,38 +58,42 @@
         dataReady = false
 
         computePy_func({ e, pyfile: 'normline.oposcan', args, general }).then((dataFromPython) => {
-            fullData.data = dataFromPython
+            $OPO_fulldata[uniqueID] = dataFromPython as OPOData
             dataReady = true
             // $opoMode[uniqueID] = true
             showOPOFiles = false
         })
     }
 
-    $: updateplot = dataReady && plotfile && normMethod && fullData.data && $opoMode[uniqueID]
+    $: updateplot = dataReady && plotfile && $normMethod[uniqueID] && $OPO_fulldata[uniqueID] && $opoMode[uniqueID]
     $: if (updateplot && showall) {
         if (currentGraph.hasAttribute('data-plotted')) {
             // const currentKey = mapNormMethodKeys[normMethod]
-            // const currentData = get_data(fullData.data[currentKey])
+            // const currentData = get_data($OPO_fulldata[uniqueID][currentKey])
             // react(`${uniqueID}-opoRelPlot`, currentData, plotlayout[normMethod])
-            const { yaxis, xaxis, title, key } = plotlayout[normMethod]
-            plot(title, xaxis.title, yaxis.title, fullData.data[key], `${uniqueID}-opoRelPlot`)
-            plot('Baseline Corrected', 'Wavelength (cm-1)', 'Counts', fullData.data['base'], `${uniqueID}-opoplot`)
+            const { yaxis, xaxis, title, key } = plotlayout[$normMethod[uniqueID]]
+            plot(title, xaxis.title, yaxis.title, $OPO_fulldata[uniqueID][key], `${uniqueID}-opoRelPlot`)
+            plot(
+                'Baseline Corrected',
+                'Wavelength (cm-1)',
+                'Counts',
+                $OPO_fulldata[uniqueID]['base'],
+                `${uniqueID}-opoplot`
+            )
             plot(
                 'OPO Calibration',
                 'Set Wavenumber (cm-1)',
                 'Measured Wavenumber (cm-1)',
-                fullData.data['SA'],
+                $OPO_fulldata[uniqueID]['SA'],
                 `${uniqueID}-opoSA`
             )
         } else {
-            felix_opo_func({ dataFromPython: fullData.data, uniqueID, mode: 'opo', normMethod })
+            felix_opo_func({ uniqueID, mode: 'opo' })
         }
     } else if (updateplot) {
         plotIndividualDataIntoGraph({
-            fullData,
             plotfile,
             uniqueID,
-            normMethod,
         })
     }
 

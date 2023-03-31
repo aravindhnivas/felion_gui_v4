@@ -8,6 +8,7 @@
         felixOutputName,
         felixopoLocation,
         felixPlotAnnotations,
+        normMethod,
     } from '../../functions/svelteWritables'
     import { felix_peak_detection } from '../../functions/svelteWritables'
 
@@ -17,10 +18,11 @@
     import { dropRight, sortBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
     import { Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
+    import { find_felix_opo_peaks } from '../../functions/utils'
     // //////////////////////////////////////////////////////////////////////
 
     export let writeFile: boolean = false
-    export let normMethod: string
+    // export let normMethod: string
     export let showall = true
     export let fullfiles: string[]
     export let addedFileCol: string
@@ -144,7 +146,7 @@
                     writeFileName,
                     addedFileScale,
                     overwrite_expfit,
-                    normMethod,
+                    normMethod: $normMethod[uniqueID],
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
                     output_name: $felixOutputName[uniqueID],
@@ -195,7 +197,7 @@
                     output_name: $felixOutputName[uniqueID],
                     fullfiles,
                     fitall,
-                    normMethod,
+                    normMethod: $normMethod[uniqueID],
                 }
 
                 computePy_func({
@@ -203,11 +205,13 @@
                     pyfile: 'normline.multiGauss',
                     args: NGauss_fit_args,
                 }).then((dataFromPython) => {
-                    NGauss_fit_func({ dataFromPython, uniqueID, normMethod })
-                    if (dataFromPython[normMethod]) {
+                    NGauss_fit_func({ dataFromPython, uniqueID })
+                    if (dataFromPython[$normMethod[uniqueID]]) {
                         console.log('Line fitted')
                         window.createToast(
-                            `Line fitted with ${dataFromPython[normMethod]['fitted_parameter'].length} gaussian function`,
+                            `Line fitted with ${
+                                dataFromPython[$normMethod[uniqueID]]['fitted_parameter'].length
+                            } gaussian function`,
                             'success'
                         )
                     }
@@ -242,11 +246,13 @@
     <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Exp Fit.</button>
     <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Fit NGauss.</button>
     <Select
+        on:change={() => find_felix_opo_peaks(uniqueID)}
         bind:value={$felix_peak_detection[uniqueID].filename}
         options={fileChecked}
         label="Select file to find peaks"
     />
     <Textfield
+        on:change={() => find_felix_opo_peaks(uniqueID)}
         style="width: 7em;"
         input$type="number"
         input$min="1"
@@ -254,13 +260,14 @@
         bind:value={$felix_peak_detection[uniqueID].threshold}
     />
     <Textfield
+        on:change={() => find_felix_opo_peaks(uniqueID)}
         style="width: 5em;"
         input$type="number"
         input$min="1"
         label="peak width"
         bind:value={$felix_peak_detection[uniqueID].window}
     />
-    <button class="button is-warning" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Find peaks</button>
+    <button class="button is-warning" on:click={() => find_felix_opo_peaks(uniqueID)}>Find peaks</button>
     <div class="ml-auto">
         <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
         <button class="button is-danger" on:click={clearAllPeak}>Clear All</button>

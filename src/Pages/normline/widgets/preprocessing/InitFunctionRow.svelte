@@ -1,6 +1,8 @@
 <script lang="ts">
     import {
         opoMode,
+        felix_fulldata,
+        normMethod,
         felixPeakTable,
         expfittedLines,
         felixOutputName,
@@ -10,14 +12,13 @@
     } from '../../functions/svelteWritables'
     import FelixPlotting from '../../modals/FelixPlotting.svelte'
     import { subplot, plot } from '$src/js/functions'
-
+    // import { find_felix_opo_peaks } from '../../functions/utils'
     import plotIndividualDataIntoGraph from '../../functions/plotIndividualDataIntoGraph'
     import { felix_opo_func } from '../../functions/felix_opo_func'
     import { TextSwitch, ButtonBadge } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { plotlayout } from '../../functions/plot_labels'
     import { felixPlotCheckboxes, felixPlotWidgets, felix_peak_detection } from '../../functions/svelteWritables'
-    import { find_peaks } from '$lib/misc/utils'
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -26,7 +27,7 @@
     export let removeExtraFile: VoidFunction
     export let showall = true
     export let theoryRow = false
-    export let normMethod: string
+    // export let normMethod: string
     export let theoryLocation: string
 
     let className = ''
@@ -37,7 +38,6 @@
     let active = false
     let deltaFELIX = 1
 
-    const fullData = {}
     let dataReady = false
 
     async function plotData({ e = null, filetype = 'felix', target = null } = {}) {
@@ -70,7 +70,7 @@
                 $felixPlotAnnotations[uniqueID] = []
                 $felixOutputName[uniqueID] = 'averaged'
 
-                const dataFromPython = await computePy_func({
+                const dataFromPython = await computePy_func<FELIXData>({
                     e,
                     target,
                     pyfile,
@@ -82,7 +82,7 @@
                 $fittedTraceCount[uniqueID] = 0
                 $felixPlotAnnotations[uniqueID] = []
 
-                fullData.data = dataFromPython
+                $felix_fulldata[uniqueID] = dataFromPython
                 dataReady = true
                 break
 
@@ -123,7 +123,7 @@
                     booleanWidgets,
                     selectedWidgets,
                     location: $felixopoLocation[uniqueID],
-                    normMethod,
+                    normMethod: $normMethod[uniqueID],
                     theoryLocation,
                 }
                 computePy_func({ e, pyfile, args, general: true })
@@ -132,42 +132,36 @@
         }
     }
 
-    const find_felix_peaks = ({ x, y }) => {
-        const { indices, peaks, shapes } = find_peaks({
-            data: { x, y },
-            plotID: `${uniqueID}-avgplot`,
-            windowWidth: 4,
-            threshold: 1,
-        })
-    }
-
-    $: updateplot = !$opoMode[uniqueID] && dataReady && plotfile && normMethod && fullData.data
+    $: updateplot = !$opoMode[uniqueID] && dataReady && plotfile && $normMethod[uniqueID] && $felix_fulldata[uniqueID]
     $: if (updateplot && showall) {
-        const { yaxis, xaxis, title, key } = plotlayout[normMethod]
+        const { yaxis, xaxis, title, key } = plotlayout[$normMethod[uniqueID]]
         if (currentGraph.hasAttribute('data-plotted')) {
-            plot('Baseline Corrected', 'Wavelength (cm-1)', 'Counts', fullData.data['base'], `${uniqueID}-bplot`)
+            plot(
+                'Baseline Corrected',
+                'Wavelength (cm-1)',
+                'Counts',
+                $felix_fulldata[uniqueID]['base'],
+                `${uniqueID}-bplot`
+            )
             subplot(
                 'Spectrum and Power Analyser',
                 'Wavelength set (cm-1)',
                 'SA (cm-1)',
-                fullData.data['SA'],
+                $felix_fulldata[uniqueID]['SA'],
                 `${uniqueID}-saPlot`,
                 'Wavelength (cm-1)',
                 `Total Power (mJ)`,
-                fullData.data['pow']
+                $felix_fulldata[uniqueID]['pow']
             )
-            plot(title, xaxis.title, yaxis.title, fullData.data[key], `${uniqueID}-avgplot`)
+            plot(title, xaxis.title, yaxis.title, $felix_fulldata[uniqueID][key], `${uniqueID}-avgplot`)
         } else {
-            felix_opo_func({ dataFromPython: fullData.data, uniqueID, mode: 'felix', normMethod })
+            felix_opo_func({ uniqueID, mode: 'felix' })
         }
-        const { x, y } = fullData.data[key][$felix_peak_detection[uniqueID].filename]
-        find_felix_peaks({ x, y })
+        // find_felix_opo_peaks(uniqueID)
     } else if (updateplot) {
         plotIndividualDataIntoGraph({
-            fullData,
             plotfile,
             uniqueID,
-            normMethod,
         })
     }
 

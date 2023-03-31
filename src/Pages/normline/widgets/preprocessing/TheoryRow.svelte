@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { felixopoLocation } from '../../functions/svelteWritables'
+    import { felixopoLocation, normMethod } from '../../functions/svelteWritables'
     import { theory_func } from '../../functions/theory'
     import { TextSwitch, Switch, QuickBrowser, BrowseTextfield } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
@@ -8,7 +8,7 @@
     export { className as class }
     export let theoryRow = false
 
-    export let normMethod: string
+    // export let normMethod: string
     export let theoryLocation: string
 
     let sigma = 7
@@ -33,7 +33,7 @@
 
         const args = {
             theoryfiles,
-            normMethod,
+            normMethod: $normMethod[uniqueID],
             sigma,
             scale,
             currentLocation: $felixopoLocation[uniqueID],
@@ -43,7 +43,7 @@
 
         const dataFromPython = await computePy_func({ e, pyfile, args })
         if (!dataFromPython) return
-        theory_func({ dataFromPython, normMethod, uniqueID })
+        theory_func({ dataFromPython, uniqueID })
         showTheoryFiles = false
     }
 

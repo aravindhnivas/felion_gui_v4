@@ -27,7 +27,11 @@ export const felixopoLocation = customStore('')
 export const felixPlotAnnotations = customStore<Partial<Plotly.Annotations>[]>([])
 export const expfittedLines = customStore<Plotly.Shape[]>([])
 export const fittedTraceCount = customStore(0)
+export const felix_fulldata = customStore<FELIXData>(null)
+export const OPO_fulldata = customStore<OPOData>(null)
+
 export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton']
+export const normMethod = customStore<'Log' | 'Relative' | 'IntensityPerPhoton'>('Relative')
 
 export const felixPlotWidgets = writable({
     text: [

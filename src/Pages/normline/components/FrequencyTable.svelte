@@ -5,15 +5,17 @@
         frequencyDatas,
         fitted_data,
         felixopoLocation,
+        normMethod,
     } from '../functions/svelteWritables'
-    import { STable } from '$src/components'
-    export let normMethod: string
 
-    $: if ($fitted_data?.[uniqueID]?.[normMethod]) {
-        $frequencyDatas[uniqueID] = $fitted_data[uniqueID][normMethod]
-    }
+    import { STable } from '$src/components'
+    // export let normMethod: string
 
     const uniqueID = getContext<string>('uniqueID')
+    $: if ($fitted_data?.[uniqueID]?.[$normMethod[uniqueID]]) {
+        $frequencyDatas[uniqueID] = $fitted_data[uniqueID][$normMethod[uniqueID]]
+    }
+
     function tableCleanup() {
         $fitted_data[uniqueID] = {}
         $frequencyDatas[uniqueID] = []

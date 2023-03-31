@@ -1,5 +1,13 @@
 <script lang="ts">
-    import { opoMode, normMethods, Ngauss_sigma, felixopoLocation } from './normline/functions/svelteWritables'
+    import {
+        opoMode,
+        normMethod,
+        normMethods,
+        Ngauss_sigma,
+        felixopoLocation,
+        felix_fulldata,
+        OPO_fulldata,
+    } from './normline/functions/svelteWritables'
     import {
         OPORow,
         TheoryRow,
@@ -132,31 +140,37 @@
     $: plotfileOptions = $opoMode[uniqueID] ? [...OPOfilesChecked, 'average'] : [...fileChecked, 'average']
 
     let mounted = false
+
     onMount(() => {
         opoMode.init(uniqueID)
         Ngauss_sigma.init(uniqueID)
         felixopoLocation.init(uniqueID)
+
+        felix_fulldata.init(uniqueID)
+        OPO_fulldata.init(uniqueID)
+        normMethod.init(uniqueID)
         mounted = true
         console.warn('Normline mounted')
         return () => {
             opoMode.remove(uniqueID)
             Ngauss_sigma.remove(uniqueID)
             felixopoLocation.remove(uniqueID)
+            felix_fulldata.remove(uniqueID)
+            OPO_fulldata.remove(uniqueID)
+            normMethod.remove(uniqueID)
             console.warn('Normline destroyed')
         }
     })
-
     let felix_toggle = true
     let opo_toggle = true
     let theory_toggle = true
     let showall = true
-    let normMethod: string = normMethods[1]
     let theoryRow = false
 
     let graphWidth: number
 
     const demo_plot = () => {
-        const { yaxis, xaxis, title } = plotlayout[normMethod]
+        const { yaxis, xaxis, title } = plotlayout[$normMethod[uniqueID]]
         const dataLayout: Partial<Plotly.Layout> = {
             title,
             xaxis,
@@ -204,7 +218,6 @@
     <svelte:fragment slot="buttonContainer">
         <InitFunctionRow
             {theoryLocation}
-            {normMethod}
             bind:theoryRow
             {removeExtraFile}
             {felixfiles}
@@ -213,7 +226,6 @@
             {showall}
         />
         <OPORow
-            {normMethod}
             {showall}
             {removeExtraFile}
             bind:OPOLocation
@@ -222,9 +234,10 @@
             {plotfile}
             class={opo_toggle ? '' : 'hide'}
         />
-        <TheoryRow bind:theoryLocation {normMethod} class={theory_toggle ? '' : 'hide'} {theoryRow} />
+        <TheoryRow bind:theoryLocation class={theory_toggle ? '' : 'hide'} {theoryRow} />
+
         <div class="align" class:hide={!felix_toggle}>
-            <Radio bind:value={normMethod} options={normMethods} />
+            <Radio bind:value={$normMethod[uniqueID]} options={normMethods} />
         </div>
 
         <div class="align">
@@ -279,7 +292,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="config">
-        <GetFileInfoTable {felixfiles} {opofiles} {normMethod} />
+        <GetFileInfoTable {felixfiles} {opofiles} />
     </svelte:fragment>
 
     <svelte:fragment slot="plotContainer_functions">
@@ -295,7 +308,6 @@
         />
 
         <ExecuteFunctionContents
-            {normMethod}
             {showall}
             bind:modalActivate
             bind:adjustPeakTrigger
@@ -310,7 +322,7 @@
         />
     </svelte:fragment>
     <svelte:fragment slot="plotContainer_reports">
-        <FrequencyTable {normMethod} />
+        <FrequencyTable />
     </svelte:fragment>
 </Layout>
 

@@ -1,10 +1,11 @@
 import { plot } from '../../../js/functions'
+import { normMethod } from './svelteWritables'
 
-export function theory_func({ dataFromPython, normMethod, uniqueID }) {
+export function theory_func({ dataFromPython, uniqueID }) {
     let ylabel
-    if (normMethod === 'Log') {
+    if (normMethod.get(uniqueID) === 'Log') {
         ylabel = 'Normalised Intensity per J'
-    } else if (normMethod === 'Relative') {
+    } else if (normMethod.get(uniqueID) === 'Relative') {
         ylabel = 'Relative Depletion (%)'
     } else {
         ylabel = 'Normalised Intensity per Photon'

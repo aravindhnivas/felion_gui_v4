@@ -1,4 +1,4 @@
-import { dataTable, opoMode, felixOutputName, fittedTraceCount, normMethods, fitted_data } from './svelteWritables'
+import { dataTable, opoMode, felixOutputName, fittedTraceCount, normMethods, fitted_data, normMethod } from './svelteWritables'
 import type { DataTable } from './svelteWritables'
 import { addTraces } from 'plotly.js-basic-dist'
 import { uniqBy } from 'lodash-es'
@@ -20,11 +20,11 @@ function getTable(data, name, color) {
     return table
 }
 
-export function NGauss_fit_func({ dataFromPython, uniqueID, normMethod }) {
+export function NGauss_fit_func({ dataFromPython, uniqueID }) {
     console.log({ dataFromPython })
 
     const currentGraph = opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
-    addTraces(currentGraph, dataFromPython[normMethod]['fitted_data'])
+    addTraces(currentGraph, dataFromPython[normMethod.get(uniqueID)]['fitted_data'])
     fittedTraceCount.update((n) => {
         n[uniqueID] += 1
         return n
@@ -39,7 +39,7 @@ export function NGauss_fit_func({ dataFromPython, uniqueID, normMethod }) {
         if (!methodData) return
         const data = methodData['fitted_parameter']
         const table = uniqBy(getTable(data, output_name, color), 'freq')
-        if (method === normMethod) {
+        if (method === normMethod.get(uniqueID)) {
             dataTable.setValue(uniqueID, table)
         }
         fitted_data.update((data) => {

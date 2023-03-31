@@ -1,18 +1,17 @@
 import { subplot, plot } from '../../../js/functions'
 import { plotlySelection, plotlyClick } from './misc'
 import beforePlot from './beforePlot'
+import { felix_fulldata, OPO_fulldata } from './svelteWritables'
 
 export async function felix_opo_func({
-    dataFromPython,
     uniqueID,
     mode,
-    normMethod,
 }: {
-    dataFromPython: FELIXData
     uniqueID: string
     mode: 'felix' | 'opo'
-    normMethod: string
 }) {
+
+
     let baseGraphDiv: string
     let graphDiv: string
 
@@ -23,28 +22,25 @@ export async function felix_opo_func({
         graphDiv = `${uniqueID}-opoRelPlot`
         baseGraphDiv = `${uniqueID}-opoplot`
     }
-    // console.log(normMethod)
     const status = await beforePlot({
-        dataFromPython,
         graphDiv,
         baseGraphDiv,
         uniqueID,
-        normMethod,
     })
 
     if (!status) return console.warn('No data to plot')
 
     if (mode === 'felix') {
-        if (dataFromPython['SA'] && dataFromPython['pow']) {
+        if (felix_fulldata.get(uniqueID)['SA'] && felix_fulldata.get(uniqueID)['pow']) {
             subplot(
                 'Spectrum and Power Analyser',
                 'Wavelength set (cm-1)',
                 'SA (cm-1)',
-                dataFromPython['SA'],
+                felix_fulldata.get(uniqueID)['SA'],
                 `${uniqueID}-saPlot`,
                 'Wavelength (cm-1)',
                 'Total Power (mJ)',
-                dataFromPython['pow']
+                felix_fulldata.get(uniqueID)['pow']
             )
         }
 
@@ -54,7 +50,7 @@ export async function felix_opo_func({
             'OPO Calibration',
             'Set Wavenumber (cm-1)',
             'Measured Wavenumber (cm-1)',
-            dataFromPython['SA'],
+            OPO_fulldata.get(uniqueID)['SA'],
             `${uniqueID}-opoSA`
         )
     }

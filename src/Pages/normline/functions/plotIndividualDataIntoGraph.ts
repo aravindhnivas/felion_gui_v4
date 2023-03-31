@@ -1,9 +1,9 @@
-import { opoMode } from './svelteWritables'
+import { opoMode, normMethod } from './svelteWritables'
 import { plotlayout } from './plot_labels'
 import { subplot, plot } from '$src/js/functions'
 import { react } from 'plotly.js-basic-dist'
 import { felix_opo_func } from './felix_opo_func'
-
+import { get_fulldata } from './utils'
 export const get_data = (data) => {
     let dataPlot = []
     for (const x in data) {
@@ -18,8 +18,8 @@ export const mapNormMethodKeys = {
     IntensityPerPhoton: 'average_per_photon',
 }
 
-export default function ({ fullData, plotfile, uniqueID, normMethod }) {
-    const data = fullData.data || null
+export default function ({ plotfile, uniqueID }) {
+    const data = get_fulldata(uniqueID)
     if (!data) return window.createToast('No data for ' + plotfile, 'danger')
     if (!data.average?.[plotfile]) return console.warn(plotfile, 'data is not available', data)
 
@@ -70,11 +70,11 @@ export default function ({ fullData, plotfile, uniqueID, normMethod }) {
     const currentGraphID = opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
     const currentGraph = document.getElementById(currentGraphID)
     if (currentGraph.hasAttribute('data-plotted')) {
-        const currentKey = mapNormMethodKeys[normMethod]
+        const currentKey = mapNormMethodKeys[normMethod.get(uniqueID)]
         const currentData = get_data(dataToPlot[currentKey])
-        react(currentGraph, currentData, plotlayout[normMethod])
+        react(currentGraph, currentData, plotlayout[normMethod.get(uniqueID)])
     } else {
         const mode = opoMode.get(uniqueID) ? 'opo' : 'felix'
-        felix_opo_func({ dataFromPython: dataToPlot, uniqueID, mode, normMethod })
+        felix_opo_func({ uniqueID, mode })
     }
 }
