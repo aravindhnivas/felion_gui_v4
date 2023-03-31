@@ -2,6 +2,7 @@ import { felixPeakTable, felixIndex, felixOutputName, felixPlotAnnotations, Ngau
 import { relayout } from 'plotly.js-basic-dist'
 import { uniqBy } from 'lodash-es'
 import { fs, path } from '@tauri-apps/api'
+import { get_graphDiv } from './utils'
 
 export async function savefile({ file = {}, name = '', location = '' } = {}) {
     const filestem = name.endsWith('.json') ? name : `${name}.json`
@@ -57,6 +58,34 @@ export function plotlySelection({ graphDiv, mode, uniqueID }) {
         }
     })
 }
+
+export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black'}) => {
+    const freq = x.toFixed(1)
+    const amp = y.toFixed(1)
+    const annotation = {
+        text: `(${freq}, ${amp})`,
+        x,
+        y,
+        font: { color },
+        arrowcolor: color,
+    }
+
+    felixPlotAnnotations.update((data) => {
+        data[uniqueID] = uniqBy([...data[uniqueID], annotation], 'text')
+        return data
+    })
+
+    relayout(graphDiv ?? get_graphDiv(uniqueID).graphDiv, {
+        annotations: felixPlotAnnotations.get(uniqueID),
+    })
+
+    const currentPeaks = { freq, amp, sig: Ngauss_sigma.get(uniqueID), id: window.getID() }
+    felixPeakTable.update((data) => {
+        data[uniqueID] = uniqBy([...data[uniqueID], currentPeaks], 'freq')
+        return data
+    })
+}
+
 export function plotlyClick({ graphDiv, mode, uniqueID }: { graphDiv: string; mode: string; uniqueID: string }) {
     const graph = document.getElementById(graphDiv)
     console.warn('Creating plotly click events for, ', graphDiv)
@@ -72,7 +101,6 @@ export function plotlyClick({ graphDiv, mode, uniqueID }: { graphDiv: string; mo
 
                 let d = data.points[i]
                 let name = d.data.name
-                // mode === 'felix' ? opoMode.setValue(uniqueID, false) : opoMode.setValue(uniqueID, true)
 
                 const outputName = felixOutputName.get(uniqueID)
                 console.log('felixOutputName', outputName)
@@ -80,30 +108,8 @@ export function plotlyClick({ graphDiv, mode, uniqueID }: { graphDiv: string; mo
                 if (!name.includes(outputName)) {
                     return window.createToast('Change output filename.', 'danger')
                 }
-
                 const { color } = d.data?.line
-                const [freq, amp] = [parseFloat(d.x.toFixed(2)), parseFloat(d.y.toFixed(2))]
-                const annotation = {
-                    text: `(${freq}, ${amp})`,
-                    x: freq,
-                    y: amp,
-                    font: { color },
-                    arrowcolor: color,
-                }
-
-                felixPlotAnnotations.update((data) => {
-                    data[uniqueID] = uniqBy([...data[uniqueID], annotation], 'text')
-                    return data
-                })
-                relayout(graphDiv, {
-                    annotations: felixPlotAnnotations.get(uniqueID),
-                })
-
-                const currentPeaks = { freq, amp, sig: Ngauss_sigma.get(uniqueID), id: window.getID() }
-                felixPeakTable.update((data) => {
-                    data[uniqueID] = uniqBy([...data[uniqueID], currentPeaks], 'freq')
-                    return data
-                })
+                set_peaks({graphDiv, uniqueID, x: d.x, y: d.y, color})
             }
         }
     })

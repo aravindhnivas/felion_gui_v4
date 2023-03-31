@@ -31,6 +31,7 @@ export const felix_fulldata = customStore<FELIXData>(null)
 export const OPO_fulldata = customStore<OPOData>(null)
 
 export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton']
+export const fileChecked = customStore<string[]>([])
 export const normMethod = customStore<'Log' | 'Relative' | 'IntensityPerPhoton'>('Relative')
 
 export const felixPlotWidgets = writable({
@@ -85,7 +86,7 @@ export const felixPlotCheckboxes = writable([
 ])
 
 export const felix_peak_detection = customStore({
-    threshold: 50,
-    window: 4,
+    threshold: 5,
+    window: 3,
     filename: 'average',
 })
