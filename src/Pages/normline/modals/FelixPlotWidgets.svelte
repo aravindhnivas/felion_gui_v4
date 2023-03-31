@@ -3,14 +3,9 @@
     import { getfiles } from '../functions/stores/func'
     import { fade } from 'svelte/transition'
     import { Textfield, CheckList, Checkbox } from '$src/components'
+    import { felixPlotCheckboxes, felixPlotWidgets } from '../functions/svelteWritables'
 
-    export let felixPlotCheckboxes = []
     export let theoryLocation: string
-    export let felixPlotWidgets: {
-        text: ValueLabel<string>[]
-        boolean: ValueLabel<boolean>[]
-        number: ValueLabel<string>[]
-    }
 
     const uniqueID = getContext<string>('uniqueID')
 
@@ -19,7 +14,7 @@
         const felixOpoDatfiles = await getfiles(felixOpoDatLocation, '.dat')
 
         const theoryfiles = await getfiles(theoryLocation, '.txt')
-        felixPlotCheckboxes = [
+        $felixPlotCheckboxes = [
             {
                 label: 'DAT_file',
                 options: felixOpoDatfiles,
@@ -60,31 +55,29 @@
         <button class="button is-link ml-auto" on:click={async () => await loadFiles()}>fetch files</button>
     </div>
     <div class="align" style="justify-content: center; align-items: baseline;">
-        {#each felixPlotCheckboxes as { label, options, value, id } (id)}
+        {#each $felixPlotCheckboxes as { label, options, value, id } (id)}
             <div style="margin-bottom: 1em;" transition:fade>
                 <div class="checkboxes_header">
                     {label}
                 </div>
-                <!-- {#if options.length > 0} -->
                 <CheckList class="modal_checkboxes__div" bind:fileChecked={value} bind:items={options} />
-                <!-- {/if} -->
             </div>
         {/each}
     </div>
 
     <div class="felix_plotting_div">
         <div class="widgets">
-            {#each felixPlotWidgets.text as { label, value, id } (id)}
+            {#each $felixPlotWidgets.text as { label, value, id } (id)}
                 <Textfield type="text" bind:value {label} />
             {/each}
         </div>
         <div class="widgets">
-            {#each felixPlotWidgets.number as { label, value, id } (id)}
+            {#each $felixPlotWidgets.number as { label, value, id } (id)}
                 <Textfield type="text" bind:value {label} />
             {/each}
         </div>
         <div class="widgets">
-            {#each felixPlotWidgets.boolean as { label, value, id } (id)}
+            {#each $felixPlotWidgets.boolean as { label, value, id } (id)}
                 <Checkbox bind:value {label} />
             {/each}
         </div>

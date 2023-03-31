@@ -5,13 +5,14 @@
     import GetLabviewSettings from '$lib/GetLabviewSettings.svelte'
     import Configs, { configs } from '$src/Pages/masspec/configs/Configs.svelte'
     import { plot } from '$src/js/functions'
-    import { detectPeaks, readMassFile } from './masspec/mass'
+    import { readMassFile } from './masspec/mass'
     import computePy_func from '$lib/pyserver/computePy'
     import Database from './masspec/components/Database.svelte'
     import { DB_active, DB_window, DB } from './masspec/components/db/stores'
     import Select from '$src/components/Select.svelte'
 
     import colors from '$lib/misc/colors'
+    import { detectPeaks, find_peaks } from '$lib/misc/utils'
 
     export let id = 'Masspec'
     export let display = 'grid'
@@ -136,51 +137,25 @@
     }
     let peak_data: { x: number; y: number; ynorm: number; id: string }[] = []
 
-    const findPeaks = () => {
+    const set_peaks = () => {
         const data = plotted_data[peak_detection.filename]
-        const indices = detectPeaks({
-            data: data.y,
+        const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
+        const color = `rgb${colors[fileInd]}`
+        const { indices, peaks } = find_peaks({
             windowWidth: peak_detection.window,
             threshold: peak_detection.threshold,
+            data,
+            color,
+            plotID,
         })
-
-        if (indices.length < 1) return
-        const peaks = {
-            x: indices.map((i) => data.x[i]),
-            y: indices.map((i) => data.y[i]),
-        }
-
         normalize_wrt_mz = peaks.x[0]?.toString()
         if (!normalize_wrt_mz || isNaN(Number(normalize_wrt_mz))) return
-
         const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))
         const normalized = data.y.map((y) => Number((y / data.y[ind]).toFixed(fixed_digits ?? 2)))
         peak_data = indices.map((i) => ({ x: data.x[i], y: data.y[i], ynorm: normalized[i], id: window.getID() }))
-
-        const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
-
-        const shapes: Partial<Plotly.Shape>[] = indices.map((i) => {
-            const x = data.x[i]
-            const y = data.y[i]
-
-            return {
-                type: 'line',
-                x0: x,
-                y0: y,
-                x1: x,
-                y1: 1,
-                line: {
-                    color: `rgb${colors[fileInd]}`,
-                    width: 1,
-                    dash: 'dashdot',
-                    editable: false,
-                },
-            }
-        })
-        relayout(plotID, { shapes })
     }
 
-    $: if (include_peaks && peak_detection.filename && peak_detection.window && peak_detection.threshold) findPeaks()
+    $: if (include_peaks && peak_detection.filename && peak_detection.window && peak_detection.threshold) set_peaks()
     let normalize_wrt_mz = ''
     let IE = ''
     let fixed_digits = 2
@@ -285,11 +260,11 @@
                     label="digits"
                     bind:value={fixed_digits}
                     input$type="number"
-                    on:change={() => findPeaks()}
+                    on:change={() => set_peaks()}
                 />
 
                 <Textfield style="width: 5em;" label="IE (eV)" bind:value={IE} />
-                <RefreshButtons on:refresh={() => findPeaks()} />
+                <RefreshButtons on:refresh={() => set_peaks()} />
             </div>
 
             <div class="save_file__div">

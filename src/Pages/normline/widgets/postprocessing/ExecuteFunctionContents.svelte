@@ -9,12 +9,14 @@
         felixopoLocation,
         felixPlotAnnotations,
     } from '../../functions/svelteWritables'
+    import { felix_peak_detection } from '../../functions/svelteWritables'
+
     import { savefile, loadfile } from '../../functions/misc'
     import { NGauss_fit_func } from '../../functions/NGauss_fit'
     import { exp_fit_func } from '../../functions/exp_fit'
     import { dropRight, sortBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
-    import { Switch, TextAndSelectOptsToggler } from '$src/components'
+    import { Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
     // //////////////////////////////////////////////////////////////////////
 
     export let writeFile: boolean = false
@@ -212,7 +214,6 @@
                 })
 
                 break
-
             default:
                 break
         }
@@ -230,13 +231,40 @@
             felixPlotAnnotations.remove(uniqueID)
         }
     })
+    const selected_files = async (files: string[]) => {
+        fileChecked = await Promise.all(files.map(async (f) => await path.basename(f)))
+    }
+    let fileChecked = []
+    $: selected_files(fullfiles)
 </script>
 
 <div class="align">
     <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Exp Fit.</button>
     <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Fit NGauss.</button>
-    <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
-    <button class="button is-danger" on:click={clearAllPeak}>Clear All</button>
+    <Select
+        bind:value={$felix_peak_detection[uniqueID].filename}
+        options={fileChecked}
+        label="Select file to find peaks"
+    />
+    <Textfield
+        style="width: 7em;"
+        input$type="number"
+        input$min="1"
+        label="threshold count"
+        bind:value={$felix_peak_detection[uniqueID].threshold}
+    />
+    <Textfield
+        style="width: 5em;"
+        input$type="number"
+        input$min="1"
+        label="peak width"
+        bind:value={$felix_peak_detection[uniqueID].window}
+    />
+    <button class="button is-warning" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Find peaks</button>
+    <div class="ml-auto">
+        <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
+        <button class="button is-danger" on:click={clearAllPeak}>Clear All</button>
+    </div>
 </div>
 
 {#if toggleFindPeaksRow}

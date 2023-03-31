@@ -12,7 +12,7 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
         loadbtn?.classList.toggle('is-loading')
 
         const dataToSend: {
-            [name: string]: Plotly.PlotData
+            [name: string]: Partial<Plotly.PlotData>
         } = {}
 
         let i = 0
@@ -68,41 +68,4 @@ export async function readMassFile(massfiles: string[], btnID: string = '') {
     } finally {
         loadbtn?.classList.toggle('is-loading')
     }
-}
-
-// export function detectPeaks({ data, windowWidth, threshold }) {
-//     console.info('detectPeaks', data, windowWidth, threshold)
-//     const peaks = []
-//     for (let i = 0; i < data.length; i++) {
-//         const start = Math.max(0, i - windowWidth)
-//         const end = Math.min(data.length, i + windowWidth)
-//         let deltaAcc = 0
-//         for (let a = start; a < end; a++) {
-//             deltaAcc += Math.abs(data[a - 1] - data[a])
-//         }
-//         if (deltaAcc > threshold) {
-//             peaks.push(i)
-//         }
-//     }
-//     return peaks
-// }
-
-export function detectPeaks({ data, threshold, windowWidth }) {
-    let peaks = []
-    let isPeak = false
-
-    for (let i = windowWidth; i < data.length - windowWidth; i++) {
-        let windowStart = i - windowWidth
-        let windowEnd = i + windowWidth
-        let windowMax = Math.max(...data.slice(windowStart, windowEnd))
-
-        if (data[i] > threshold && data[i] === windowMax) {
-            isPeak = true
-            peaks.push(i)
-        } else {
-            isPeak = false
-        }
-    }
-
-    return peaks
 }

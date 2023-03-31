@@ -16,6 +16,9 @@
     import { TextSwitch, ButtonBadge } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { plotlayout } from '../../functions/plot_labels'
+    import { felixPlotCheckboxes, felixPlotWidgets, felix_peak_detection } from '../../functions/svelteWritables'
+    import { find_peaks } from '$lib/misc/utils'
+
     ///////////////////////////////////////////////////////////////////////////
 
     export let plotfile = 'average'
@@ -31,26 +34,8 @@
     ///////////////////////////////////////////////////////////////////////////
 
     const uniqueID = getContext<string>('uniqueID')
-    // const changeGraphDivWidth = getContext<VoidFunction>('changeGraphDivWidth')
     let active = false
     let deltaFELIX = 1
-    let felixPlotWidgets = {
-        text: [
-            {
-                label: 'Exp_title',
-                value: 'FELIX-Experiment',
-                id: window.getID(),
-            },
-            { label: 'Exp_legend', value: 'legend', id: window.getID() },
-            { label: 'Cal_title', value: 'calc_title', id: window.getID() },
-        ],
-
-        number: [
-            { label: 'freqScale', value: '1', id: window.getID() },
-            { label: 'theorySigma', value: '5', id: window.getID() },
-        ],
-        boolean: [{ label: 'Only_exp', value: true, id: window.getID() }],
-    }
 
     const fullData = {}
     let dataReady = false
@@ -74,7 +59,6 @@
                     relayout(`${uniqueID}-avgplot`, {
                         annotations: [],
                         shapes: [],
-                        // line: [],
                     })
                 }
                 dataReady = false
@@ -100,7 +84,6 @@
 
                 fullData.data = dataFromPython
                 dataReady = true
-                // changeGraphDivWidth()
                 break
 
             case 'baseline':
@@ -124,14 +107,14 @@
 
             case 'matplotlib':
                 const numberWidgets: { [name: string]: number } = {}
-                felixPlotWidgets.number.forEach((n) => (numberWidgets[n.label] = parseFloat(n.value)))
+                $felixPlotWidgets.number.forEach((n) => (numberWidgets[n.label] = parseFloat(n.value)))
 
                 const textWidgets = {}
-                felixPlotWidgets.text.forEach((n) => (textWidgets[n.label] = n.value))
+                $felixPlotWidgets.text.forEach((n) => (textWidgets[n.label] = n.value))
                 const booleanWidgets = {}
-                felixPlotWidgets.boolean.forEach((n) => (booleanWidgets[n.label] = n.value))
+                $felixPlotWidgets.boolean.forEach((n) => (booleanWidgets[n.label] = n.value))
                 const selectedWidgets = {}
-                felixPlotCheckboxes.forEach((n) => (selectedWidgets[n.label] = n.value))
+                $felixPlotCheckboxes.forEach((n) => (selectedWidgets[n.label] = n.value))
 
                 pyfile = 'normline.felix_tkplot'
                 args = {
@@ -149,8 +132,18 @@
         }
     }
 
+    const find_felix_peaks = ({ x, y }) => {
+        const { indices, peaks, shapes } = find_peaks({
+            data: { x, y },
+            plotID: `${uniqueID}-avgplot`,
+            windowWidth: 4,
+            threshold: 1,
+        })
+    }
+
     $: updateplot = !$opoMode[uniqueID] && dataReady && plotfile && normMethod && fullData.data
     $: if (updateplot && showall) {
+        const { yaxis, xaxis, title, key } = plotlayout[normMethod]
         if (currentGraph.hasAttribute('data-plotted')) {
             plot('Baseline Corrected', 'Wavelength (cm-1)', 'Counts', fullData.data['base'], `${uniqueID}-bplot`)
             subplot(
@@ -163,11 +156,12 @@
                 `Total Power (mJ)`,
                 fullData.data['pow']
             )
-            const { yaxis, xaxis, title, key } = plotlayout[normMethod]
             plot(title, xaxis.title, yaxis.title, fullData.data[key], `${uniqueID}-avgplot`)
         } else {
             felix_opo_func({ dataFromPython: fullData.data, uniqueID, mode: 'felix', normMethod })
         }
+        const { x, y } = fullData.data[key][$felix_peak_detection[uniqueID].filename]
+        find_felix_peaks({ x, y })
     } else if (updateplot) {
         plotIndividualDataIntoGraph({
             fullData,
@@ -179,53 +173,22 @@
 
     let currentGraph: HTMLElement
 
-    let felixPlotCheckboxes = [
-        {
-            label: 'DAT_file',
-            options: [],
-            value: [],
-            id: window.getID(),
-        },
-        {
-            label: 'Fundamentals',
-            options: [],
-            value: [],
-            id: window.getID(),
-        },
-        {
-            label: 'Others',
-            options: [],
-            value: [],
-            id: window.getID(),
-        },
-        {
-            label: 'Overtones',
-            options: [],
-            value: [],
-            id: window.getID(),
-        },
-        {
-            label: 'Combinations',
-            options: [],
-            value: [],
-            id: window.getID(),
-        },
-    ]
     onMount(() => {
         currentGraph = document.getElementById(`${uniqueID}-avgplot`)
         fittedTraceCount.init(uniqueID)
         expfittedLines.init(uniqueID)
+        felix_peak_detection.init(uniqueID)
+
         return () => {
             expfittedLines.remove(uniqueID)
             fittedTraceCount.remove(uniqueID)
+            felix_peak_detection.remove(uniqueID)
         }
     })
 </script>
 
 <FelixPlotting
     bind:active
-    bind:felixPlotCheckboxes
-    bind:felixPlotWidgets
     {theoryLocation}
     on:submit={(e) => plotData({ e: e.detail.event, filetype: 'matplotlib' })}
 />

@@ -96,7 +96,7 @@
     }
     let fullfiles: string[] = []
     const update_fullfiles = async (opofiles: string[], felixfiles: string[], addedfiles: string[]) => {
-        const avgfile = await path.resolve(currentLocation, 'averaged.felix')
+        const avgfile = await path.resolve(currentLocation, 'average')
         fullfiles = $opoMode[uniqueID] ? [...opofiles, ...addedfiles, avgfile] : [...felixfiles, ...addedfiles, avgfile]
     }
     $: update_fullfiles(opofiles, felixfiles, addedfiles)
