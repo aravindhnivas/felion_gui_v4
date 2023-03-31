@@ -12,13 +12,12 @@
     } from '../../functions/svelteWritables'
     import FelixPlotting from '../../modals/FelixPlotting.svelte'
     import { subplot, plot } from '$src/js/functions'
-    // import { find_felix_opo_peaks } from '../../functions/utils'
     import plotIndividualDataIntoGraph from '../../functions/plotIndividualDataIntoGraph'
     import { felix_opo_func } from '../../functions/felix_opo_func'
     import { TextSwitch, ButtonBadge } from '$src/components'
     import computePy_func from '$lib/pyserver/computePy'
     import { plotlayout } from '../../functions/plot_labels'
-    import { felixPlotCheckboxes, felixPlotWidgets, felix_peak_detection } from '../../functions/svelteWritables'
+    import { felixPlotCheckboxes, felixPlotWidgets } from '../../functions/svelteWritables'
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -157,7 +156,6 @@
         } else {
             felix_opo_func({ uniqueID, mode: 'felix' })
         }
-        // find_felix_opo_peaks(uniqueID)
     } else if (updateplot) {
         plotIndividualDataIntoGraph({
             plotfile,
@@ -171,12 +169,9 @@
         currentGraph = document.getElementById(`${uniqueID}-avgplot`)
         fittedTraceCount.init(uniqueID)
         expfittedLines.init(uniqueID)
-        felix_peak_detection.init(uniqueID)
-
         return () => {
             expfittedLines.remove(uniqueID)
             fittedTraceCount.remove(uniqueID)
-            felix_peak_detection.remove(uniqueID)
         }
     })
 </script>

@@ -7,6 +7,7 @@
         felixopoLocation,
         felix_fulldata,
         OPO_fulldata,
+        felix_peak_detection,
     } from './normline/functions/svelteWritables'
     import {
         OPORow,
@@ -149,6 +150,8 @@
         felix_fulldata.init(uniqueID)
         OPO_fulldata.init(uniqueID)
         normMethod.init(uniqueID)
+        felix_peak_detection.init(uniqueID)
+
         mounted = true
         console.warn('Normline mounted')
         return () => {
@@ -158,6 +161,7 @@
             felix_fulldata.remove(uniqueID)
             OPO_fulldata.remove(uniqueID)
             normMethod.remove(uniqueID)
+            felix_peak_detection.remove(uniqueID)
             console.warn('Normline destroyed')
         }
     })
