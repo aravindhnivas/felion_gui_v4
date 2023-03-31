@@ -266,7 +266,7 @@
             style="width: 7em;"
             input$type="number"
             input$min="1"
-            label="threshold count"
+            label="threshold intensity"
             bind:value={$felix_peak_detection[uniqueID].threshold}
         />
         <Textfield
