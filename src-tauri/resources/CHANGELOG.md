@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 4.11.0
+
+- New feature: Peak finder for FELIX and OPO plots
+
+---
+
 ## 4.10.1
 
 - Masspec peaks plot
