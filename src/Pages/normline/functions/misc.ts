@@ -69,7 +69,6 @@ export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black'}) => 
         font: { color },
         arrowcolor: color,
     }
-
     felixPlotAnnotations.update((data) => {
         data[uniqueID] = uniqBy([...data[uniqueID], annotation], 'text')
         return data

@@ -18,29 +18,33 @@ export const get_fulldata = (uniqueID: string) => {
 }
 
 export const find_felix_opo_peaks = (uniqueID) => {
-    
-    const { graphDiv } = get_graphDiv(uniqueID)
-    relayout(graphDiv, { annotations: [], shapes: [] })
+    try {
+        const { graphDiv } = get_graphDiv(uniqueID)
+        relayout(graphDiv, { annotations: [], shapes: [] })
 
-    felixPeakTable.setValue(uniqueID, [])
-    felixPlotAnnotations.setValue(uniqueID, [])
-    
-    const { key } = plotlayout[normMethod.get(uniqueID)]
-    const filename = felix_peak_detection.get(uniqueID).filename
-    const { x, y } = get_fulldata(uniqueID)[key][filename] as {x: number[], y: number[]}
+        felixPeakTable.setValue(uniqueID, [])
+        felixPlotAnnotations.setValue(uniqueID, [])
+        
+        const { key } = plotlayout[normMethod.get(uniqueID)]
+        const filename = felix_peak_detection.get(uniqueID).filename
+        const { x, y } = get_fulldata(uniqueID)[key][filename] as {x: number[], y: number[]}
 
-    const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
-    const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
+        const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
+        const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
 
-    const {indices} = find_peaks({
-        data: { x, y },
-        plotID: graphDiv,
-        windowWidth: felix_peak_detection.get(uniqueID).window,
-        threshold: felix_peak_detection.get(uniqueID).threshold,
-        color,
-    })
+        const {indices} = find_peaks({
+            data: { x, y },
+            plotID: graphDiv,
+            windowWidth: felix_peak_detection.get(uniqueID).window,
+            threshold: felix_peak_detection.get(uniqueID).threshold,
+            color,
+        })
 
-    indices.forEach((i) => {
-        set_peaks({uniqueID, x: x[i], y: y[i], color })
-    })
+        indices.forEach((i) => {
+            set_peaks({uniqueID, x: x[i], y: y[i], color })
+        })
+        console.log('Done finding peaks for ', uniqueID)
+    } catch (error) {
+        window.handleError(error)            
+    }
 }

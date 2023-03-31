@@ -79,6 +79,7 @@ export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, col
     if(plotID) {
         console.log(`Setting shapes for ${plotID}`)
         relayout(plotID, { shapes })
+        console.log(`done setting shapes for ${plotID}`)
     }
 
     return {indices, peaks, shapes}
