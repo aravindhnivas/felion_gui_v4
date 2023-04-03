@@ -51,7 +51,11 @@ export const find_felix_opo_peaks = (uniqueID) => {
         indices.forEach((i) => {
             set_peaks({uniqueID, x: x[i], y: y[i], color })
         })
-        console.log('Done finding peaks for ', uniqueID)
+
+        window.createToast(
+            `${indices.length} peaks found. Adjust threshold and peak width to re-calibrate peak finder`, 
+            'success', { duration: 5000, position: 'bottom-left'}
+        )
     } catch (error) {
         window.handleError(error)            
     }

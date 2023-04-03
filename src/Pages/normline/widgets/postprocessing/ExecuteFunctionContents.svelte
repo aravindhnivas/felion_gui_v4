@@ -257,12 +257,18 @@
         { name: 'Overwrite', selected: true },
     ]
 
-    $: console.log('Write', write_controller.find((w) => w.name == 'Write').selected)
-    $: console.log('Overwrite', write_controller.find((w) => w.name == 'Overwrite').selected)
+    // $: if (toggleFindPeaksRow && $felixOutputName[uniqueID]) find_felix_opo_peaks(uniqueID)
 </script>
 
 <div class="align" style="align-items: end;">
-    <Select bind:value={$felixOutputName[uniqueID]} label="Select file to fit" options={output_namelists} />
+    <Select
+        bind:value={$felixOutputName[uniqueID]}
+        label="Select file to fit"
+        options={output_namelists}
+        on:change={() => {
+            find_felix_opo_peaks(uniqueID)
+        }}
+    />
     <TextAndSelectOptsToggler
         toggle={false}
         bind:value={writeFileName}
@@ -304,15 +310,29 @@
             bind:value={$felix_peak_detection[uniqueID].window}
         />
         <button class="button is-warning" on:click={() => find_felix_opo_peaks(uniqueID)}>Find peaks</button>
-        <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
-    </div>
-    <div class="align">
-        <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
-        <Switch bind:selected={fitall} label="fit all methods" />
         <button style="width:7em" class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'NGauss_fit' })}>
             Fit
         </button>
+        <div class="ml-auto">
+            <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
+            <button
+                class="button is-danger"
+                on:click={() => {
+                    $felixPlotAnnotations[uniqueID] = []
+                    $felixPeakTable[uniqueID] = []
+                    NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
+                    relayout(currentGraph, { annotations: [] })
+                    window.createToast('Cleared', 'warning')
+                }}
+            >
+                Clear peaks
+            </button>
+        </div>
+    </div>
 
+    <div class="align">
+        <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
+        <Switch bind:selected={fitall} label="fit all methods" />
         <TextAndSelectOptsToggler
             style="width: 7em;"
             bind:value={savePeakfilename}
@@ -334,17 +354,5 @@
             Save peaks
         </button>
         <button class="button is-link" on:click={loadpeakTable}>Load peaks</button>
-        <button
-            class="button is-danger"
-            on:click={() => {
-                $felixPlotAnnotations[uniqueID] = []
-                $felixPeakTable[uniqueID] = []
-                NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
-                relayout(currentGraph, { annotations: [] })
-                window.createToast('Cleared', 'warning')
-            }}
-        >
-            Clear peaks
-        </button>
     </div>
 {/if}
