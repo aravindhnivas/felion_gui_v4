@@ -42,7 +42,7 @@ export function exp_fit_func({ dataFromPython, uniqueID }: { dataFromPython: any
 
     let color = '#fafafa'
 
-    const output_name = felixOutputName.get(uniqueID) as string
+    const output_name = felixOutputName.get(uniqueID)
     if (output_name === 'averaged') {
         color = '#836ac05c'
         const total_lines = dataTable_avg.get(uniqueID).length
