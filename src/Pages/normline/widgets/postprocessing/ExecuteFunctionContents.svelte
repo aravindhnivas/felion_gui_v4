@@ -287,12 +287,6 @@
 
 {#if toggleFindPeaksRow}
     <div class="align">
-        <!-- <Select
-            on:change={() => find_felix_opo_peaks(uniqueID)}
-            bind:value={$felix_peak_detection[uniqueID].filename}
-            options={$fileChecked[uniqueID]}
-            label="Select file to find peaks"
-        /> -->
         <Textfield
             on:change={() => find_felix_opo_peaks(uniqueID)}
             style="width: 7em;"
@@ -350,7 +344,7 @@
                 window.createToast('Cleared', 'warning')
             }}
         >
-            Clear
+            Clear peaks
         </button>
     </div>
 {/if}
