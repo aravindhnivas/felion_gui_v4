@@ -88,5 +88,4 @@ export const felixPlotCheckboxes = writable([
 export const felix_peak_detection = customStore({
     threshold: 5,
     window: 3,
-    filename: 'average',
 })

@@ -34,7 +34,7 @@
 
     // let overwrite_expfit: boolean = true
     // let writeFile: boolean = false
-    let writeFileName: string = 'average_normline.dat'
+    let writeFileName: string = 'averaged_normline.dat'
 
     // //////////////////////////////////////////////////////////////////////
     const uniqueID = getContext<string>('uniqueID')
@@ -244,6 +244,7 @@
             felixPlotAnnotations.remove(uniqueID)
         }
     })
+
     const selected_files = async (files: string[]) => {
         $fileChecked[uniqueID] = await Promise.all(files.map(async (f) => await path.basename(f)))
     }
@@ -286,12 +287,12 @@
 
 {#if toggleFindPeaksRow}
     <div class="align">
-        <Select
+        <!-- <Select
             on:change={() => find_felix_opo_peaks(uniqueID)}
             bind:value={$felix_peak_detection[uniqueID].filename}
             options={$fileChecked[uniqueID]}
             label="Select file to find peaks"
-        />
+        /> -->
         <Textfield
             on:change={() => find_felix_opo_peaks(uniqueID)}
             style="width: 7em;"

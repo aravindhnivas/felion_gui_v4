@@ -27,8 +27,9 @@ export const find_felix_opo_peaks = (uniqueID) => {
         
         const { key } = plotlayout[normMethod.get(uniqueID)]
         let filename = felixOutputName.get(uniqueID)
+        filename = fileChecked.get(uniqueID).find((f) => f.includes(filename))
         if(filename === 'averaged') filename = 'average'
-        
+        console.log('Finding peaks for ', filename)
         const data = get_fulldata(uniqueID)[key][filename] as {x: number[], y: number[]}
         if(!data) return window.createToast('No data available to find peaks', 'danger')
 
