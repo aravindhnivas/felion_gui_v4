@@ -2,10 +2,10 @@
     import { felixOutputName, felixopoLocation } from '../../functions/svelteWritables'
     import { Select, Switch, TextAndSelectOptsToggler } from '$src/components'
 
-    export let writeFile: boolean = false
-    export let writeFileName = 'average_normline.dat'
+    // export let writeFile: boolean = false
+    // export let writeFileName = 'average_normline.dat'
     export let output_namelists: string[] = []
-    export let overwrite_expfit: boolean = true
+    // export let overwrite_expfit: boolean = true
 
     const dispatch = createEventDispatcher()
     const uniqueID = getContext<string>('uniqueID')
@@ -18,7 +18,7 @@
 </script>
 
 <div class="align">
-    <Select bind:value={$felixOutputName[uniqueID]} label="Output filename" options={output_namelists} />
+    <Select bind:value={$felixOutputName[uniqueID]} label="Select file to fit" options={output_namelists} />
     <TextAndSelectOptsToggler
         toggle={false}
         bind:value={writeFileName}

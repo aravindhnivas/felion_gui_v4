@@ -141,13 +141,16 @@
         const data = plotted_data[peak_detection.filename]
         const fileInd = fileChecked.findIndex((file) => file === peak_detection.filename)
         const color = `rgb${colors[fileInd]}`
-        const { indices, peaks } = find_peaks({
+        const found_peaks = find_peaks({
             windowWidth: peak_detection.window,
             threshold: peak_detection.threshold,
             data,
             color,
             plotID,
         })
+        if (!found_peaks) return
+        const { indices, peaks } = found_peaks
+
         normalize_wrt_mz = peaks.x[0]?.toString()
         if (!normalize_wrt_mz || isNaN(Number(normalize_wrt_mz))) return
         const ind = data.x.findIndex((x) => x == Number(normalize_wrt_mz))

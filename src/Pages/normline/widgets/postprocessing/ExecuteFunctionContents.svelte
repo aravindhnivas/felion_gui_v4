@@ -22,16 +22,18 @@
     import { find_felix_opo_peaks } from '../../functions/utils'
     // //////////////////////////////////////////////////////////////////////
 
-    export let writeFile: boolean = false
     // export let normMethod: string
     export let showall = true
     export let fullfiles: string[]
     export let addedFileCol: string
-    export let writeFileName: string
     export let addedFileScale: number
-    export let overwrite_expfit: boolean
     export let modalActivate = false
     export let adjustPeakTrigger = false
+    export let output_namelists: string[] = []
+
+    let overwrite_expfit: boolean = true
+    let writeFile: boolean = false
+    let writeFileName: string = 'average_normline.dat'
 
     // //////////////////////////////////////////////////////////////////////
     const uniqueID = getContext<string>('uniqueID')
@@ -224,7 +226,10 @@
         }
     }
     $: if (adjustPeakTrigger) adjustPeak()
-    onMount(() => {
+
+    let lookIn = ''
+    onMount(async () => {
+        lookIn = await path.resolve($felixopoLocation[uniqueID], '../EXPORT')
         felixIndex.init(uniqueID)
         felixPeakTable.init(uniqueID)
         felixOutputName.init(uniqueID)
@@ -236,16 +241,32 @@
             felixPlotAnnotations.remove(uniqueID)
         }
     })
-
     const selected_files = async (files: string[]) => {
         $fileChecked[uniqueID] = await Promise.all(files.map(async (f) => await path.basename(f)))
     }
+
     $: selected_files(fullfiles)
+    const dispatch = createEventDispatcher()
 </script>
 
 <div class="align">
+    <Select bind:value={$felixOutputName[uniqueID]} label="Select file to fit" options={output_namelists} />
+    <TextAndSelectOptsToggler
+        toggle={false}
+        bind:value={writeFileName}
+        label="writeFileName"
+        {lookIn}
+        lookFor=".dat"
+        auto_init={true}
+    />
+    <Switch style="margin: 0 1em;" bind:selected={writeFile} label="Write" />
+    <Switch style="margin: 0 1em;" bind:selected={overwrite_expfit} label="Overwrite" />
+
     <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Exp Fit.</button>
     <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Fit NGauss.</button>
+
+    <button class="button is-link" on:click={() => dispatch('addfile')}>Add files</button>
+    <button class="button is-link" on:click={() => dispatch('removefile')}>Remove files</button>
 
     <div class="ml-auto">
         <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>

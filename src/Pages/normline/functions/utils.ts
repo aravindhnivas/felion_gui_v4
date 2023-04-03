@@ -32,13 +32,16 @@ export const find_felix_opo_peaks = (uniqueID) => {
         const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
         const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
 
-        const {indices} = find_peaks({
+        const found_peaks = find_peaks({
             data: { x, y },
             plotID: graphDiv,
             windowWidth: felix_peak_detection.get(uniqueID).window,
             threshold: felix_peak_detection.get(uniqueID).threshold,
             color,
         })
+        if(!found_peaks) return window.createToast('No peaks found', 'warning')
+
+        const { indices } = found_peaks
 
         indices.forEach((i) => {
             set_peaks({uniqueID, x: x[i], y: y[i], color })

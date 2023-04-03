@@ -47,10 +47,10 @@
     ///////////////////////////////////////////////////////////////////////
     let showTheory = true
     let graphPlotted = false
-    let overwrite_expfit = true
-    let writeFile = true
+    // let overwrite_expfit = true
+    // let writeFile = true
     let OPOfilesChecked = []
-    let writeFileName = 'average_normline.dat'
+    // let writeFileName = 'average_normline.dat'
 
     $: plottedFiles = $opoMode[uniqueID]
         ? OPOfilesChecked.map((file) => file.split('.')[0]) || []
@@ -300,16 +300,13 @@
     </svelte:fragment>
 
     <svelte:fragment slot="plotContainer_functions">
-        <WriteFunctionContents
+        <!-- <WriteFunctionContents
             on:addfile={() => {
                 addFileModal = true
             }}
             on:removefile={removeExtraFile}
             {output_namelists}
-            bind:writeFileName
-            bind:writeFile
-            bind:overwrite_expfit
-        />
+        /> -->
 
         <ExecuteFunctionContents
             {showall}
@@ -317,12 +314,14 @@
             bind:adjustPeakTrigger
             {...{
                 fullfiles,
-                writeFile,
                 addedFileCol,
-                writeFileName,
                 addedFileScale,
-                overwrite_expfit,
+                output_namelists,
             }}
+            on:addfile={() => {
+                addFileModal = true
+            }}
+            on:removefile={removeExtraFile}
         />
     </svelte:fragment>
     <svelte:fragment slot="plotContainer_reports">

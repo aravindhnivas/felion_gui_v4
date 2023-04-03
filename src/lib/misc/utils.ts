@@ -48,7 +48,7 @@ export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, col
         data: data.y,
         windowWidth,
         threshold,
-    })
+    }) as number[]
 
     if (indices.length < 1) return
 
@@ -74,13 +74,12 @@ export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, col
     const peaks = {
         x: indices.map((i) => data.x[i]),
         y: indices.map((i) => data.y[i]),
-    }
+    } as {x: number[], y: number[]}
 
     if(plotID) {
         console.log(`Setting shapes for ${plotID}`)
         relayout(plotID, { shapes })
         console.log(`done setting shapes for ${plotID}`)
     }
-
     return {indices, peaks, shapes}
 }
