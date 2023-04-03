@@ -1,4 +1,4 @@
-import { felix_fulldata, opoMode, OPO_fulldata, normMethod, felix_peak_detection, fileChecked, felixPeakTable, felixPlotAnnotations} from "./svelteWritables"
+import { felix_fulldata, opoMode, OPO_fulldata, normMethod, felix_peak_detection, fileChecked, felixPeakTable, felixPlotAnnotations, felixOutputName} from "./svelteWritables"
 import { find_peaks } from "$src/lib/misc/utils"
 import { plotlayout } from "./plot_labels"
 import { set_peaks } from "./misc"
@@ -26,9 +26,13 @@ export const find_felix_opo_peaks = (uniqueID) => {
         felixPlotAnnotations.setValue(uniqueID, [])
         
         const { key } = plotlayout[normMethod.get(uniqueID)]
-        const filename = felix_peak_detection.get(uniqueID).filename
-        const { x, y } = get_fulldata(uniqueID)[key][filename] as {x: number[], y: number[]}
+        let filename = felixOutputName.get(uniqueID)
+        if(filename === 'averaged') filename = 'average'
+        
+        const data = get_fulldata(uniqueID)[key][filename] as {x: number[], y: number[]}
+        if(!data) return window.createToast('No data available to find peaks', 'danger')
 
+        const { x, y } = data
         const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
         const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
 
