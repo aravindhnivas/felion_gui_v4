@@ -20,6 +20,7 @@
     import computePy_func from '$lib/pyserver/computePy'
     import { Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
     import { find_felix_opo_peaks } from '../../functions/utils'
+    import SegBtn from '$src/components/SegBtn.svelte'
     // //////////////////////////////////////////////////////////////////////
 
     // export let normMethod: string
@@ -31,8 +32,8 @@
     export let adjustPeakTrigger = false
     export let output_namelists: string[] = []
 
-    let overwrite_expfit: boolean = true
-    let writeFile: boolean = false
+    // let overwrite_expfit: boolean = true
+    // let writeFile: boolean = false
     let writeFileName: string = 'average_normline.dat'
 
     // //////////////////////////////////////////////////////////////////////
@@ -138,22 +139,24 @@
                 if (!$felixOutputName[uniqueID]) {
                     return window.createToast('Output name not found!!. Please select output filename', 'danger')
                 }
+
                 if ($felixIndex[uniqueID].length < 2) {
                     return window.createToast('Range not found!!. Select a range using Box-select', 'danger')
                 }
 
                 const expfit_args = {
                     fullfiles,
-                    writeFile,
                     addedFileCol,
                     writeFileName,
                     addedFileScale,
-                    overwrite_expfit,
                     normMethod: $normMethod[uniqueID],
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
                     output_name: $felixOutputName[uniqueID],
+                    writeFile: write_controller.find((w) => w.name == 'Write').selected,
+                    overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
                 }
+
                 computePy_func({
                     e,
                     pyfile: 'normline.exp_gauss_fit',
@@ -194,8 +197,8 @@
                     location: $felixopoLocation[uniqueID],
                     addedFileScale,
                     addedFileCol,
-                    overwrite_expfit,
-                    writeFile,
+                    writeFile: write_controller.find((w) => w.name == 'Write').selected,
+                    overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
                     writeFileName,
                     output_name: $felixOutputName[uniqueID],
                     fullfiles,
@@ -246,10 +249,18 @@
     }
 
     $: selected_files(fullfiles)
+
     const dispatch = createEventDispatcher()
+    let write_controller = [
+        { name: 'Write', selected: false },
+        { name: 'Overwrite', selected: true },
+    ]
+
+    $: console.log('Write', write_controller.find((w) => w.name == 'Write').selected)
+    $: console.log('Overwrite', write_controller.find((w) => w.name == 'Overwrite').selected)
 </script>
 
-<div class="align">
+<div class="align" style="align-items: end;">
     <Select bind:value={$felixOutputName[uniqueID]} label="Select file to fit" options={output_namelists} />
     <TextAndSelectOptsToggler
         toggle={false}
@@ -259,8 +270,7 @@
         lookFor=".dat"
         auto_init={true}
     />
-    <Switch style="margin: 0 1em;" bind:selected={writeFile} label="Write" />
-    <Switch style="margin: 0 1em;" bind:selected={overwrite_expfit} label="Overwrite" />
+    <SegBtn bind:choices={write_controller} label="write/overwrite file" />
 
     <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Exp Fit.</button>
     <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Fit NGauss.</button>

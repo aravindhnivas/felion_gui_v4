@@ -393,8 +393,8 @@
             label="output data directory"
             bind:lock={data_dir_locked}
         />
-        <div class="align box px-3 py-2" style="border: solid 1px #fff9;">
-            <SegBtn bind:choices={simulation_choices} />
+        <div class="align box px-3 py-2" style="border: solid 1px #fff9; align-items: end;">
+            <SegBtn bind:choices={simulation_choices} label="select processes to include" />
             <Checkbox bind:value={$electronSpin} label="Electron Spin" />
             <Checkbox bind:value={$zeemanSplit} label="Zeeman" />
         </div>

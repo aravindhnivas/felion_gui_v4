@@ -130,17 +130,18 @@ li.mdc-deprecated-list-item.mdc-ripple-upgraded {
 }
 
 button.mdc-segmented-button__segment.mdc-ripple-upgraded {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-danger-light);
   opacity: 0.7;
-  &:hover {
-      background-color: var(--color-primary);
-      border: solid 1px white;
-  }
+  // &:hover {
+  //     // background-color: var(--color-primary);
+  //     // border: solid 1px white;
+  // }
   .mdc-segmented-button__label {
       color: white;
   }
   &.mdc-segmented-button__segment--selected {
-      border: solid 1px white;
+    background-color: var(--color-success-light);;
+      // border: solid 1px white;
       opacity: 1;
       .mdc-segmented-button__label {
           color: white;

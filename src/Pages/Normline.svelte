@@ -17,7 +17,6 @@
         InitFunctionRow,
         GetFileInfoTable,
         AdjustInitialGuess,
-        WriteFunctionContents,
         ExecuteFunctionContents,
     } from './normline'
     import { Select, Switch, Radio, SegBtn } from '$src/components'
@@ -127,8 +126,8 @@
         { name: 'Raw data', selected: true },
         { name: 'Power-Calib', selected: true },
         { name: 'FELIX', selected: true },
-        { name: 'OPO', selected: true },
-        { name: 'Theory', selected: true },
+        { name: 'OPO', selected: false },
+        { name: 'Theory', selected: false },
     ]
     $: if (show_graphs) {
         showFELIX = show_graphs.find((graph) => graph.name === 'FELIX').selected
@@ -251,7 +250,7 @@
                     <Select bind:value={plotfile} label="plotfile" options={plotfileOptions} />
                 {/if}
             </div>
-            <SegBtn class="ml-auto" bind:choices={show_graphs} />
+            <SegBtn class="ml-auto" bind:choices={show_graphs} label="select plots to include" />
         </div>
     </svelte:fragment>
 
@@ -300,14 +299,6 @@
     </svelte:fragment>
 
     <svelte:fragment slot="plotContainer_functions">
-        <!-- <WriteFunctionContents
-            on:addfile={() => {
-                addFileModal = true
-            }}
-            on:removefile={removeExtraFile}
-            {output_namelists}
-        /> -->
-
         <ExecuteFunctionContents
             {showall}
             bind:modalActivate
