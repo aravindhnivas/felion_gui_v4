@@ -17,7 +17,7 @@ export const get_fulldata = (uniqueID: string) => {
     return mode ? OPO_fulldata.get(uniqueID) : felix_fulldata.get(uniqueID)
 }
 
-export const find_felix_opo_peaks = (uniqueID) => {
+export const find_felix_opo_peaks = ({uniqueID, toast = false}) => {
     try {
         const { graphDiv } = get_graphDiv(uniqueID)
         relayout(graphDiv, { annotations: [], shapes: [] })
@@ -52,10 +52,12 @@ export const find_felix_opo_peaks = (uniqueID) => {
             set_peaks({uniqueID, x: x[i], y: y[i], color })
         })
 
-        window.createToast(
-            `${indices.length} peaks found. Adjust threshold and peak width to re-calibrate peak finder`, 
-            'success', { duration: 5000, position: 'bottom-left'}
-        )
+        if(toast){
+            window.createToast(
+                `${indices.length} peaks found. Adjust threshold and peak width to re-calibrate peak finder`, 
+                'success', { duration: 5000, position: 'bottom-left'}
+                )
+            }
     } catch (error) {
         window.handleError(error)            
     }
