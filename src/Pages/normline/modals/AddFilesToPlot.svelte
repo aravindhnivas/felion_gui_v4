@@ -49,20 +49,25 @@
 {#if active}
     <Modal bind:active title="Add file to plot">
         <svelte:fragment slot="content">
+            <div class="tag is-warning" style="width: auto;">
+                Make sure the filename does not ends with or have 'felix' extension
+            </div>
             <div class="align mb-2">
                 <button on:click={addFileSelection} class="button is-link">Browse</button>
                 <Textfield bind:value={addedFile.col} label="Columns" />
                 <Textfield bind:value={addedFile.scale} label="ScaleY" input$type="number" />
             </div>
 
-            <div class="align">
-                <div class="tag is-warning">{addedFile.files.length} file(s) added</div>
+            {#if addedFile.files.length > 0}
                 <div class="align">
-                    {#each addedFile.files as file, i}
-                        <div>{i + 1}: {file}</div>
-                    {/each}
+                    <div class="tag is-warning">{addedFile.files.length} file(s) added</div>
+                    <div class="align">
+                        {#each addedFile.files as file, i}
+                            <div>{i + 1}: {file}</div>
+                        {/each}
+                    </div>
                 </div>
-            </div>
+            {/if}
         </svelte:fragment>
         <svelte:fragment slot="footerbtn">
             <button
