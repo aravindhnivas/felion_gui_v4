@@ -284,8 +284,14 @@
     />
 
     <SegBtn bind:choices={write_controller} label="write/overwrite file" />
-    <button class="button is-link" on:click={() => dispatch('addfile')}>Add files</button>
-    <button class="button is-link" on:click={() => dispatch('removefile')}>Remove files</button>
+    <div class="ml-auto">
+        <button class="button is-link" on:click={() => dispatch('addfile')}
+            >Add file <i class="i-material-symbols-add-box-outline text-xs" /></button
+        >
+        <button class="button is-link" on:click={() => dispatch('removefile')}
+            >Remove file <i class="i-material-symbols-remove text-xs" /></button
+        >
+    </div>
 
     {#if $fittedTraceCount[uniqueID] > 0}
         <div class="ml-auto">
