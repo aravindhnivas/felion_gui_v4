@@ -35,7 +35,7 @@
             }
         }
         if (files.length < 1) return (active = false)
-        addedFile.N = plotted_names.length + addedFile.files.length
+        addedFile.N = plotted_names.length + addedFile.files.length - 1
 
         console.log({ N: addedFile.N, files })
         computePy_func({ e, pyfile, args: { ...addedFile, files } }).then((dataFromPython) => {
