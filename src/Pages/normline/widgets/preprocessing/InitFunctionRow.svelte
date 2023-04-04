@@ -23,7 +23,7 @@
 
     export let plotfile = 'average'
     export let felixfiles = []
-    export let removeExtraFile: VoidFunction
+    // export let removeExtraFile: VoidFunction
     export let showall = true
     export let theoryRow = false
     // export let normMethod: string
@@ -48,7 +48,7 @@
                 if (felixfiles.length < 1) return window.createToast('No files selected', 'danger')
                 if (deltaFELIX == 0)
                     return window.createToast('Delta FELIX cannot be 0. Set it to atleast 0.5', 'danger')
-                removeExtraFile()
+                // removeExtraFile()
 
                 const graphDiv_avgplot = <Plotly.PlotlyHTMLElement>document.getElementById(`${uniqueID}-avgplot`)
 

@@ -12,7 +12,7 @@
     export let plotfile: string
     export let opofiles: string[]
     export let OPOLocation: string
-    export let removeExtraFile: VoidFunction
+    // export let removeExtraFile: VoidFunction
     export let OPOfilesChecked: string[]
     export let showall = true
     // export let normMethod: string
@@ -41,7 +41,7 @@
     let dataReady = false
 
     function plotData({ e = null, tkplot = 'run', general = false } = {}) {
-        removeExtraFile()
+        // removeExtraFile()
 
         if (opofiles.length < 1) return window.createToast('No OPO files selected', 'danger')
         $felixPlotAnnotations[uniqueID] = []

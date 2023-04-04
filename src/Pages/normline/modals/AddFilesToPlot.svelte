@@ -2,44 +2,43 @@
     import { Textfield, Modal } from '$src/components'
     import { opoMode } from '../functions/svelteWritables'
     import computePy_func from '$lib/pyserver/computePy'
+    import { uniq } from 'lodash-es'
 
     export let active = false
-    export let fileChecked = []
-    export let addedFileCol = '0, 1'
-    export let addedFileScale = 1000
-
-    export let addedfiles: string[] = []
-
     export let addedFile: { files: string[]; col: string; scale: number; N: number } = {
         files: [],
         col: '0, 1',
         scale: 1,
         N: 0,
     }
-    export let extrafileAdded = 0
 
     const uniqueID = getContext<string>('uniqueID')
 
     async function addFileSelection() {
         const result = (await dialog.open({ directory: false, multiple: true })) as string[]
         if (!result) return
-        addedfiles = addedFile['files'] = result
+        addedFile.files = uniq([...addedFile.files, ...result])
         window.createToast('Files added')
     }
 
-    function plotData({ e = null } = {}) {
+    $: currentGraph = document.getElementById($opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`)
+    async function plotData({ e = null } = {}) {
         const pyfile = 'normline.addTrace'
-        let args
         if (addedFile.files.length < 1) return window.createToast('No files selected', 'danger')
-        extrafileAdded += addedfiles.length
-        addedFile['col'] = addedFileCol
-        addedFile['N'] = fileChecked.length + extrafileAdded
+        const plotted_names = currentGraph?.data.map((d) => d.name) ?? []
 
-        addedFile['scale'] = addedFileScale
-        args = addedFile
+        let files = []
+        for (const f of addedFile.files) {
+            const filename = await path.basename(f)
+            if (!plotted_names.includes(filename)) {
+                files = [...files, f]
+            }
+        }
+        if (files.length < 1) return (active = false)
+        addedFile.N = plotted_names.length + addedFile.files.length
 
-        computePy_func({ e, pyfile, args }).then((dataFromPython) => {
-            const currentGraph = $opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
+        console.log({ N: addedFile.N, files })
+        computePy_func({ e, pyfile, args: { ...addedFile, files } }).then((dataFromPython) => {
             addTraces(currentGraph, dataFromPython)
             window.createToast('Graph Plotted', 'success')
             active = false
@@ -49,11 +48,37 @@
 
 {#if active}
     <Modal bind:active title="Add file to plot">
-        <div class="align" slot="content">
-            <Textfield bind:value={addedFileCol} label="Columns" />
-            <Textfield bind:value={addedFileScale} label="ScaleY" />
-            <button on:click={addFileSelection} class="button is-link">Browse</button>
-        </div>
-        <button slot="footerbtn" class="button is-link" on:click={(e) => plotData({ e: e })}>Add</button>
+        <svelte:fragment slot="content">
+            <div class="align mb-2">
+                <button on:click={addFileSelection} class="button is-link">Browse</button>
+                <Textfield bind:value={addedFile.col} label="Columns" />
+                <Textfield bind:value={addedFile.scale} label="ScaleY" input$type="number" />
+            </div>
+
+            <div class="align">
+                <div class="tag is-warning">{addedFile.files.length} file(s) added</div>
+                <div class="align">
+                    {#each addedFile.files as file, i}
+                        <div>{i + 1}: {file}</div>
+                    {/each}
+                </div>
+            </div>
+        </svelte:fragment>
+        <svelte:fragment slot="footerbtn">
+            <button
+                class="button is-danger"
+                on:click={(e) => {
+                    addedFile.files.forEach(async (f) => {
+                        addedFile.files = addedFile.files.filter((file) => file !== f)
+                        const plotted_names = currentGraph?.data.map((d) => d.name) ?? []
+                        const filename = await path.basename(f)
+
+                        const index = plotted_names.indexOf(filename)
+                        if (index > -1) deleteTraces(currentGraph, [-1])
+                    })
+                }}>Clear</button
+            >
+            <button class="button is-link" on:click={(e) => plotData({ e: e })}>Add to plot</button>
+        </svelte:fragment>
     </Modal>
 {/if}

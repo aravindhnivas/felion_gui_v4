@@ -23,6 +23,7 @@
     import { Select, Switch, Radio, SegBtn } from '$src/components'
     import Layout from '$src/layout/pages/Layout.svelte'
     import { plotlayout } from './normline/functions/plot_labels'
+    import { dropRight } from 'lodash-es'
     ///////////////////////////////////////////////////////////////////////
 
     export let id = 'Normline'
@@ -46,11 +47,7 @@
 
     ///////////////////////////////////////////////////////////////////////
     let showTheory = true
-    // let graphPlotted = false
-    // let overwrite_expfit = true
-    // let writeFile = true
     let OPOfilesChecked = []
-    // let writeFileName = 'average_normline.dat'
 
     $: plottedFiles = $opoMode[uniqueID]
         ? OPOfilesChecked.map((file) => file.split('.')[0]) || []
@@ -62,62 +59,43 @@
         output_namelists = ['averaged', ..._plottedFiles, ..._extrafiles.map((file) => file.split('.')[0])]
     }
     let output_namelists = []
-    $: update_output_namelists(plottedFiles, addedfiles)
+    $: update_output_namelists(plottedFiles, addedFile.files)
 
     // OPO
     let OPOLocation = localStorage.getItem('ofelix_location') || currentLocation
-    let opofiles = []
-
     let theoryLocation = localStorage.getItem('theoryLocation') || currentLocation
+    let opofiles = []
 
     $: $felixopoLocation[uniqueID] = $opoMode[uniqueID] ? OPOLocation : currentLocation
     $: $Ngauss_sigma[uniqueID] = $opoMode[uniqueID] ? 2 : 5
-
     let addFileModal = false
-
     let addedFile = {
         files: [],
         col: '0, 1',
         scale: 1,
         N: 0,
     }
-    let addedfiles = []
-    let addedFileCol = '0, 1'
-    let addedFileScale = 1
-    let extrafileAdded = 0
 
     $: currentGraphID = $opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
 
-    $: console.log(`Extrafile added: ${extrafileAdded}`)
-
     function removeExtraFile() {
-        // console.log(extrafileAdded)
-        if (extrafileAdded === 0) return
-        for (let i = 0; i < extrafileAdded + 1; i++) {
-            try {
-                deleteTraces(currentGraphID, [-1])
-                extrafileAdded--
-                addedfiles = addedfiles.slice(0, addedfiles.length - 1)
-            } catch (err) {
-                console.warn(err, 'Could not delete trace')
-            }
-        }
+        if (addedFile.files.length === 0) return
+        deleteTraces(currentGraphID, [-1])
+        addedFile.files = dropRight(addedFile.files)
     }
+
     let fullfiles: string[] = []
+
     const update_fullfiles = async (opofiles: string[], felixfiles: string[], addedfiles: string[]) => {
         const avgfile = await path.resolve(currentLocation, 'averaged')
         fullfiles = $opoMode[uniqueID] ? [...opofiles, ...addedfiles, avgfile] : [...felixfiles, ...addedfiles, avgfile]
     }
-    $: update_fullfiles(opofiles, felixfiles, addedfiles)
+    $: update_fullfiles(opofiles, felixfiles, addedFile.files)
 
     let activateConfigModal = false
     let modalActivate = false
     let adjustPeakTrigger = false
-
     let plotfile = 'average'
-
-    // let showMoreOptions = false
-
     let showOPO = true
     let showFELIX = true
     let showRawData = true
@@ -193,16 +171,7 @@
     }
 </script>
 
-<AddFilesToPlot
-    {fileChecked}
-    bind:addedfiles
-    bind:addedFile
-    bind:addedFileCol
-    bind:addedFileScale
-    bind:extrafileAdded
-    bind:active={addFileModal}
-/>
-
+<AddFilesToPlot bind:addedFile bind:active={addFileModal} />
 <AdjustInitialGuess bind:active={modalActivate} on:save={() => (adjustPeakTrigger = true)} />
 
 <Layout
@@ -233,7 +202,6 @@
         <InitFunctionRow
             {theoryLocation}
             bind:theoryRow
-            {removeExtraFile}
             {felixfiles}
             {plotfile}
             class={felix_toggle && mounted ? '' : 'hide'}
@@ -241,7 +209,6 @@
         />
         <OPORow
             {showall}
-            {removeExtraFile}
             bind:OPOLocation
             bind:OPOfilesChecked
             bind:opofiles
@@ -290,15 +257,10 @@
 
     <svelte:fragment slot="plotContainer_functions">
         <ExecuteFunctionContents
-            {showall}
             bind:modalActivate
             bind:adjustPeakTrigger
-            {...{
-                fullfiles,
-                addedFileCol,
-                addedFileScale,
-                output_namelists,
-            }}
+            {fullfiles}
+            {output_namelists}
             on:addfile={() => {
                 addFileModal = true
             }}

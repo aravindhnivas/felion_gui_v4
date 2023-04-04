@@ -21,12 +21,10 @@
     import { Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
     import { find_felix_opo_peaks } from '../../functions/utils'
     import SegBtn from '$src/components/SegBtn.svelte'
+
     // //////////////////////////////////////////////////////////////////////
 
-    export let showall = true
     export let fullfiles: string[]
-    export let addedFileCol: string
-    export let addedFileScale: number
     export let modalActivate = false
     export let adjustPeakTrigger = false
     export let output_namelists: string[] = []
@@ -39,8 +37,8 @@
         fitNGauss_arguments: { [name: string]: number }
         index: number[]
         location: string
-        addedFileScale: string
-        addedFileCol: string
+        // addedFileScale: number
+        // addedFileCol: string
         writeFile: boolean
         overwrite_expfit: boolean
         writeFileName: string
@@ -52,8 +50,8 @@
         fitNGauss_arguments: {},
         index: [],
         location: '',
-        addedFileScale: '',
-        addedFileCol: '',
+        // addedFileScale: 1,
+        // addedFileCol: '',
         writeFile: false,
         overwrite_expfit: true,
         writeFileName: '',
@@ -70,17 +68,10 @@
     $: currentGraph = $opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
 
     const clearAllPeak = () => {
-        // const graphElement = document.getElementById(currentGraph)
-
-        // relayout(currentGraph, { annotations: [], shapes: [] })
-
-        // const defaultLength = showall ? fullfiles.length : 1
-        // const noOfFittedData = graphElement.data?.length - defaultLength
         if ($fittedTraceCount[uniqueID] === 0) {
             return window.createToast('No fitted lines found', 'danger')
         }
-        // console.log('Removing all found peak values')
-        // console.log({ noOfFittedData }, fullfiles.length, graphElement.data?.length)
+
         $felixIndex[uniqueID] = []
         $felixPlotAnnotations[uniqueID] = []
         $expfittedLines[uniqueID] = []
@@ -92,13 +83,8 @@
         }
         $fittedTraceCount[uniqueID] = 0
     }
-    $: number_of_fitted_data = document.getElementById(currentGraph)?.data?.length - (showall ? fullfiles.length : 1)
-    $: console.log('number_of_fitted_data', number_of_fitted_data)
 
     const clearLastPeak = () => {
-        // const graphElement = document.getElementById(currentGraph)
-        // const defaultLength = showall ? fullfiles.length : 1
-        // const noOfFittedData = graphElement.data?.length - defaultLength
         if ($fittedTraceCount[uniqueID] === 0) {
             return window.createToast('No fitted lines found', 'danger')
         }
@@ -124,7 +110,6 @@
 
     function adjustPeak() {
         const annotationDefaults = {
-            // xref: 'x',
             y: 'y',
             showarrow: true,
             arrowhead: 2,
@@ -171,9 +156,9 @@
 
                 const expfit_args = {
                     fullfiles,
-                    addedFileCol,
+                    // addedFileCol,
+                    // addedFileScale,
                     writeFileName,
-                    addedFileScale,
                     normMethod: $normMethod[uniqueID],
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
@@ -221,8 +206,8 @@
                 NGauss_fit_args = {
                     ...NGauss_fit_args,
                     location: $felixopoLocation[uniqueID],
-                    addedFileScale,
-                    addedFileCol,
+                    // addedFileScale,
+                    // addedFileCol,
                     writeFile,
                     overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
                     writeFileName,

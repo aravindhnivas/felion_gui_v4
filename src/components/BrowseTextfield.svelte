@@ -2,10 +2,10 @@
     import { Textfield } from '$src/components'
     import IconButton, { Icon } from '@smui/icon-button'
 
-    export let value: typeof type = ''
+    export let dir: boolean = true
+    export let value: string | number | string[] = dir ? '' : []
     export let label: string = ''
     export let browseBtn: boolean = true
-    export let dir: boolean = true
     export let filetype: string = ''
     export let lock: boolean | null = null
     export let type: string | number = 'text'
