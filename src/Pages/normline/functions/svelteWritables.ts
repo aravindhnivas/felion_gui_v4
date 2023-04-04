@@ -29,6 +29,7 @@ export const expfittedLines = customStore<Plotly.Shape[]>([])
 export const fittedTraceCount = customStore(0)
 export const felix_fulldata = customStore<FELIXData>(null)
 export const OPO_fulldata = customStore<OPOData>(null)
+export const graphPlotted = customStore(false)
 
 export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton']
 export const fileChecked = customStore<string[]>([])

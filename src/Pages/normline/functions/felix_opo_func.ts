@@ -1,7 +1,7 @@
 import { subplot, plot } from '../../../js/functions'
 import { plotlySelection, plotlyClick } from './misc'
 import beforePlot from './beforePlot'
-import { felix_fulldata, OPO_fulldata } from './svelteWritables'
+import { felix_fulldata, OPO_fulldata, graphPlotted } from './svelteWritables'
 
 export async function felix_opo_func({
     uniqueID,
@@ -56,9 +56,9 @@ export async function felix_opo_func({
     }
 
     const currentGraphDiv = document.getElementById(graphDiv)
-
-    const event = new CustomEvent('plotted', { bubbles: false, detail: { graphDiv } })
-    currentGraphDiv.dispatchEvent(event)
+    graphPlotted.setValue(uniqueID, true)
+    // const event = new CustomEvent('plotted', { bubbles: false, detail: { graphDiv } })
+    // currentGraphDiv.dispatchEvent(event)
 
     if (currentGraphDiv.hasAttribute('data-plotly-event-created')) return
 

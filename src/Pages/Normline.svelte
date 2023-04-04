@@ -8,7 +8,7 @@
         felix_fulldata,
         OPO_fulldata,
         felix_peak_detection,
-        frequencyDatas,
+        graphPlotted,
     } from './normline/functions/svelteWritables'
     import {
         OPORow,
@@ -46,7 +46,7 @@
 
     ///////////////////////////////////////////////////////////////////////
     let showTheory = true
-    let graphPlotted = false
+    // let graphPlotted = false
     // let overwrite_expfit = true
     // let writeFile = true
     let OPOfilesChecked = []
@@ -151,9 +151,10 @@
         OPO_fulldata.init(uniqueID)
         normMethod.init(uniqueID)
         felix_peak_detection.init(uniqueID)
-
+        graphPlotted.init(uniqueID)
         mounted = true
         console.warn('Normline mounted')
+
         return () => {
             opoMode.remove(uniqueID)
             Ngauss_sigma.remove(uniqueID)
@@ -162,6 +163,7 @@
             OPO_fulldata.remove(uniqueID)
             normMethod.remove(uniqueID)
             felix_peak_detection.remove(uniqueID)
+            graphPlotted.remove(uniqueID)
             console.warn('Normline destroyed')
         }
     })
@@ -186,7 +188,7 @@
         }
 
         react(`${uniqueID}-avgplot`, [], dataLayout, { editable: true })
-        graphPlotted = true
+        $graphPlotted[uniqueID] = true
         window.createToast('Demo plotted', 'success')
     }
 </script>
@@ -203,7 +205,15 @@
 
 <AdjustInitialGuess bind:active={modalActivate} on:save={() => (adjustPeakTrigger = true)} />
 
-<Layout {id} {display} {filetype} {graphPlotted} bind:fileChecked bind:currentLocation bind:activateConfigModal>
+<Layout
+    {id}
+    {display}
+    {filetype}
+    graphPlotted={$graphPlotted[uniqueID]}
+    bind:fileChecked
+    bind:currentLocation
+    bind:activateConfigModal
+>
     <svelte:fragment slot="toggle_row">
         {#if $opoMode[uniqueID]}
             <span class="tag" style="border: solid 1px; background-color: #ffa94d33;">OPO Mode</span>
@@ -264,30 +274,13 @@
         <div id="{uniqueID}-felix_graphs" class:hide={!showFELIX}>
             <div id="{uniqueID}-bplot" class="graph__div" class:hide={!showRawData} />
             <div id="{uniqueID}-saPlot" class="graph__div" class:hide={!showPowerData} />
-            <div
-                bind:clientWidth={graphWidth}
-                id="{uniqueID}-avgplot"
-                class="graph__div"
-                on:plotted={(e) => {
-                    if (e.detail.graphDiv === `${uniqueID}-avgplot`) {
-                        graphPlotted = true
-                    }
-                }}
-            />
+            <div bind:clientWidth={graphWidth} id="{uniqueID}-avgplot" class="graph__div" />
         </div>
 
         <div id="{uniqueID}-opo_graphs" class:hide={!showOPO}>
             <div class="graph__div" class:hide={!showRawData} id="{uniqueID}-opoplot" />
             <div class="graph__div" class:hide={!showRawData} id="{uniqueID}-opoSA" />
-            <div
-                class="graph__div"
-                id="{uniqueID}-opoRelPlot"
-                on:plotted={(e) => {
-                    if (e.detail.graphDiv === `${uniqueID}-opoRelPlot`) {
-                        graphPlotted = true
-                    }
-                }}
-            />
+            <div class="graph__div" id="{uniqueID}-opoRelPlot" />
         </div>
     </svelte:fragment>
 
