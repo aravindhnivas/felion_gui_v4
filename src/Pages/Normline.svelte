@@ -241,7 +241,6 @@
 
         <div class="align" class:hide={!felix_toggle}>
             <Radio bind:value={$normMethod[uniqueID]} options={normMethods} />
-            <!-- </div> -->
 
             <div class="flex flex-row ml-auto">
                 <div style="display: flex; gap: 0.5em;">
