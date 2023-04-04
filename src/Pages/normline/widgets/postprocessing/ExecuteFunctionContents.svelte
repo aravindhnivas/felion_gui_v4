@@ -23,7 +23,6 @@
     import SegBtn from '$src/components/SegBtn.svelte'
     // //////////////////////////////////////////////////////////////////////
 
-    // export let normMethod: string
     export let showall = true
     export let fullfiles: string[]
     export let addedFileCol: string
@@ -32,15 +31,36 @@
     export let adjustPeakTrigger = false
     export let output_namelists: string[] = []
 
-    // let overwrite_expfit: boolean = true
-    // let writeFile: boolean = false
-    let writeFileName: string = 'averaged_normline.dat'
-
     // //////////////////////////////////////////////////////////////////////
     const uniqueID = getContext<string>('uniqueID')
-    let NGauss_fit_args: { fitNGauss_arguments: { [name: string]: number }; index: number[] } = {
+
+    let writeFileName: string = 'averaged_normline.dat'
+    let NGauss_fit_args: {
+        fitNGauss_arguments: { [name: string]: number }
+        index: number[]
+        location: string
+        addedFileScale: string
+        addedFileCol: string
+        writeFile: boolean
+        overwrite_expfit: boolean
+        writeFileName: string
+        output_name: string
+        fullfiles: string[]
+        fitall: boolean
+        normMethod: string
+    } = {
         fitNGauss_arguments: {},
         index: [],
+        location: '',
+        addedFileScale: '',
+        addedFileCol: '',
+        writeFile: false,
+        overwrite_expfit: true,
+        writeFileName: '',
+        output_name: '',
+        fullfiles: [],
+        fitall: false,
+        normMethod: '',
     }
     let savePeakfilename = 'peakTable'
     let toggleFindPeaksRow = false
@@ -158,7 +178,7 @@
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
                     output_name: $felixOutputName[uniqueID],
-                    writeFile: write_controller.find((w) => w.name == 'Write').selected,
+                    writeFile,
                     overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
                 }
 
@@ -169,6 +189,7 @@
                 }).then((dataFromPython) => {
                     exp_fit_func({ dataFromPython, uniqueID })
                 })
+
                 break
 
             case 'NGauss_fit':
@@ -202,7 +223,7 @@
                     location: $felixopoLocation[uniqueID],
                     addedFileScale,
                     addedFileCol,
-                    writeFile: write_controller.find((w) => w.name == 'Write').selected,
+                    writeFile,
                     overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
                     writeFileName,
                     output_name: $felixOutputName[uniqueID],
@@ -301,32 +322,16 @@
                 <i class="i-mdi-keyboard-arrow-down" />
             {/if}
         </button>
-        <button class="button is-link" on:click={() => dispatch('addfile')}
-            >Add file <i class="i-material-symbols-add-box-outline text-xs" /></button
-        >
-        <button class="button is-link" on:click={() => dispatch('removefile')}
-            >Remove file <i class="i-material-symbols-remove text-xs" /></button
-        >
-    </div>
 
-    {#if $fittedTraceCount[uniqueID] > 0}
-        <div class="ml-auto">
-            <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
-            <button class="button is-danger" on:click={clearAllPeak}>
-                <i
-                    class="i-material-symbols-delete-forever-outline-rounded text-xs
-                
-                "
-                />
-                Clear All
-            </button>
-        </div>
-    {/if}
+        <button class="button is-link" on:click={() => dispatch('addfile')}
+            >Add file <i class="ml-2 i-material-symbols-add-box text-xs" /></button
+        >
+        <button class="button is-link" on:click={() => dispatch('removefile')}>Remove file</button>
+    </div>
 </div>
 
 {#if show_fitting_div}
     <div class="align">
-        <h3>Gaussian profile fitting</h3>
         <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Fit 1-peak</button>
         <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>
             Fit N-peak(s)
@@ -336,6 +341,20 @@
                 <i class="i-mdi-keyboard-arrow-down" />
             {/if}
         </button>
+
+        {#if $fittedTraceCount[uniqueID] > 0}
+            <div class="ml-auto">
+                <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
+                <button class="button is-danger" on:click={clearAllPeak}>
+                    <i
+                        class="i-material-symbols-delete-forever-outline-rounded text-xs
+                
+                "
+                    />
+                    Clear All
+                </button>
+            </div>
+        {/if}
     </div>
 
     {#if toggleFindPeaksRow}
