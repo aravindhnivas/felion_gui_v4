@@ -1,17 +1,17 @@
 <script lang="ts">
     import {
-        felixIndex,
         opoMode,
         dataTable,
+        normMethod,
+        fileChecked,
+        felixIndex,
         expfittedLines,
         felixPeakTable,
         felixOutputName,
+        fittedTraceCount,
         felixopoLocation,
         felixPlotAnnotations,
-        normMethod,
-        fileChecked,
     } from '../../functions/svelteWritables'
-
     import { felix_peak_detection } from '../../functions/svelteWritables'
     import { savefile, loadfile } from '../../functions/misc'
     import { NGauss_fit_func } from '../../functions/NGauss_fit'
@@ -50,39 +50,40 @@
     $: currentGraph = $opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
 
     const clearAllPeak = () => {
-        const graphElement = document.getElementById(currentGraph)
+        // const graphElement = document.getElementById(currentGraph)
 
-        relayout(currentGraph, { annotations: [], shapes: [] })
+        // relayout(currentGraph, { annotations: [], shapes: [] })
 
-        const defaultLength = showall ? fullfiles.length : 1
-        const noOfFittedData = graphElement.data?.length - defaultLength
-        if (noOfFittedData === 0) {
+        // const defaultLength = showall ? fullfiles.length : 1
+        // const noOfFittedData = graphElement.data?.length - defaultLength
+        if ($fittedTraceCount[uniqueID] === 0) {
             return window.createToast('No fitted lines found', 'danger')
         }
-
-        console.log('Removing all found peak values')
-        console.log({ noOfFittedData }, fullfiles.length, graphElement.data?.length)
-
+        // console.log('Removing all found peak values')
+        // console.log({ noOfFittedData }, fullfiles.length, graphElement.data?.length)
         $felixIndex[uniqueID] = []
         $felixPlotAnnotations[uniqueID] = []
         $expfittedLines[uniqueID] = []
+
         relayout(currentGraph, { annotations: [], shapes: [] })
 
-        for (let i = 0; i < noOfFittedData; i++) {
+        for (let i = 0; i < $fittedTraceCount[uniqueID]; i++) {
             deleteTraces(currentGraph, [-1])
         }
+        $fittedTraceCount[uniqueID] = 0
     }
+    $: number_of_fitted_data = document.getElementById(currentGraph)?.data?.length - (showall ? fullfiles.length : 1)
+    $: console.log('number_of_fitted_data', number_of_fitted_data)
 
     const clearLastPeak = () => {
-        const graphElement = document.getElementById(currentGraph)
-        const defaultLength = showall ? fullfiles.length : 1
-        const noOfFittedData = graphElement.data?.length - defaultLength
-        if (noOfFittedData === 0) {
+        // const graphElement = document.getElementById(currentGraph)
+        // const defaultLength = showall ? fullfiles.length : 1
+        // const noOfFittedData = graphElement.data?.length - defaultLength
+        if ($fittedTraceCount[uniqueID] === 0) {
             return window.createToast('No fitted lines found', 'danger')
         }
         $dataTable[uniqueID] = dropRight($dataTable[uniqueID], 1)
         $expfittedLines[uniqueID] = dropRight($expfittedLines[uniqueID], 2)
-
         $felixPlotAnnotations[uniqueID] = dropRight($felixPlotAnnotations[uniqueID], 1)
         relayout(currentGraph, {
             annotations: $felixPlotAnnotations[uniqueID],
@@ -90,6 +91,7 @@
         })
 
         deleteTraces(currentGraph, [-1])
+        $fittedTraceCount[uniqueID] = $fittedTraceCount[uniqueID] - 1
         window.createToast('Last fitted peak removed', 'warning')
     }
 
@@ -141,7 +143,10 @@
                 }
 
                 if ($felixIndex[uniqueID].length < 2) {
-                    return window.createToast('Range not found!!. Select a range using Box-select', 'danger')
+                    return window.createToast(
+                        'Range not found!!. Select a range using Box-select tool in plotted graph',
+                        'danger'
+                    )
                 }
 
                 const expfit_args = {
@@ -252,12 +257,11 @@
     $: selected_files(fullfiles)
 
     const dispatch = createEventDispatcher()
+
     let write_controller = [
         { name: 'Write', selected: false },
         { name: 'Overwrite', selected: true },
     ]
-
-    // $: if (toggleFindPeaksRow && $felixOutputName[uniqueID]) find_felix_opo_peaks(uniqueID)
 </script>
 
 <div class="align" style="align-items: end;">
@@ -266,9 +270,10 @@
         label="Select file to fit"
         options={output_namelists}
         on:change={() => {
-            find_felix_opo_peaks(uniqueID)
+            find_felix_opo_peaks({ uniqueID, toast: true })
         }}
     />
+
     <TextAndSelectOptsToggler
         toggle={false}
         bind:value={writeFileName}
@@ -277,56 +282,87 @@
         lookFor=".dat"
         auto_init={true}
     />
+
     <SegBtn bind:choices={write_controller} label="write/overwrite file" />
-
-    <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Exp Fit.</button>
-    <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>Fit NGauss.</button>
-
     <button class="button is-link" on:click={() => dispatch('addfile')}>Add files</button>
     <button class="button is-link" on:click={() => dispatch('removefile')}>Remove files</button>
 
-    <div class="ml-auto">
-        <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
-        <button class="button is-danger" on:click={clearAllPeak}>Clear All</button>
-    </div>
+    {#if $fittedTraceCount[uniqueID] > 0}
+        <div class="ml-auto">
+            <button class="button is-warning" on:click={clearLastPeak}>Clear Last</button>
+            <button class="button is-danger" on:click={clearAllPeak}>
+                <i
+                    class="i-material-symbols-delete-forever-outline-rounded text-xs
+                
+                "
+                />
+                Clear All
+            </button>
+        </div>
+    {/if}
+</div>
+
+<div class="align">
+    <h3>Gaussian profile fitting</h3>
+    <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Fit 1-peak</button>
+    <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>
+        Fit N-peak(s)
+        {#if toggleFindPeaksRow}
+            <i class="i-mdi-keyboard-arrow-up" />
+        {:else}
+            <i class="i-mdi-keyboard-arrow-down" />
+        {/if}
+    </button>
 </div>
 
 {#if toggleFindPeaksRow}
     <div class="align">
         <Textfield
-            on:change={() => find_felix_opo_peaks(uniqueID)}
+            on:change={() => find_felix_opo_peaks({ uniqueID })}
             style="width: 7em;"
             input$type="number"
             input$min="1"
             label="threshold intensity"
             bind:value={$felix_peak_detection[uniqueID].threshold}
         />
+
         <Textfield
-            on:change={() => find_felix_opo_peaks(uniqueID)}
+            on:change={() => find_felix_opo_peaks({ uniqueID })}
             style="width: 5em;"
             input$type="number"
             input$min="1"
             label="peak width"
             bind:value={$felix_peak_detection[uniqueID].window}
         />
-        <button class="button is-warning" on:click={() => find_felix_opo_peaks(uniqueID)}>Find peaks</button>
+        <button class="button is-warning" on:click={() => find_felix_opo_peaks({ uniqueID, toast: true })}
+            >Find peaks</button
+        >
+
         <button style="width:7em" class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'NGauss_fit' })}>
             Fit
         </button>
+
         <div class="ml-auto">
             <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
-            <button
-                class="button is-danger"
-                on:click={() => {
-                    $felixPlotAnnotations[uniqueID] = []
-                    $felixPeakTable[uniqueID] = []
-                    NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
-                    relayout(currentGraph, { annotations: [] })
-                    window.createToast('Cleared', 'warning')
-                }}
-            >
-                Clear peaks
-            </button>
+            {#if $felixPeakTable[uniqueID].length}
+                <button
+                    class="button is-danger"
+                    on:click={() => {
+                        $felixPlotAnnotations[uniqueID] = []
+                        $felixPeakTable[uniqueID] = []
+                        NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
+                        relayout(currentGraph, { annotations: [] })
+                        window.createToast('Cleared', 'warning')
+                    }}
+                >
+                    <i
+                        class="i-material-symbols-delete-forever-outline-rounded text-xs
+
+                    "
+                    />
+                    Clear peaks
+                </button>
+            {/if}
         </div>
     </div>
 

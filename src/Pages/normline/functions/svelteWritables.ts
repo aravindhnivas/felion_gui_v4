@@ -32,6 +32,7 @@ export const OPO_fulldata = customStore<OPOData>(null)
 
 export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton']
 export const fileChecked = customStore<string[]>([])
+
 export const normMethod = customStore<'Log' | 'Relative' | 'IntensityPerPhoton'>('Relative')
 
 export const felixPlotWidgets = writable({
