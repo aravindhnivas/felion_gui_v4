@@ -44,6 +44,7 @@
     })
 </script>
 
+<!-- {#if $frequencyDatas[uniqueID]?.length} -->
 <div class="notice__div">Frequency table</div>
 <STable
     rows={$frequencyDatas[uniqueID]}
@@ -55,3 +56,4 @@
     configDir={felixOpoDatLocation}
     options_filter=".felix.table.json"
 />
+<!-- {/if} -->

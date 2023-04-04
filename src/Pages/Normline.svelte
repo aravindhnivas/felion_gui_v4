@@ -8,6 +8,7 @@
         felix_fulldata,
         OPO_fulldata,
         felix_peak_detection,
+        frequencyDatas,
     } from './normline/functions/svelteWritables'
     import {
         OPORow,

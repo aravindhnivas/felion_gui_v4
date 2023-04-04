@@ -265,31 +265,42 @@
 
     $: writeFile = write_controller.find((w) => w.name == 'Write').selected
     $: overwrite_expfit = write_controller.find((w) => w.name == 'Overwrite').selected
+    let show_fitting_div = false
 </script>
 
 <div class="align" style="align-items: end;">
-    <Select
-        bind:value={$felixOutputName[uniqueID]}
-        label="Select file to fit"
-        options={output_namelists}
-        on:change={() => {
-            find_felix_opo_peaks({ uniqueID, toast: true })
-        }}
-    />
-
-    <SegBtn bind:choices={write_controller} label="write/overwrite file" />
-
-    {#if writeFile}
-        <TextAndSelectOptsToggler
-            toggle={false}
-            bind:value={writeFileName}
-            label="writeFileName"
-            {lookIn}
-            lookFor=".dat"
-            auto_init={true}
+    {#if show_fitting_div}
+        <Select
+            bind:value={$felixOutputName[uniqueID]}
+            label="Select file to fit"
+            options={output_namelists}
+            on:change={() => {
+                find_felix_opo_peaks({ uniqueID, toast: true })
+            }}
         />
+
+        <SegBtn bind:choices={write_controller} label="write/overwrite file" />
+
+        {#if writeFile}
+            <TextAndSelectOptsToggler
+                toggle={false}
+                bind:value={writeFileName}
+                label="writeFileName"
+                {lookIn}
+                lookFor=".dat"
+                auto_init={true}
+            />
+        {/if}
     {/if}
     <div class="ml-auto">
+        <button class="button is-link" on:click={() => (show_fitting_div = !show_fitting_div)}
+            >Line profile fitting
+            {#if show_fitting_div}
+                <i class="i-mdi-keyboard-arrow-up" />
+            {:else}
+                <i class="i-mdi-keyboard-arrow-down" />
+            {/if}
+        </button>
         <button class="button is-link" on:click={() => dispatch('addfile')}
             >Add file <i class="i-material-symbols-add-box-outline text-xs" /></button
         >
@@ -313,93 +324,99 @@
     {/if}
 </div>
 
-<div class="align">
-    <h3>Gaussian profile fitting</h3>
-    <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Fit 1-peak</button>
-    <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>
-        Fit N-peak(s)
-        {#if toggleFindPeaksRow}
-            <i class="i-mdi-keyboard-arrow-up" />
-        {:else}
-            <i class="i-mdi-keyboard-arrow-down" />
-        {/if}
-    </button>
-</div>
-
-{#if toggleFindPeaksRow}
+{#if show_fitting_div}
     <div class="align">
-        <Textfield
-            on:change={() => find_felix_opo_peaks({ uniqueID })}
-            style="width: 7em;"
-            input$type="number"
-            input$min="1"
-            label="threshold intensity"
-            bind:value={$felix_peak_detection[uniqueID].threshold}
-        />
-
-        <Textfield
-            on:change={() => find_felix_opo_peaks({ uniqueID })}
-            style="width: 5em;"
-            input$type="number"
-            input$min="1"
-            label="peak width"
-            bind:value={$felix_peak_detection[uniqueID].window}
-        />
-        <button class="button is-warning" on:click={() => find_felix_opo_peaks({ uniqueID, toast: true })}
-            >Find peaks</button
-        >
-
-        <button style="width:7em" class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'NGauss_fit' })}>
-            Fit
+        <h3>Gaussian profile fitting</h3>
+        <button class="button is-link" on:click={(e) => plotData({ e: e, filetype: 'exp_fit' })}>Fit 1-peak</button>
+        <button class="button is-link" on:click={() => (toggleFindPeaksRow = !toggleFindPeaksRow)}>
+            Fit N-peak(s)
+            {#if toggleFindPeaksRow}
+                <i class="i-mdi-keyboard-arrow-up" />
+            {:else}
+                <i class="i-mdi-keyboard-arrow-down" />
+            {/if}
         </button>
+    </div>
 
-        <div class="ml-auto">
-            <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
-            {#if $felixPeakTable[uniqueID].length}
-                <button
-                    class="button is-danger"
-                    on:click={() => {
-                        $felixPlotAnnotations[uniqueID] = []
-                        $felixPeakTable[uniqueID] = []
-                        NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
-                        relayout(currentGraph, { annotations: [] })
-                        window.createToast('Cleared', 'warning')
-                    }}
-                >
-                    <i
-                        class="i-material-symbols-delete-forever-outline-rounded text-xs
+    {#if toggleFindPeaksRow}
+        <div class="align">
+            <Textfield
+                on:change={() => find_felix_opo_peaks({ uniqueID })}
+                style="width: 7em;"
+                input$type="number"
+                input$min="1"
+                label="threshold intensity"
+                bind:value={$felix_peak_detection[uniqueID].threshold}
+            />
+
+            <Textfield
+                on:change={() => find_felix_opo_peaks({ uniqueID })}
+                style="width: 5em;"
+                input$type="number"
+                input$min="1"
+                label="peak width"
+                bind:value={$felix_peak_detection[uniqueID].window}
+            />
+            <button class="button is-warning" on:click={() => find_felix_opo_peaks({ uniqueID, toast: true })}
+                >Find peaks</button
+            >
+
+            <button
+                style="width:7em"
+                class="button is-link"
+                on:click={(e) => plotData({ e: e, filetype: 'NGauss_fit' })}
+            >
+                Fit
+            </button>
+
+            <div class="ml-auto">
+                <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
+                {#if $felixPeakTable[uniqueID].length}
+                    <button
+                        class="button is-danger"
+                        on:click={() => {
+                            $felixPlotAnnotations[uniqueID] = []
+                            $felixPeakTable[uniqueID] = []
+                            NGauss_fit_args = { fitNGauss_arguments: {}, index: [] }
+                            relayout(currentGraph, { annotations: [] })
+                            window.createToast('Cleared', 'warning')
+                        }}
+                    >
+                        <i
+                            class="i-material-symbols-delete-forever-outline-rounded text-xs
 
                     "
-                    />
-                    Clear peaks
-                </button>
-            {/if}
+                        />
+                        Clear peaks
+                    </button>
+                {/if}
+            </div>
         </div>
-    </div>
 
-    <div class="align">
-        <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
-        <Switch bind:selected={fitall} label="fit all methods" />
-        <TextAndSelectOptsToggler
-            style="width: 7em;"
-            bind:value={savePeakfilename}
-            label="savefile"
-            lookIn={$felixopoLocation[uniqueID]}
-            lookFor=".json"
-            auto_init={true}
-        />
+        <div class="align">
+            <Switch bind:selected={boxSelected_peakfinder} label="limited range" />
+            <Switch bind:selected={fitall} label="fit all methods" />
+            <TextAndSelectOptsToggler
+                style="width: 7em;"
+                bind:value={savePeakfilename}
+                label="savefile"
+                lookIn={$felixopoLocation[uniqueID]}
+                lookFor=".json"
+                auto_init={true}
+            />
 
-        <button
-            class="button is-link"
-            on:click={async () =>
-                await savefile({
-                    file: $felixPeakTable[uniqueID],
-                    name: savePeakfilename,
-                    location: $felixopoLocation[uniqueID],
-                })}
-        >
-            Save peaks
-        </button>
-        <button class="button is-link" on:click={loadpeakTable}>Load peaks</button>
-    </div>
+            <button
+                class="button is-link"
+                on:click={async () =>
+                    await savefile({
+                        file: $felixPeakTable[uniqueID],
+                        name: savePeakfilename,
+                        location: $felixopoLocation[uniqueID],
+                    })}
+            >
+                Save peaks
+            </button>
+            <button class="button is-link" on:click={loadpeakTable}>Load peaks</button>
+        </div>
+    {/if}
 {/if}
