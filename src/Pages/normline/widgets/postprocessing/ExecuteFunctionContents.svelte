@@ -135,10 +135,10 @@
         adjustPeakTrigger = false
     }
 
-    function plotData({ e = null, filetype = 'exp_fit', general = { pyfile: '', args: '' } } = {}) {
+    async function plotData({ e = null, filetype = 'exp_fit', general = { pyfile: '', args: '' } } = {}) {
         if (filetype == 'general') {
             const { pyfile, args } = general
-            computePy_func({ pyfile, args, general: true })
+            await computePy_func({ pyfile, args, general: true })
             return
         }
 
@@ -156,16 +156,16 @@
                 }
 
                 const expfit_args = {
+                    writeFile,
                     fullfiles,
+                    writeFileName,
+                    overwrite_expfit,
                     addedFileCol: addedFile.col,
                     addedFileScale: addedFile.scale,
-                    writeFileName,
                     normMethod: $normMethod[uniqueID],
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
                     output_name: $felixOutputName[uniqueID],
-                    writeFile,
-                    overwrite_expfit,
                 }
 
                 computePy_func({
@@ -198,6 +198,7 @@
                 }
 
                 NGauss_fit_args.fitNGauss_arguments = {}
+                // const filename = fullfiles.findIndex((f) => f.includes($felixOutputName[uniqueID]))
 
                 $felixPeakTable[uniqueID].forEach((f, index) => {
                     NGauss_fit_args.fitNGauss_arguments[`cen${index}`] = f.freq
