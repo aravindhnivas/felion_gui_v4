@@ -241,18 +241,19 @@
 
         <div class="align" class:hide={!felix_toggle}>
             <Radio bind:value={$normMethod[uniqueID]} options={normMethods} />
-        </div>
+            <!-- </div> -->
 
-        <div class="align">
-            <div style="display: flex; gap: 0.5em;">
-                <Switch bind:selected={showall} label="plot-all-files" />
-                {#if !showall}
-                    <Select bind:value={plotfile} label="plotfile" options={plotfileOptions} />
-                {/if}
+            <div class="flex flex-row ml-auto">
+                <div style="display: flex; gap: 0.5em;">
+                    <Switch bind:selected={showall} label="plot-all-files" />
+                    {#if !showall}
+                        <Select bind:value={plotfile} label="plotfile" options={plotfileOptions} />
+                    {/if}
+                </div>
+                <SegBtn bind:choices={show_graphs} label="select plots to include" />
             </div>
-            <SegBtn class="ml-auto" bind:choices={show_graphs} label="select plots to include" />
-        </div>
-    </svelte:fragment>
+        </div></svelte:fragment
+    >
 
     <svelte:fragment slot="plotContainer">
         <div
@@ -276,14 +277,10 @@
         </div>
 
         <div id="{uniqueID}-opo_graphs" class:hide={!showOPO}>
+            <div class="graph__div" class:hide={!showRawData} id="{uniqueID}-opoplot" />
+            <div class="graph__div" class:hide={!showRawData} id="{uniqueID}-opoSA" />
             <div
-                class="animate__animated animate__fadeIn graph__div"
-                class:hide={!showRawData}
-                id="{uniqueID}-opoplot"
-            />
-            <div class="animate__animated animate__fadeIn graph__div" class:hide={!showRawData} id="{uniqueID}-opoSA" />
-            <div
-                class="animate__animated animate__fadeIn graph__div"
+                class="graph__div"
                 id="{uniqueID}-opoRelPlot"
                 on:plotted={(e) => {
                     if (e.detail.graphDiv === `${uniqueID}-opoRelPlot`) {
