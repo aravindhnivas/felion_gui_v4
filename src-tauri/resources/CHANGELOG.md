@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 4.11.01
+## 4.11.1
 
 - Multi Gaussian fit bug fix
 
