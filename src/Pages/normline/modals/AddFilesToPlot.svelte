@@ -3,13 +3,15 @@
     import { opoMode } from '../functions/svelteWritables'
     import computePy_func from '$lib/pyserver/computePy'
     import { uniq } from 'lodash-es'
+    import Select from '$src/components/Select.svelte'
 
     export let active = false
-    export let addedFile: { files: string[]; col: string; scale: number; N: number } = {
+    export let addedFile: { files: string[]; col: string; scale: number; N: number; sep: string } = {
         files: [],
         col: '0, 1',
         scale: 1,
         N: 0,
+        sep: 'tab',
     }
 
     const uniqueID = getContext<string>('uniqueID')
@@ -54,7 +56,8 @@
             </div>
             <div class="align mb-2">
                 <button on:click={addFileSelection} class="button is-link">Browse</button>
-                <Textfield bind:value={addedFile.col} label="Columns" />
+                <Select bind:value={addedFile.sep} options={['tab', 'space', 'comma']} label="Separator" />
+                <Textfield bind:value={addedFile.col} label="Columns (x, y)" />
                 <Textfield bind:value={addedFile.scale} label="ScaleY" input$type="number" />
             </div>
 

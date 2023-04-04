@@ -282,8 +282,8 @@
             bind:value={$felixOutputName[uniqueID]}
             label="Select file to fit"
             options={output_namelists}
-            on:change={() => {
-                find_felix_opo_peaks({ uniqueID, toast: true })
+            on:change={async () => {
+                await find_felix_opo_peaks({ uniqueID, toast: true, addedFile })
             }}
         />
 
@@ -349,7 +349,7 @@
     {#if toggleFindPeaksRow}
         <div class="align">
             <Textfield
-                on:change={() => find_felix_opo_peaks({ uniqueID })}
+                on:change={async () => await find_felix_opo_peaks({ uniqueID, addedFile })}
                 style="width: 7em;"
                 input$type="number"
                 input$min="1"
@@ -358,14 +358,16 @@
             />
 
             <Textfield
-                on:change={() => find_felix_opo_peaks({ uniqueID })}
+                on:change={async () => await find_felix_opo_peaks({ uniqueID, addedFile })}
                 style="width: 5em;"
                 input$type="number"
                 input$min="1"
                 label="peak width"
                 bind:value={$felix_peak_detection[uniqueID].window}
             />
-            <button class="button is-warning" on:click={() => find_felix_opo_peaks({ uniqueID, toast: true })}
+            <button
+                class="button is-warning"
+                on:click={async () => await find_felix_opo_peaks({ uniqueID, addedFile, toast: true })}
                 >Find peaks</button
             >
 

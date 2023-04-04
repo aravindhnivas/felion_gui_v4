@@ -24,7 +24,6 @@
     import Layout from '$src/layout/pages/Layout.svelte'
     import { plotlayout } from './normline/functions/plot_labels'
     import { dropRight } from 'lodash-es'
-    ///////////////////////////////////////////////////////////////////////
 
     export let id = 'Normline'
     export let display = 'grid'
@@ -60,19 +59,19 @@
     let output_namelists = []
     $: update_output_namelists(plottedFiles, addedFile.files)
 
-    // OPO
     let OPOLocation = localStorage.getItem('ofelix_location') || currentLocation
     let theoryLocation = localStorage.getItem('theoryLocation') || currentLocation
     let opofiles = []
-
     $: $felixopoLocation[uniqueID] = $opoMode[uniqueID] ? OPOLocation : currentLocation
     $: $Ngauss_sigma[uniqueID] = $opoMode[uniqueID] ? 2 : 5
+
     let addFileModal = false
     let addedFile = {
         files: [],
         col: '0, 1',
         scale: 1,
         N: 0,
+        sep: 'tab',
     }
 
     $: currentGraphID = $opoMode[uniqueID] ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
