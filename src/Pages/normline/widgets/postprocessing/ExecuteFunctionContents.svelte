@@ -27,6 +27,7 @@
     export let fullfiles: string[]
     export let modalActivate = false
     export let adjustPeakTrigger = false
+    export let addedFile: { files: string[]; col: string; scale: number; N: number } = null
     export let output_namelists: string[] = []
 
     // //////////////////////////////////////////////////////////////////////
@@ -37,8 +38,8 @@
         fitNGauss_arguments: { [name: string]: number }
         index: number[]
         location: string
-        // addedFileScale: number
-        // addedFileCol: string
+        addedFileScale: number
+        addedFileCol: string
         writeFile: boolean
         overwrite_expfit: boolean
         writeFileName: string
@@ -50,8 +51,8 @@
         fitNGauss_arguments: {},
         index: [],
         location: '',
-        // addedFileScale: 1,
-        // addedFileCol: '',
+        addedFileScale: 1,
+        addedFileCol: '',
         writeFile: false,
         overwrite_expfit: true,
         writeFileName: '',
@@ -156,15 +157,15 @@
 
                 const expfit_args = {
                     fullfiles,
-                    // addedFileCol,
-                    // addedFileScale,
+                    addedFileCol: addedFile.col,
+                    addedFileScale: addedFile.scale,
                     writeFileName,
                     normMethod: $normMethod[uniqueID],
                     index: $felixIndex[uniqueID],
                     location: $felixopoLocation[uniqueID],
                     output_name: $felixOutputName[uniqueID],
                     writeFile,
-                    overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
+                    overwrite_expfit,
                 }
 
                 computePy_func({
@@ -206,10 +207,10 @@
                 NGauss_fit_args = {
                     ...NGauss_fit_args,
                     location: $felixopoLocation[uniqueID],
-                    // addedFileScale,
-                    // addedFileCol,
+                    addedFileCol: addedFile.col,
+                    addedFileScale: addedFile.scale,
                     writeFile,
-                    overwrite_expfit: write_controller.find((w) => w.name == 'Overwrite').selected,
+                    overwrite_expfit,
                     writeFileName,
                     output_name: $felixOutputName[uniqueID],
                     fullfiles,
@@ -311,7 +312,9 @@
         <button class="button is-link" on:click={() => dispatch('addfile')}
             >Add file <i class="ml-2 i-material-symbols-add-box text-xs" /></button
         >
-        <button class="button is-link" on:click={() => dispatch('removefile')}>Remove file</button>
+        {#if addedFile.files.length > 0}
+            <button class="button is-danger" on:click={() => dispatch('removefile')}>Remove file</button>
+        {/if}
     </div>
 </div>
 

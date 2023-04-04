@@ -45,7 +45,6 @@
     let felixfiles: string[] = []
     $: update_felixfiles(fileChecked, currentLocation)
 
-    ///////////////////////////////////////////////////////////////////////
     let showTheory = true
     let OPOfilesChecked = []
 
@@ -108,6 +107,7 @@
         { name: 'OPO', selected: false },
         { name: 'Theory', selected: false },
     ]
+
     $: if (show_graphs) {
         showFELIX = show_graphs.find((graph) => graph.name === 'FELIX').selected
         showOPO = show_graphs.find((graph) => graph.name === 'OPO').selected
@@ -117,19 +117,18 @@
     }
 
     $: plotfileOptions = $opoMode[uniqueID] ? [...OPOfilesChecked, 'average'] : [...fileChecked, 'average']
-
     let mounted = false
 
     onMount(() => {
         opoMode.init(uniqueID)
         Ngauss_sigma.init(uniqueID)
         felixopoLocation.init(uniqueID)
-
         felix_fulldata.init(uniqueID)
         OPO_fulldata.init(uniqueID)
         normMethod.init(uniqueID)
         felix_peak_detection.init(uniqueID)
         graphPlotted.init(uniqueID)
+
         mounted = true
         console.warn('Normline mounted')
 
@@ -145,12 +144,12 @@
             console.warn('Normline destroyed')
         }
     })
+
     let felix_toggle = true
     let opo_toggle = true
     let theory_toggle = true
     let showall = true
     let theoryRow = false
-
     let graphWidth: number
 
     const demo_plot = () => {
@@ -166,6 +165,7 @@
         }
 
         react(`${uniqueID}-avgplot`, [], dataLayout, { editable: true })
+
         $graphPlotted[uniqueID] = true
         window.createToast('Demo plotted', 'success')
     }
@@ -264,6 +264,7 @@
             on:addfile={() => {
                 addFileModal = true
             }}
+            {addedFile}
             on:removefile={removeExtraFile}
         />
     </svelte:fragment>
