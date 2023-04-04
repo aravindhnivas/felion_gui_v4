@@ -18,7 +18,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",
     "@formkit/auto-animate": "^1.0.0-beta.6",
-    "@iconify/json": "^2.2.42",
+    "@iconify/json": "^2.2.45",
     "@octokit/rest": "^19.0.7",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.0.4",
