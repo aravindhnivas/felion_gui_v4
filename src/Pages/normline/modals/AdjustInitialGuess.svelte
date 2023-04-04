@@ -13,6 +13,7 @@
 {#if active}
     <Modal bind:active title="Adjust initial guess">
         <svelte:fragment slot="content">
+            <h3>ctrl + left-click on plot to add a guess (peak annotate)</h3>
             <STable
                 maxHeight="100%"
                 headKeys={['Frequency', 'Intensity', 'Sigma']}

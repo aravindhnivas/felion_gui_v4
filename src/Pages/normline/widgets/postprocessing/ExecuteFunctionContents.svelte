@@ -262,6 +262,9 @@
         { name: 'Write', selected: false },
         { name: 'Overwrite', selected: true },
     ]
+
+    $: writeFile = write_controller.find((w) => w.name == 'Write').selected
+    $: overwrite_expfit = write_controller.find((w) => w.name == 'Overwrite').selected
 </script>
 
 <div class="align" style="align-items: end;">
@@ -274,16 +277,18 @@
         }}
     />
 
-    <TextAndSelectOptsToggler
-        toggle={false}
-        bind:value={writeFileName}
-        label="writeFileName"
-        {lookIn}
-        lookFor=".dat"
-        auto_init={true}
-    />
-
     <SegBtn bind:choices={write_controller} label="write/overwrite file" />
+
+    {#if writeFile}
+        <TextAndSelectOptsToggler
+            toggle={false}
+            bind:value={writeFileName}
+            label="writeFileName"
+            {lookIn}
+            lookFor=".dat"
+            auto_init={true}
+        />
+    {/if}
     <div class="ml-auto">
         <button class="button is-link" on:click={() => dispatch('addfile')}
             >Add file <i class="i-material-symbols-add-box-outline text-xs" /></button
