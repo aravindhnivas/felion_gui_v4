@@ -96,7 +96,9 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
         if (!found_peaks) return window.createToast('No peaks found', 'warning')
 
         const { indices } = found_peaks
-
+        if(indices.length > 50) {
+            if(!await dialog.confirm(`Found ${indices.length} peaks. Do you want to continue?`)) return
+        }
         indices.forEach((i) => {
             set_peaks({ uniqueID, x: x[i], y: y[i], color })
         })
