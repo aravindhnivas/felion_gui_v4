@@ -10,7 +10,7 @@
 
 <div class="container__div {className}" {style}>
     <div class="text-sm">{label}</div>
-    <SegmentedButton segments={choices} let:segment key={(segment) => segment.name}>
+    <SegmentedButton bind:segments={choices} let:segment key={(segment) => segment.name}>
         <Segment
             {segment}
             selected={segment.selected}

@@ -162,7 +162,6 @@
             height: 450,
             width: graphWidth,
         }
-
         react(`${uniqueID}-avgplot`, [], dataLayout, { editable: true })
 
         $graphPlotted[uniqueID] = true
@@ -205,6 +204,8 @@
             {plotfile}
             class={felix_toggle && mounted ? '' : 'hide'}
             {showall}
+            on:opoMode={(e) => (show_graphs[3].selected = e.detail)}
+            on:theoryMode={(e) => (show_graphs[4].selected = e.detail)}
         />
         <OPORow
             {showall}
@@ -214,11 +215,11 @@
             {plotfile}
             class={opo_toggle ? '' : 'hide'}
         />
+
         <TheoryRow bind:theoryLocation class={theory_toggle ? '' : 'hide'} {theoryRow} />
 
         <div class="align" class:hide={!felix_toggle}>
             <Radio bind:value={$normMethod[uniqueID]} options={normMethods} />
-
             <div class="flex flex-row ml-auto">
                 <div style="display: flex; gap: 0.5em;">
                     <Switch bind:selected={showall} label="plot-all-files" />
@@ -228,8 +229,8 @@
                 </div>
                 <SegBtn bind:choices={show_graphs} label="select plots to include" />
             </div>
-        </div></svelte:fragment
-    >
+        </div>
+    </svelte:fragment>
 
     <svelte:fragment slot="plotContainer">
         <div
@@ -272,7 +273,7 @@
     </svelte:fragment>
 </Layout>
 
-<style lang="scss">
+<style>
     .graph__div {
         margin-bottom: 1em;
     }

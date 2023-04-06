@@ -162,7 +162,6 @@
             uniqueID,
         })
     }
-
     let currentGraph: HTMLElement
 
     onMount(() => {
@@ -174,6 +173,8 @@
             fittedTraceCount.remove(uniqueID)
         }
     })
+
+    const dispatch = createEventDispatcher()
 </script>
 
 <FelixPlotting
@@ -197,11 +198,18 @@
         <i class="i-logos-matplotlib-icon text-xs" />
     </button>
 
-    <button class="button is-link" on:click={() => (theoryRow = !theoryRow)}>Add Theory</button>
+    <button
+        class="button is-link"
+        on:click={() => {
+            theoryRow = !theoryRow
+            dispatch('theoryMode', theoryRow)
+        }}>Add Theory</button
+    >
     <button
         class="button is-link"
         on:click={() => {
             $opoMode[uniqueID] = !$opoMode[uniqueID]
+            dispatch('opoMode', $opoMode[uniqueID])
         }}>OPO</button
     >
 </div>
