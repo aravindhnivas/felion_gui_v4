@@ -2,7 +2,7 @@
 
 ## 4.11.2
 
-- Minor changes in multi-Gaussian fit
+- Major changes in multi-Gaussian fit method
 - Segment buttons style update
 - other minor changes and bug fixes
 
