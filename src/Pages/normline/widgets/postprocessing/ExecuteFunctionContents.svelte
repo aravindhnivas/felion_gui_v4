@@ -18,7 +18,7 @@
     import { exp_fit_func } from '../../functions/exp_fit'
     import { dropRight, sortBy } from 'lodash-es'
     import computePy_func from '$lib/pyserver/computePy'
-    import { Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
+    import { ButtonBadge, Select, Switch, TextAndSelectOptsToggler, Textfield } from '$src/components'
     import { find_felix_opo_peaks } from '../../functions/utils'
     import SegBtn from '$src/components/SegBtn.svelte'
 
@@ -391,7 +391,12 @@
             </button>
 
             <div class="ml-auto">
-                <button class="button is-link" on:click={() => (modalActivate = true)}>Show peaks</button>
+                <ButtonBadge
+                    label="Show peaks"
+                    on:click={() => (modalActivate = true)}
+                    badge={$felixPeakTable[uniqueID].length || ''}
+                />
+                <!-- <button class="button is-link" on:click={() => (modalActivate = true)}> Show peaks </button> -->
                 {#if $felixPeakTable[uniqueID].length}
                     <button
                         class="button is-danger"
