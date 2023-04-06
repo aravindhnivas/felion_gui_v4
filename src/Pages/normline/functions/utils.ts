@@ -51,7 +51,6 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
         } else {
             const [xCol, yCol] = addedFile.col.split(',').map((c) => parseInt(c))
             const file = addedFile.files.find((f) => f.includes(filename))
-            // let [xVal, y] = [[], []]
             const contents = await fs.readTextFile(file)
 
             const lines = contents
@@ -76,7 +75,6 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
                 default:
                     break
             }
-            // console.log({ final_lines })
             final_lines.forEach((l) => {
                 x.push(parseFloat(l[xCol]))
                 y.push(parseFloat(l[yCol]) * addedFile.scale)
@@ -85,22 +83,24 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
 
         const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
         const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
-
         const found_peaks = find_peaks({
             data: { x, y },
             plotID: graphDiv,
             windowWidth: felix_peak_detection.get(uniqueID).window,
             threshold: felix_peak_detection.get(uniqueID).threshold,
             color,
+            ymin: 0,
+            lineWidth: 2,
         })
+
         if (!found_peaks) return window.createToast('No peaks found', 'warning')
 
         const { indices } = found_peaks
-        if(indices.length > 50) {
-            if(!await dialog.confirm(`Found ${indices.length} peaks. Do you want to continue?`)) return
-        }
+        // if(indices.length > 50) {
+        //     if(!await dialog.confirm(`Found ${indices.length} peaks. Do you want to continue?`)) return
+        // }
         indices.forEach((i) => {
-            set_peaks({ uniqueID, x: x[i], y: y[i], color })
+            set_peaks({ uniqueID, x: x[i], y: y[i], color, add_annotation: false })
         })
 
         if (toast) {

@@ -24,6 +24,7 @@ export function NGauss_fit_func({ dataFromPython, uniqueID }) {
     console.log({ dataFromPython })
 
     const currentGraph = opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
+    if(!dataFromPython?.[normMethod.get(uniqueID)]) return
     addTraces(currentGraph, dataFromPython[normMethod.get(uniqueID)]['fitted_data'])
     fittedTraceCount.update((n) => {
         n[uniqueID] += 1

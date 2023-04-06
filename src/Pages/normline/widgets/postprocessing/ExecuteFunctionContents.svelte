@@ -224,16 +224,15 @@
                     pyfile: 'normline.multiGauss',
                     args: NGauss_fit_args,
                 }).then((dataFromPython) => {
+                    if (!dataFromPython?.[$normMethod[uniqueID]]) return
                     NGauss_fit_func({ dataFromPython, uniqueID })
-                    if (dataFromPython[$normMethod[uniqueID]]) {
-                        console.log('Line fitted')
-                        window.createToast(
-                            `Line fitted with ${
-                                dataFromPython[$normMethod[uniqueID]]['fitted_parameter'].length
-                            } gaussian function`,
-                            'success'
-                        )
-                    }
+
+                    window.createToast(
+                        `Line fitted with ${
+                            dataFromPython[$normMethod[uniqueID]]['fitted_parameter'].length
+                        } gaussian function`,
+                        'success'
+                    )
                 })
 
                 break
@@ -283,7 +282,7 @@
             label="Select file to fit"
             options={output_namelists}
             on:change={async () => {
-                await find_felix_opo_peaks({ uniqueID, toast: true, addedFile })
+                await find_felix_opo_peaks({ uniqueID, toast: false, addedFile })
             }}
         />
 

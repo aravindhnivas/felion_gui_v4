@@ -36,7 +36,7 @@ export async function loadfile(name, location) {
     return loadedfile
 }
 
-export function plotlySelection({ graphDiv, mode, uniqueID }) {
+export function plotlySelection({ graphDiv, uniqueID }) {
     const graph = document.getElementById(graphDiv)
     console.warn('Creating plotly selection events for, ', graphDiv)
 
@@ -59,9 +59,19 @@ export function plotlySelection({ graphDiv, mode, uniqueID }) {
     })
 }
 
-export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black'}) => {
+export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black', add_annotation = true}) => {
+
     const freq = x.toFixed(1)
     const amp = y.toFixed(1)
+    const currentPeaks = { freq, amp, sig: Ngauss_sigma.get(uniqueID), id: window.getID() }
+
+    felixPeakTable.update((data) => {
+        data[uniqueID] = uniqBy([...data[uniqueID], currentPeaks], 'freq')
+        return data
+    })
+
+    if(!add_annotation) return
+
     const annotation = {
         text: `(${freq}, ${amp})`,
         x,
@@ -69,6 +79,7 @@ export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black'}) => 
         font: { color },
         arrowcolor: color,
     }
+
     felixPlotAnnotations.update((data) => {
         data[uniqueID] = uniqBy([...data[uniqueID], annotation], 'text')
         return data
@@ -77,15 +88,10 @@ export const set_peaks = ({ graphDiv = null, uniqueID, x, y, color='black'}) => 
     relayout(graphDiv ?? get_graphDiv(uniqueID).graphDiv, {
         annotations: felixPlotAnnotations.get(uniqueID),
     })
-
-    const currentPeaks = { freq, amp, sig: Ngauss_sigma.get(uniqueID), id: window.getID() }
-    felixPeakTable.update((data) => {
-        data[uniqueID] = uniqBy([...data[uniqueID], currentPeaks], 'freq')
-        return data
-    })
+    
 }
 
-export function plotlyClick({ graphDiv, mode, uniqueID }: { graphDiv: string; mode: string; uniqueID: string }) {
+export function plotlyClick({ graphDiv, uniqueID }: { graphDiv: string; uniqueID: string }) {
     const graph = document.getElementById(graphDiv)
     console.warn('Creating plotly click events for, ', graphDiv)
 

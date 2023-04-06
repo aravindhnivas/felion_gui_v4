@@ -41,7 +41,18 @@ export function detectPeaks({ data, threshold, windowWidth }) {
     return peaks
 }
 
-export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, color = 'black'}) => {
+export const find_peaks = (
+    {data, plotID = null, windowWidth=4, threshold=1, color = 'black', ymin = 1, lineWidth = 1, dash = 'dashdot'}: {    
+        data: {x: number[], y: number[]},
+        plotID?: string,    
+        windowWidth?: number,   
+        threshold?: number, 
+        color?: string, 
+        ymin?: number,
+        lineWidth?: number,
+        dash?: Plotly.ShapeLine['dash'],  
+    }   
+) => {
     if(!data) return
 
     const indices = detectPeaks({
@@ -53,6 +64,7 @@ export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, col
     if (indices.length < 1) return
 
     const shapes: Partial<Plotly.Shape>[] = indices.map((i) => {
+
         const x = data.x[i]
         const y = data.y[i]
 
@@ -61,11 +73,11 @@ export const find_peaks = ({data, plotID = null, windowWidth=4, threshold=1, col
             x0: x,
             y0: y,
             x1: x,
-            y1: 1,
+            y1: ymin,
             line: {
                 color: color ?? 'black',
-                width: 1,
-                dash: 'dashdot',
+                width: lineWidth,
+                dash,
                 editable: false,
             },
         }
