@@ -297,6 +297,14 @@
                 lookFor=".dat"
                 auto_init={true}
             />
+            <button
+                class="i-material-symbols-folder-open-outline"
+                on:click={async () => {
+                    const file = await path.join(lookIn, writeFileName)
+                    console.log(file)
+                    if (await fs.exists(file)) await shell.open(file)
+                }}
+            />
         {/if}
     {/if}
     <div class="ml-auto">
