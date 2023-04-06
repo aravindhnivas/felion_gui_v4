@@ -4,6 +4,7 @@
     export let style: string = ''
     export let id: string = window.getID()
     export let label: string = 'Submit'
+    export let badge: string | number = ''
 </script>
 
 <button
@@ -17,7 +18,7 @@
     on:pyEventClosed
 >
     {label}
-    <Badge><div id="{id}_badge" class="tag is-warning is-rounded mr-2" /></Badge>
+    <Badge><div id="{id}_badge" class="tag is-warning is-rounded mr-2">{badge}</div></Badge>
     {#if label === 'Produce Figure'}
         <i class="i-logos-matplotlib-icon text-xs" />
     {/if}
