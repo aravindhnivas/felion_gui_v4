@@ -347,6 +347,10 @@
     </div>
 
     {#if toggleFindPeaksRow}
+        <span class="tag is-warning" style="width: 50rem;"
+            >Use "Find peaks" AND/OR ctrl + left-click on the plot peak area to include the peak(s) for fitting</span
+        >
+
         <div class="align">
             <Textfield
                 on:change={async () => await find_felix_opo_peaks({ uniqueID, addedFile })}
