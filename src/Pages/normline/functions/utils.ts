@@ -82,7 +82,9 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
         }
 
         const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
+
         const color = filename === 'average' ? 'black' : `rgb(${colors[fileInd]})`
+        
         const found_peaks = find_peaks({
             data: { x, y },
             plotID: graphDiv,

@@ -1,4 +1,4 @@
-import { felixPeakTable, felixIndex, felixOutputName, felixPlotAnnotations, Ngauss_sigma, get } from './svelteWritables'
+import { felixPeakTable, felixIndex, felixOutputName, felixPlotAnnotations, Ngauss_sigma, get, fitted_data, normMethod, getFileColor, getCurrentGraph } from './svelteWritables'
 import { relayout } from 'plotly.js-basic-dist'
 import { uniqBy } from 'lodash-es'
 import { fs, path } from '@tauri-apps/api'
@@ -118,4 +118,57 @@ export function plotlyClick({ graphDiv, uniqueID }: { graphDiv: string; uniqueID
             }
         }
     })
+}
+
+export function relayout_fitted_data(uniqueID) {
+    console.log({fitted_data: fitted_data.get(uniqueID)})
+
+    const current_method = normMethod.get(uniqueID)
+    const currentData = fitted_data.get(uniqueID)[current_method]
+
+    const hlines: Partial<Plotly.Shape>[] = currentData.map((d) => {
+        const freq = parseFloat(d.freq.split('±')[0])
+        const amp = parseFloat(d.amp.split('±')[0])
+        if(isNaN(freq) || isNaN(amp)) return
+        
+        return {
+            type: 'line',
+            x0: freq,
+            y0: amp,
+            x1: freq,
+            y1: 0,
+            line: {
+                color: getFileColor(uniqueID),
+                width: 2,
+                dash: "dashdot",
+                editable: false,
+            },
+        }
+    })
+
+    const vlines: Partial<Plotly.Shape>[] = currentData.map((d) => {
+        const freq = parseFloat(d.freq.split('±')[0])
+        const amp = parseFloat(d.amp.split('±')[0])
+        const fwhm = parseFloat(d.fwhm.split('±')[0])
+        if(isNaN(freq) || isNaN(amp) || isNaN(fwhm)) return
+        
+        return {
+            type: 'line',
+            x0: freq-(fwhm/2),
+            y0: amp/2,
+            x1: freq+(fwhm/2),
+            y1: amp/2,
+            line: {
+                color: getFileColor(uniqueID),
+                width: 2,
+                dash: "dashdot",
+                editable: false,
+            },
+        }
+    })
+
+    const shapes = [...hlines, ...vlines]
+    // const {shapes: prev_shapes} = document.getElementById(getCurrentGraph(uniqueID)).layout as Plotly.Layout
+    // console.log({ shapes })
+    relayout(getCurrentGraph(uniqueID), { shapes })
 }

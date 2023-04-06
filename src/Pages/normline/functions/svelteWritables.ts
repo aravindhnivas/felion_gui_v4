@@ -1,5 +1,6 @@
 import { get } from 'svelte/store'
 import { customStore } from './stores/func'
+import colors from '$src/lib/misc/colors'
 export { get }
 
 export const felixIndex = customStore([])
@@ -11,16 +12,16 @@ export const Ngauss_sigma = customStore(5)
 export interface DataTable {
     id: string
     name: string
-    freq: number
-    amp: number
-    fwhm: number
-    sig: number
+    freq: string
+    amp: string
+    fwhm: string
+    sig: string
     color: string
 }
 
 export const dataTable = customStore<DataTable[]>([])
 export const dataTable_avg = customStore<DataTable[]>([])
-export const frequencyDatas = customStore<DataTable[]>([])
+// export const frequencyDatas = customStore<DataTable[]>([])
 export const fitted_data = customStore<{ [name: string]: DataTable[] }>({})
 
 export const felixopoLocation = customStore('')
@@ -31,8 +32,16 @@ export const felix_fulldata = customStore<FELIXData>(null)
 export const OPO_fulldata = customStore<OPOData>(null)
 export const graphPlotted = customStore(false)
 
-export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton']
+export const normMethods = ['Log', 'Relative', 'IntensityPerPhoton'] as const
 export const fileChecked = customStore<string[]>([])
+export const getCurrentGraph = (uniqueID) => opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
+export const getFileColor = (uniqueID) => {
+    const filename = fileChecked.get(uniqueID).find((f) => f.includes(felixOutputName.get(uniqueID)))
+    const fileInd = fileChecked.get(uniqueID).findIndex((f) => f === filename)
+
+    const color = filename === 'averaged' ? 'black' : `rgb(${colors[fileInd]})`
+    return color
+}
 
 export const normMethod = customStore<'Log' | 'Relative' | 'IntensityPerPhoton'>('Relative')
 

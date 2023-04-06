@@ -219,7 +219,7 @@
                     normMethod: $normMethod[uniqueID],
                 }
 
-                computePy_func({
+                computePy_func<NGaussDataObjType>({
                     e,
                     pyfile: 'normline.multiGauss',
                     args: NGauss_fit_args,

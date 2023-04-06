@@ -3,11 +3,12 @@ import {
     opoMode,
     dataTable,
     dataTable_avg,
-    frequencyDatas,
+    fitted_data,
     expfittedLines,
     felixOutputName,
     fittedTraceCount,
     felixPlotAnnotations,
+    normMethod,
 } from './svelteWritables'
 
 import { relayout, addTraces } from 'plotly.js-basic-dist'
@@ -74,9 +75,10 @@ export function exp_fit_func({ dataFromPython, uniqueID }: { dataFromPython: any
         data[uniqueID] = uniqBy([...data[uniqueID], newTable], 'freq')
         return data
     })
-    frequencyDatas.update((data) => {
-        data[uniqueID] = uniqBy([...data[uniqueID], newTable], 'freq')
+
+    fitted_data.update((data) => {
+        const currentData = data[uniqueID]?.[normMethod.get(uniqueID)] ?? []
+        data[uniqueID][normMethod.get(uniqueID)] = uniqBy([...currentData, newTable], 'freq')
         return data
     })
-    console.log('Line fitted', get(frequencyDatas))
 }

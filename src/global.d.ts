@@ -1,4 +1,5 @@
 import type { ToastOptions } from 'svelte-french-toast'
+import type { normMethods } from './Pages/normline/functions/svelteWritables'
 
 const felix_opo_data_from_python = <const>['SA', 'pow', 'base', 'average', 'average_per_photon', 'average_rel']
 declare global {
@@ -72,4 +73,22 @@ declare global {
         background_pressure: string | number
         calibration_factor: string | number
     }
+
+    interface NGaussDataType {
+        fitted_data: {
+            x: number[] 
+            y: number[]
+            line: {color: string}
+            mode: 'lines'
+            name: string
+        }[]
+        fitted_parameter: {
+            freq: number
+            amp: number 
+            fwhm: number    
+            sig: number
+        }[]
+        for_weighted_error: string[]
+    }
+    type NGaussDataObjType = Record<typeof normMethods[number], NGaussDataType>
 }
