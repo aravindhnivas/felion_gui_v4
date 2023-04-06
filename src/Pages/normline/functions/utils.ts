@@ -43,7 +43,7 @@ export const find_felix_opo_peaks = async ({ uniqueID, toast = false, addedFile 
         let x: number[] = []
         let y: number[] = []
 
-        if (filename.endsWith('felix')) {
+        if (filename.endsWith('felix') || filename === 'average') {
             const { key } = plotlayout[normMethod.get(uniqueID)]
             const data = get_fulldata(uniqueID)[key][filename] as { x: number[]; y: number[] }
             if (!data) return window.createToast('No data available to find peaks', 'danger')
