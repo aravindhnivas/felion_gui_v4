@@ -21,10 +21,9 @@ function getTable(data, name, color) {
 }
 
 export function NGauss_fit_func({ dataFromPython, uniqueID }) {
-    console.log({ dataFromPython })
-
-    const currentGraph = opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
     if(!dataFromPython?.[normMethod.get(uniqueID)]) return
+    console.log({ dataFromPython })
+    const currentGraph = opoMode.get(uniqueID) ? `${uniqueID}-opoRelPlot` : `${uniqueID}-avgplot`
     addTraces(currentGraph, dataFromPython[normMethod.get(uniqueID)]['fitted_data'])
     fittedTraceCount.update((n) => {
         n[uniqueID] += 1
