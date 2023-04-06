@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 4.11.2
+
+- Minor changes in multi-Gaussian fit
+- Segment buttons style update
+- other minor changes and bug fixes
+
 ## 4.11.1
 
 - Multi Gaussian fit bug fix
