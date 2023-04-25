@@ -62,6 +62,6 @@
     "unplugin-auto-import": "^0.15.2",
     "vite": "^4.2.1",
     "winbox": "^0.2.6",
-    "yaml": "^2.2.1"
+    "yaml": "^2.2.2"
   }
 }
