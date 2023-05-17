@@ -3,8 +3,8 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { join } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
-import { presetIcons, presetAttributify, presetUno, extractorSvelte } from 'unocss'
-
+import { presetIcons, presetAttributify, presetUno } from 'unocss'
+import extractorSvelte from '@unocss/extractor-svelte'
 const PACKAGE_ROOT = __dirname
 
 export default defineConfig({

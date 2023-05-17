@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "feliongui",
-    "version": "4.11.2"
+    "version": "4.11.3"
   },
   "tauri": {
     "allowlist": {
@@ -148,7 +148,11 @@
         "resources/**/*"
       ],
       "shortDescription": "",
-      "targets": "all",
+      "targets": [
+        "appimage",
+        "nsis",
+        "dmg"
+      ],
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
@@ -167,7 +171,10 @@
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJERkFCNEYzNDExRjYyRTIKUldUaVloOUI4N1Q2dmVqZDVwUEVjYytMa1VUZEVlUVhsN1ZLdlFISjM4Wkp5Y1pYcGtVdHd2cGwK",
       "windows": {
-        "installMode": "passive"
+        "installMode": "passive",
+        "installerArgs": [
+          "/S"
+        ]
       }
     },
     "windows": [
