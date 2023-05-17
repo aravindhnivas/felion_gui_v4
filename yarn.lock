@@ -3388,7 +3388,7 @@ svelte@^3.59.1:
 
 "tauri-plugin-sql-api@https://github.com/tauri-apps/tauri-plugin-sql":
   version "0.0.0"
-  resolved "https://github.com/tauri-apps/tauri-plugin-sql#b945c7a74ed207771420f7f0809d20ba66d55f70"
+  resolved "https://github.com/tauri-apps/tauri-plugin-sql#312c4d39ac5eb1c6c75e8ecee1c4bc89ed799675"
   dependencies:
     "@tauri-apps/api" "^1.2.0"
 
