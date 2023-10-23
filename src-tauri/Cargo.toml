@@ -9,12 +9,12 @@ edition = "2021"
 rust-version = "1.68"
 
 [build-dependencies]
-tauri-build = {version = "1.2", features = [] }
+tauri-build = {version = "1.5.0", features = [] }
 
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = {version = "1.2.4", features = ["dialog-all", "fs-all", "os-all", "path-all", "process-relaunch", "shell-all", "updater", "window-close"] }
+tauri = {version = "1.5.2", features = ["dialog-all", "fs-all", "os-all", "path-all", "process-relaunch", "shell-all", "updater", "window-close"] }
 portpicker = "0.1.1"
 tauri-plugin-window-state = "0.1"
 reqwest = { version = "0.11", features = ["json", "stream"] }
